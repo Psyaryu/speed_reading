@@ -147,6 +147,32 @@ Notes: Added GoRouter route definitions for onboarding, dashboard, library, read
 
 Goal: Establish the local data model that supports passages, sessions, quizzes, scoring, imported text, and progress history.
 
+### Epic 1.0: Core Utilities
+
+Status: Done
+
+Tasks:
+
+- Implement word-count utility with unit tests.
+
+Acceptance criteria:
+
+- Plain words are counted.
+- Common contractions and hyphenated words are counted as single words.
+- Punctuation and whitespace do not inflate counts.
+
+Completed task log:
+
+```text
+Task: Implement word-count utility
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/core/utils/word_counter.dart, test/word_counter_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added focused unit tests for plain words, contractions, hyphenated words, punctuation, whitespace, and empty text.
+Commit: See Git history for `feat: add word-count utility`
+Notes: Word counting uses a shared regex utility so WPM calculations can use one consistent count.
+```
+
 ### Epic 1.1: Core Domain Models
 
 Status: Done
