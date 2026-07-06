@@ -222,6 +222,8 @@ Notes: Used manual immutable Dart models with JSON helpers instead of generated 
 
 ### Epic 1.2: Local Persistence
 
+Status: In Progress
+
 Tasks:
 
 - Implement local database schema.
@@ -246,6 +248,18 @@ Acceptance criteria:
 Dependencies:
 
 - Domain models complete.
+
+Completed task log:
+
+```text
+Task: Add local progress export formatter
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/settings/domain/progress_exporter.dart, test/progress_exporter_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for JSON export structure and session CSV output.
+Commit: See Git history for `feat: add progress export formatter`
+Notes: Database persistence and file writing remain open. This formatter supports future JSON/CSV export flows.
+```
 
 ### Epic 1.3: Local User Profile
 
