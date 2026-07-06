@@ -933,6 +933,8 @@ Dependencies:
 
 ### Epic 8.3: Shareable Progress Summary
 
+Status: In Progress
+
 Tasks:
 
 - Create local progress summary card.
@@ -950,6 +952,18 @@ Dependencies:
 
 - Dashboard metrics.
 - Platform sharing package.
+
+Completed task log:
+
+```text
+Task: Add shareable progress summary model
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/progress/domain/shareable_progress_summary.dart, test/shareable_progress_summary_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for summary formatting and excluding passage text.
+Commit: See Git history for `feat: add shareable progress summary`
+Notes: UI card and platform share sheet integration remain open.
+```
 
 ## Milestone 9: Settings, Accessibility, Privacy, and Reliability
 
