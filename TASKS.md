@@ -110,6 +110,8 @@ Follow-up tasks:
 
 ### Epic 0.2: App Architecture Skeleton
 
+Status: Done
+
 Tasks:
 
 - Create module folders: `core`, `reading`, `training`, `assessment`, `progress`, `content`, `settings`.
@@ -128,6 +130,18 @@ Dependencies:
 
 - Flutter project setup.
 - State management and routing package selected.
+
+Completed task log:
+
+```text
+Task: Add app architecture route and theme skeleton
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/main.dart, lib/core/router/app_router.dart, lib/core/theme/app_theme.dart, lib/core/widgets/placeholder_page.dart, lib/assessment/presentation/quiz_screen.dart, lib/assessment/presentation/results_screen.dart, lib/content/presentation/library_screen.dart, lib/progress/presentation/progress_screen.dart, lib/reading/presentation/reader_screen.dart, lib/settings/presentation/settings_screen.dart, lib/training/presentation/dashboard_screen.dart, lib/training/presentation/onboarding_screen.dart, TASKS.md
+Verification: Could not run flutter analyze or flutter test because Flutter is not installed or not on PATH. Manual file review completed.
+Commit: See Git history for `chore: add app architecture skeleton`
+Notes: Added GoRouter route definitions for onboarding, dashboard, library, reader, quiz, results, progress, and settings. Added app theme helper and shared placeholder page.
+```
 
 ## Milestone 1: Domain Model and Local Data
 
