@@ -787,6 +787,16 @@ Commit: See Git history for `feat: add delayed recall reminder copy`
 Notes: Copy is intentionally provocative and playful. Platform scheduling remains open.
 ```
 
+```text
+Task: Add delayed recall reminder scheduling contract
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/progress/domain/delayed_recall_reminder.dart, test/delayed_recall_reminder_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added test for 24-hour delayed recall due-time calculation.
+Commit: See Git history for `feat: add delayed recall reminder contract`
+Notes: Platform implementation using local notifications remains open.
+```
+
 ## Milestone 7: Training Curriculum and Adaptive Plan
 
 Goal: Deliver structured daily practice that teaches the major speed-reading skills.
