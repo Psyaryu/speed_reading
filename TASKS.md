@@ -435,6 +435,8 @@ Goal: Build the core reading experience for manual, paced, and RSVP modes.
 
 ### Epic 4.1: Manual Reading Mode
 
+Status: In Progress
+
 Tasks:
 
 - Render passage text in a distraction-light interface.
@@ -454,6 +456,18 @@ Dependencies:
 
 - Passage model.
 - Settings model.
+
+Completed task log:
+
+```text
+Task: Add reading session factory
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/reading/domain/reading_session_factory.dart, test/reading_session_factory_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for paused-time exclusion and interrupted session status.
+Commit: See Git history for `feat: add reading session factory`
+Notes: Manual reading UI remains open. This domain factory supports WPM calculation from active reading time.
+```
 
 ### Epic 4.2: Paced Reading Mode
 
