@@ -263,6 +263,8 @@ Goal: Provide official public-domain long-form reading content and local pasted 
 
 ### Epic 2.1: Official Passage Library
 
+Status: In Progress
+
 Tasks:
 
 - Select initial adventurous public-domain fiction source texts.
@@ -287,6 +289,22 @@ Dependencies:
 Question:
 
 - Should official passages be bundled as JSON assets, SQLite seed data, or generated Dart assets?
+
+Resolved decision:
+
+- Official passages start as JSON assets so content can be reviewed and edited without code generation.
+
+Completed task log:
+
+```text
+Task: Add starter official passage asset format
+Status: Done
+Completed: 2026-07-06
+Changed files: assets/passages/official_passages.json, lib/content/data/official_passage_loader.dart, test/official_passage_loader_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added parser tests for official passage metadata and tag structure.
+Commit: See Git history for `feat: add official passage asset loader`
+Notes: Added a starter public-domain adventure fiction passage from Treasure Island with filterable tags. The library UI and larger passage set remain open.
+```
 
 ### Epic 2.2: Paste-and-Save Imported Text
 

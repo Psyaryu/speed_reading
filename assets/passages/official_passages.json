@@ -1,0 +1,23 @@
+[
+  {
+    "id": "treasure-island-001",
+    "title": "The Old Sea-Dog at the Admiral Benbow",
+    "body": "Squire Trelawney, Dr. Livesey, and the rest of these gentlemen having asked me to write down the whole particulars about Treasure Island, from the beginning to the end, keeping nothing back but the bearings of the island, and that only because there is still treasure not yet lifted, I take up my pen in the year of grace 17-- and go back to the time when my father kept the Admiral Benbow inn and the brown old seaman with the sabre cut first took up his lodging under our roof.",
+    "metadata": {
+      "wordCount": 92,
+      "difficulty": "standard",
+      "topic": "Adventure",
+      "source": "official",
+      "license": "Public Domain",
+      "type": "fiction",
+      "vocabularyDensity": 0.24,
+      "tags": ["adventure", "pirates", "treasure", "classic", "danger"],
+      "isCertificationEligible": false,
+      "isMasteryEligible": false,
+      "gradeLevel": 8.0,
+      "author": "Robert Louis Stevenson",
+      "sourceUrl": "https://www.gutenberg.org/ebooks/120"
+    }
+  }
+]
+
