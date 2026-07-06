@@ -838,6 +838,8 @@ Dependencies:
 
 ### Epic 7.3: Adaptive Recommendation Engine
 
+Status: In Progress
+
 Tasks:
 
 - Recommend drills based on weak skills.
@@ -857,6 +859,18 @@ Dependencies:
 
 - Progress history.
 - Skill metrics.
+
+Completed task log:
+
+```text
+Task: Add adaptive training recommendation rules
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/training/domain/training_recommendation.dart, test/training_recommendation_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for comprehension-first behavior, RSVP transfer, scanning weakness, and WPM plateau recommendations.
+Commit: See Git history for `feat: add training recommendation rules`
+Notes: Recommendation inputs are domain-level for now. Wiring to persisted progress history remains open.
+```
 
 ## Milestone 8: Dashboard and Analytics
 
