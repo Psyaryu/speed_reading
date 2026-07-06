@@ -34,7 +34,7 @@ Status: Todo
 Completed:
 Changed files:
 Verification:
-Commit:
+Commit: See Git history for `chore: add initial Flutter project skeleton`
 Notes:
 ```
 
@@ -61,6 +61,8 @@ Goal: Create the Flutter project, baseline architecture, local tooling, and init
 
 ### Epic 0.1: Flutter Project Setup
 
+Status: In Progress
+
 Tasks:
 
 - Scaffold Flutter app in the repo.
@@ -84,6 +86,27 @@ Dependencies:
 
 - Flutter SDK installed locally.
 - Package choices finalized.
+
+Completed task log:
+
+```text
+Task: Add initial Flutter project skeleton
+Status: Done
+Completed: 2026-07-06
+Changed files: .gitignore, README.md, analysis_options.yaml, pubspec.yaml, lib/main.dart, test/widget_test.dart, assets/passages/.gitkeep, lib/*/.gitkeep, android/.gitkeep, ios/.gitkeep, windows/.gitkeep, TASKS.md
+Verification: Could not run flutter analyze or flutter test because Flutter is not installed or not on PATH in this environment. Manual file review completed.
+Commit:
+Notes: Added manual Flutter project metadata, dependency declarations, placeholder dashboard, starter widget test, module folders, asset folder, and platform placeholder directories. Generated platform files still need to be produced with flutter create once the Flutter SDK is available.
+```
+
+Follow-up tasks:
+
+- Status: Blocked
+  Task: Run `flutter create . --platforms=windows,android,ios` or equivalent to generate full platform scaffolding.
+  Blocker: Flutter SDK is not installed or not on PATH.
+- Status: Blocked
+  Task: Run `flutter pub get`, `flutter analyze`, and `flutter test`.
+  Blocker: Flutter SDK is not installed or not on PATH.
 
 ### Epic 0.2: App Architecture Skeleton
 
