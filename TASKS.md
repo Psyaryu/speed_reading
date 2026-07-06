@@ -239,6 +239,8 @@ Dependencies:
 
 ### Epic 1.3: Local User Profile
 
+Status: In Progress
+
 Tasks:
 
 - Create local profile model.
@@ -256,6 +258,18 @@ Acceptance criteria:
 Dependencies:
 
 - Local persistence.
+
+Completed task log:
+
+```text
+Task: Add local user profile model
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/settings/domain/local_user_profile.dart, test/local_user_profile_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for initial local profile defaults and profile serialization.
+Commit: See Git history for `feat: add local user profile model`
+Notes: Persistence wiring remains open under local persistence.
+```
 
 ## Milestone 2: Content Library
 
