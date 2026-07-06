@@ -320,6 +320,16 @@ Commit: See Git history for `feat: add official passage asset loader`
 Notes: Added a starter public-domain adventure fiction passage from Treasure Island with filterable tags. The library UI and larger passage set remain open.
 ```
 
+```text
+Task: Add passage filtering service
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/content/domain/passage_filter.dart, test/passage_filter_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for tag, query, source, and difficulty filtering.
+Commit: See Git history for `feat: add passage filtering service`
+Notes: Filtering supports query, difficulty, topic, source, and all-selected-tags matching for future library UI.
+```
+
 ### Epic 2.2: Paste-and-Save Imported Text
 
 Tasks:
