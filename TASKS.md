@@ -655,6 +655,16 @@ Commit: See Git history for `feat: add mastery rules`
 Notes: Local notification scheduling remains open under this epic.
 ```
 
+```text
+Task: Add delayed recall reminder copy
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/progress/domain/delayed_recall_reminder_copy.dart, test/delayed_recall_reminder_copy_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for stable attempt-based copy selection and basic banned-term guardrails.
+Commit: See Git history for `feat: add delayed recall reminder copy`
+Notes: Copy is intentionally provocative and playful. Platform scheduling remains open.
+```
+
 ## Milestone 7: Training Curriculum and Adaptive Plan
 
 Goal: Deliver structured daily practice that teaches the major speed-reading skills.
