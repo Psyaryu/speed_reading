@@ -149,6 +149,8 @@ Goal: Establish the local data model that supports passages, sessions, quizzes, 
 
 ### Epic 1.1: Core Domain Models
 
+Status: Done
+
 Tasks:
 
 - Define `Passage` model.
@@ -169,6 +171,18 @@ Acceptance criteria:
 Dependencies:
 
 - Persistence package selected.
+
+Completed task log:
+
+```text
+Task: Define core domain models
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/core/domain/reading_enums.dart, lib/content/domain/passage.dart, lib/assessment/domain/quiz.dart, lib/reading/domain/reading_session.dart, lib/progress/domain/progress_snapshot.dart, lib/progress/domain/certification_attempt.dart, test/domain_models_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added serialization and calculated-field tests for passage, reading session, and quiz result models.
+Commit: See Git history for `feat: define core domain models`
+Notes: Used manual immutable Dart models with JSON helpers instead of generated Freezed files so the code remains inspectable before build_runner is available.
+```
 
 ### Epic 1.2: Local Persistence
 
