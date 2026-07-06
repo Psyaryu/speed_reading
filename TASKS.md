@@ -502,6 +502,8 @@ Dependencies:
 
 ### Epic 5.2: Official Passage Question Sets
 
+Status: In Progress
+
 Tasks:
 
 - Create comprehension questions for each official MVP passage.
@@ -523,6 +525,18 @@ Dependencies:
 Question:
 
 - Should written summaries be self-scored in MVP or deferred?
+
+Completed task log:
+
+```text
+Task: Add length-scaled question count policy
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/assessment/domain/question_count_policy.dart, test/question_count_policy_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for empty, short, certification-length, long, and very long passages.
+Commit: See Git history for `feat: add question count policy`
+Notes: Policy starts at 5 questions for short passages, 10 for 600+ words, 15 for 1200+ words, and 20 for 2400+ words.
+```
 
 ## Milestone 6: Scoring, Progression, Certification, and Mastery
 
