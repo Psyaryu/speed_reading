@@ -546,6 +546,8 @@ Notes: Below-60% comprehension receives a 50% multiplier penalty before other ER
 
 ### Epic 6.2: Readiness Rating and Levels
 
+Status: Done
+
 Tasks:
 
 - Implement qualified attempt rules.
@@ -565,6 +567,18 @@ Dependencies:
 
 - ERS calculation.
 - Session interruption tracking.
+
+Completed task log:
+
+```text
+Task: Implement readiness and level calculation
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/progress/domain/progression.dart, test/progression_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added unit tests for qualified-attempt gates, readiness capping, and level thresholds.
+Commit: See Git history for `feat: add readiness and level progression`
+Notes: Qualified attempts require at least 70% comprehension, at least 600 words, standard-or-higher difficulty, qualified status, and no excessive pausing.
+```
 
 ### Epic 6.3: Certification
 
