@@ -7,15 +7,44 @@ These instructions define how Codex should coordinate primary and subagent work 
 The primary agent is the coordinator for each task. It is responsible for:
 
 - Reading [PRD.md](./PRD.md) before product or implementation work.
+- Reading [TASKS.md](./TASKS.md) before implementation work.
 - Maintaining product, architecture, and UX coherence.
 - Creating the plan for the current task.
 - Deciding which work should stay local and which work can be delegated.
 - Assigning subagents narrow, independent scopes.
 - Reviewing and integrating subagent outputs.
+- Updating [TASKS.md](./TASKS.md) when task status changes.
 - Protecting user changes and avoiding unrelated refactors.
 - Verifying the final result before reporting completion.
 
 The primary agent should keep blocking decisions and tightly coupled implementation work local. Subagents should be used for bounded side work, independent implementation slices, review passes, or PRD breakdowns.
+
+## Task Ledger
+
+[TASKS.md](./TASKS.md) is the live task ledger for this project. Agents must keep it current.
+
+Before implementation:
+
+- Read [TASKS.md](./TASKS.md).
+- Identify the milestone, epic, and task being worked.
+- If the task is not listed, add it before or during implementation in the correct milestone.
+- Mark active work as `In Progress` when useful for multi-step work.
+
+After implementation:
+
+- Mark completed work as `Done`.
+- Add the completion date.
+- Summarize what changed.
+- Record verification performed.
+- Add follow-up tasks for incomplete work, known limitations, or deferred scope.
+- Keep `TASKS.md` focused on remaining work; completed work should be concise and not obscure active tasks.
+
+When using subagents:
+
+- Give each worker an explicit task ID or milestone/epic scope from [TASKS.md](./TASKS.md).
+- Workers should report completed tasks and changed files.
+- The primary agent updates [TASKS.md](./TASKS.md) after reviewing and integrating worker results.
+- Reviewers should check that [TASKS.md](./TASKS.md) matches the actual implementation state.
 
 ## Subagent Roles
 
@@ -42,6 +71,7 @@ Use for product and implementation planning:
 - Identify dependencies and sequencing.
 - Separate MVP work from later enhancements.
 - Convert broad requirements into implementation-ready tickets.
+- Maintain [TASKS.md](./TASKS.md) as the source of remaining work.
 - Flag open product questions and acceptance criteria gaps.
 
 Planner agents should not change source code unless explicitly asked.
@@ -51,10 +81,12 @@ Planner agents should not change source code unless explicitly asked.
 Use for bounded implementation:
 
 - Own a specific module, feature, or file set.
+- Start by reading the assigned task in [TASKS.md](./TASKS.md).
 - Make direct edits only inside the assigned scope.
 - Avoid unrelated refactors.
 - Do not revert edits made by others.
 - Report changed files and verification performed.
+- Report task status changes needed in [TASKS.md](./TASKS.md).
 
 Workers should assume they are not alone in the codebase and should accommodate concurrent changes.
 
@@ -64,6 +96,7 @@ Use for review-style passes:
 
 - Find bugs, regressions, missing tests, and product mismatches.
 - Check implementation against [PRD.md](./PRD.md).
+- Check implementation and status against [TASKS.md](./TASKS.md).
 - Prioritize findings by severity.
 - Provide file and line references when possible.
 
@@ -103,4 +136,3 @@ For bug fixing:
 - Explorer: inspect related code paths or logs.
 - Worker: implement the smallest scoped fix.
 - Reviewer: check for regressions and missing tests.
-
