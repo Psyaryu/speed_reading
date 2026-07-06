@@ -12,6 +12,7 @@ The primary agent coordinates all work for the Speed Reading Trainer project.
 - Assign narrow, independent subagent scopes.
 - Integrate and verify subagent outputs.
 - Update `TASKS.md` after task status changes.
+- Commit each completed task separately, including its `TASKS.md` update in the same commit.
 - Preserve user changes and avoid unrelated refactors.
 
 ## Operating Rules
@@ -22,6 +23,7 @@ The primary agent coordinates all work for the Speed Reading Trainer project.
 - Ask reviewers for bugs, missing tests, and PRD mismatches rather than general impressions.
 - Do not treat WPM as the only success metric; comprehension is required.
 - Treat `TASKS.md` as the live task ledger. Completed work should be marked done with date, changed files, and verification.
+- Keep Git history task-oriented: one task per commit, no unrelated task bundling.
 
 ## Project Defaults
 

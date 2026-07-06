@@ -38,12 +38,17 @@ After implementation:
 - Record verification performed.
 - Add follow-up tasks for incomplete work, known limitations, or deferred scope.
 - Keep `TASKS.md` focused on remaining work; completed work should be concise and not obscure active tasks.
+- Commit each completed task separately in Git.
+- Include the corresponding `TASKS.md` status update in the same commit as the task implementation.
+- Do not combine unrelated tasks in one commit.
+- If one task must be split across multiple commits, document the split in `TASKS.md`.
 
 When using subagents:
 
 - Give each worker an explicit task ID or milestone/epic scope from [TASKS.md](./TASKS.md).
 - Workers should report completed tasks and changed files.
 - The primary agent updates [TASKS.md](./TASKS.md) after reviewing and integrating worker results.
+- The primary agent is responsible for final commit boundaries unless the user explicitly asks workers to commit.
 - Reviewers should check that [TASKS.md](./TASKS.md) matches the actual implementation state.
 
 ## Subagent Roles
@@ -87,6 +92,7 @@ Use for bounded implementation:
 - Do not revert edits made by others.
 - Report changed files and verification performed.
 - Report task status changes needed in [TASKS.md](./TASKS.md).
+- Keep changes scoped so each assigned task can become its own commit.
 
 Workers should assume they are not alone in the codebase and should accommodate concurrent changes.
 
@@ -97,6 +103,7 @@ Use for review-style passes:
 - Find bugs, regressions, missing tests, and product mismatches.
 - Check implementation against [PRD.md](./PRD.md).
 - Check implementation and status against [TASKS.md](./TASKS.md).
+- Check that commit boundaries match task boundaries when reviewing committed work.
 - Prioritize findings by severity.
 - Provide file and line references when possible.
 

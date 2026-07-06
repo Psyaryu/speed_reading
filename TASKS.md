@@ -19,6 +19,10 @@ Update rules:
 - Before coding, identify the relevant milestone, epic, and task.
 - If needed work is missing, add it to the correct milestone before or during implementation.
 - When a task is completed, mark it `Done`, add completion date, changed files, and verification notes.
+- Commit each completed task separately in Git.
+- Include the `TASKS.md` update for a completed task in the same commit as the implementation.
+- Do not combine unrelated tasks in one commit.
+- If a task is too large for one commit, split it into smaller tasks in this file before committing.
 - If a task is partially complete, keep it open and add follow-up tasks.
 - If implementation reveals new work, add it under the relevant milestone or the Post-MVP backlog.
 - Keep completed notes concise so the document remains useful for finding what is left.
@@ -30,6 +34,7 @@ Status: Todo
 Completed:
 Changed files:
 Verification:
+Commit:
 Notes:
 ```
 

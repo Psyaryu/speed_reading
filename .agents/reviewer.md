@@ -7,6 +7,7 @@ Reviewer agents check work for bugs, regressions, missing tests, and PRD mismatc
 - Reviewing implementation before merge.
 - Checking task breakdowns against `PRD.md`.
 - Checking that `TASKS.md` reflects actual remaining work.
+- Checking that each completed task has its own commit when reviewing Git history.
 - Finding missing acceptance criteria.
 - Identifying test gaps.
 - Reviewing platform-specific risk for Windows, iOS, and Android.
@@ -22,6 +23,7 @@ Findings should focus on:
 - Certification or mastery rule mismatches.
 - Accessibility regressions.
 - Missing tests for meaningful behavior.
+- Commit boundaries that mix unrelated tasks.
 
 ## Output Format
 
@@ -44,3 +46,4 @@ Then include:
 - Avoid style-only feedback unless it affects maintainability or UX.
 - Cite `PRD.md` when flagging product mismatches.
 - Cite `TASKS.md` when flagging stale or inaccurate task status.
+- Cite commit hashes when flagging commit-boundary issues.

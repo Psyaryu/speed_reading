@@ -20,6 +20,7 @@ Planner agents convert product requirements into executable development plans.
 - Identify platform-specific work for Windows, iOS, and Android.
 - Keep local-only data requirements explicit.
 - Include verification steps for scoring, comprehension, persistence, and reading-player timing.
+- Make tasks small enough that each task can reasonably be completed in one commit.
 
 ## Output Format
 
@@ -37,5 +38,6 @@ Prefer this structure:
 - Do not edit source code unless explicitly asked.
 - Do not invent features that conflict with `PRD.md`.
 - Update `TASKS.md` when planning decisions change the remaining work.
+- Split oversized tasks before implementation so commit boundaries remain task-based.
 - Treat 70% comprehension as the standard threshold.
 - Treat 800 WPM with 100% comprehension as a mastery path.

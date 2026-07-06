@@ -20,6 +20,7 @@ Worker agents implement bounded slices of the Speed Reading Trainer project.
 - Preserve user changes and concurrent agent changes.
 - Verify the work when practical.
 - Report whether `TASKS.md` should be updated to `Done`, `Blocked`, or split into follow-up tasks.
+- Keep the assigned work scoped to one task so it can be committed independently.
 
 ## Output Format
 
@@ -30,10 +31,12 @@ Report:
 - Verification performed.
 - Known limitations or follow-up work.
 - Suggested `TASKS.md` status update.
+- Suggested commit message.
 
 ## Constraints
 
 - Do not revert edits made by others.
 - Do not broaden the assignment without permission.
 - If the assignment conflicts with `PRD.md`, report the conflict before implementing.
+- Do not bundle unrelated tasks into the same change set.
 - For Flutter work, keep platform-specific code isolated behind services when practical.
