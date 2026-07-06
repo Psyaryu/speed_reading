@@ -582,6 +582,8 @@ Notes: Qualified attempts require at least 70% comprehension, at least 600 words
 
 ### Epic 6.3: Certification
 
+Status: Done
+
 Tasks:
 
 - Implement standard 800 WPM certification rules.
@@ -600,6 +602,18 @@ Dependencies:
 
 - Official passage eligibility.
 - Qualified attempt logic.
+
+Completed task log:
+
+```text
+Task: Implement standard certification rules
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/progress/domain/certification_rules.dart, test/certification_rules_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for three-passage certification, non-RSVP requirement, imported passage rejection, WPM threshold, and comprehension threshold.
+Commit: See Git history for `feat: add certification rules`
+Notes: Certification logic currently follows the PRD standard-certification rule: official non-fiction, standard-or-higher difficulty, 800+ WPM, 70%+ comprehension, and at least one non-RSVP attempt.
+```
 
 ### Epic 6.4: Mastery
 
