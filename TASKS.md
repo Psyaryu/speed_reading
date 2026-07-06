@@ -512,6 +512,8 @@ Goal: Implement the product's core measurement system.
 
 ### Epic 6.1: Effective Reading Score
 
+Status: Done
+
 Tasks:
 
 - Implement ERS formula.
@@ -529,6 +531,18 @@ Acceptance criteria:
 Dependencies:
 
 - Session and quiz results.
+
+Completed task log:
+
+```text
+Task: Implement Effective Reading Score calculator
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/progress/domain/effective_reading_score.dart, test/effective_reading_score_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added unit tests for the PRD example, below-60 penalty, 60% threshold, multipliers, and comprehension clamping.
+Commit: See Git history for `feat: add effective reading score calculator`
+Notes: Below-60% comprehension receives a 50% multiplier penalty before other ERS multipliers are applied.
+```
 
 ### Epic 6.2: Readiness Rating and Levels
 
