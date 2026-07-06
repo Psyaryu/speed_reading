@@ -2,6 +2,37 @@
 
 This document breaks [PRD.md](./PRD.md) into milestones, epics, implementation tasks, dependencies, acceptance criteria, and open questions.
 
+## Task Ledger Rules
+
+`TASKS.md` is the source of truth for remaining project work. It must be updated whenever implementation changes the state of a task.
+
+Status values:
+
+- `Todo`: Not started.
+- `In Progress`: Actively being worked.
+- `Blocked`: Cannot continue without a decision, dependency, or external setup.
+- `Done`: Implemented and verified.
+- `Deferred`: Intentionally moved out of current scope.
+
+Update rules:
+
+- Before coding, identify the relevant milestone, epic, and task.
+- If needed work is missing, add it to the correct milestone before or during implementation.
+- When a task is completed, mark it `Done`, add completion date, changed files, and verification notes.
+- If a task is partially complete, keep it open and add follow-up tasks.
+- If implementation reveals new work, add it under the relevant milestone or the Post-MVP backlog.
+- Keep completed notes concise so the document remains useful for finding what is left.
+
+Suggested task annotation:
+
+```text
+Status: Todo
+Completed:
+Changed files:
+Verification:
+Notes:
+```
+
 ## Planning Assumptions
 
 - MVP is a Flutter app targeting Windows, iOS, and Android.

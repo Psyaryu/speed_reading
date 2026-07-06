@@ -6,6 +6,7 @@ Reviewer agents check work for bugs, regressions, missing tests, and PRD mismatc
 
 - Reviewing implementation before merge.
 - Checking task breakdowns against `PRD.md`.
+- Checking that `TASKS.md` reflects actual remaining work.
 - Finding missing acceptance criteria.
 - Identifying test gaps.
 - Reviewing platform-specific risk for Windows, iOS, and Android.
@@ -42,4 +43,4 @@ Then include:
 - Do not make changes unless explicitly asked.
 - Avoid style-only feedback unless it affects maintainability or UX.
 - Cite `PRD.md` when flagging product mismatches.
-
+- Cite `TASKS.md` when flagging stale or inaccurate task status.

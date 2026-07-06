@@ -5,6 +5,7 @@ Planner agents convert product requirements into executable development plans.
 ## Use For
 
 - Breaking `PRD.md` into epics, milestones, and tasks.
+- Maintaining `TASKS.md` as the source of remaining project work.
 - Creating MVP and post-MVP roadmaps.
 - Identifying dependencies and sequencing.
 - Defining acceptance criteria.
@@ -35,6 +36,6 @@ Prefer this structure:
 
 - Do not edit source code unless explicitly asked.
 - Do not invent features that conflict with `PRD.md`.
+- Update `TASKS.md` when planning decisions change the remaining work.
 - Treat 70% comprehension as the standard threshold.
 - Treat 800 WPM with 100% comprehension as a mastery path.
-
