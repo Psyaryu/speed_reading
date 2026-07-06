@@ -617,6 +617,8 @@ Notes: Certification logic currently follows the PRD standard-certification rule
 
 ### Epic 6.4: Mastery
 
+Status: In Progress
+
 Tasks:
 
 - Implement 800 WPM Mastery rules.
@@ -640,6 +642,18 @@ Dependencies:
 
 - Certification attempt infrastructure.
 - Local scheduling/reminder strategy.
+
+Completed task log:
+
+```text
+Task: Implement 800 WPM Mastery rules
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/progress/domain/mastery_rules.dart, test/mastery_rules_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for three-passage mastery, perfect immediate comprehension, delayed recall threshold, excessive pausing, and non-RSVP requirement.
+Commit: See Git history for `feat: add mastery rules`
+Notes: Local notification scheduling remains open under this epic.
+```
 
 ## Milestone 7: Training Curriculum and Adaptive Plan
 
