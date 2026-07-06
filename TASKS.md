@@ -527,6 +527,8 @@ Goal: Measure comprehension reliably enough to gate progression and certificatio
 
 ### Epic 5.1: Quiz Engine
 
+Status: In Progress
+
 Tasks:
 
 - Support multiple-choice questions.
@@ -547,6 +549,18 @@ Dependencies:
 
 - Passage and quiz models.
 - Local persistence.
+
+Completed task log:
+
+```text
+Task: Add quiz scoring engine
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/assessment/domain/quiz_scorer.dart, test/quiz_scorer_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for scoring selected answers and treating missing answers as incorrect.
+Commit: See Git history for `feat: add quiz scoring engine`
+Notes: UI rendering and written-summary handling remain open.
+```
 
 ### Epic 5.2: Official Passage Question Sets
 
