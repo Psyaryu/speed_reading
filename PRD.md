@@ -299,6 +299,7 @@ Requirements:
 - Detail recall questions.
 - Inference questions.
 - Vocabulary-in-context questions.
+- Question count should scale with passage length so longer passages receive broader comprehension coverage.
 - Optional written summary for longer passages.
 
 ### 8.6 Analytics
@@ -319,9 +320,10 @@ Requirements:
 
 - Built-in reading packs by difficulty and topic.
 - Short, medium, and public-domain long-form passages in the first release.
+- Initial official content should focus on adventurous public-domain fiction.
 - Public domain or licensed text only.
 - Official bundled passages should be used for certified and mastery attempts.
-- Metadata for word count, grade level, topic, vocabulary density, and estimated difficulty.
+- Metadata for word count, grade level, topic, vocabulary density, estimated difficulty, and filterable tags.
 
 ### 8.8 User-Imported Text
 
@@ -383,7 +385,7 @@ Requirements:
 
 - Core training should work offline.
 - Built-in reading packs should be bundled.
-- Progress should sync later if cloud sync is added.
+- Delayed recall reminders should use local notifications.
 
 ## 10. Non-Functional Requirements
 
@@ -414,9 +416,9 @@ Recommended stack:
 
 - Flutter stable channel
 - Dart
-- Riverpod or Bloc for state management
+- Riverpod for state management
 - GoRouter for navigation
-- Drift, Isar, or SQLite for local persistence
+- Drift with SQLite for local persistence
 - Freezed and json_serializable for typed models
 - FL Chart or equivalent for analytics
 
@@ -500,8 +502,13 @@ Resolved product decisions:
 
 - Minimum comprehension score for standard progression and certification is 70%.
 - The first release should include public-domain long-form text.
+- Initial official content should focus on adventurous public-domain fiction.
+- Each passage should support filterable tags.
 - Users can paste passages into the app and store them locally.
 - Imported text can be used for practice and analytics, but official certification and mastery should use official bundled passages.
 - The app is local-only for MVP and should not include cloud accounts or cloud sync.
 - Social posting is allowed only as user-initiated sharing of progress summaries.
 - Delayed recall is optional for standard certification and required for the 800 WPM Mastery milestone.
+- Delayed recall reminders should use local notifications.
+- Local notification copy should be edgy and emotionally motivating, similar to a playful Duolingo-style guilt prompt, but should avoid harassment, protected-class insults, threats, or abusive language.
+- Question count should scale with passage length instead of using one fixed count for every passage.

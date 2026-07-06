@@ -1,0 +1,898 @@
+# Speed Reading Trainer Task Breakdown
+
+This document breaks [PRD.md](./PRD.md) into milestones, epics, implementation tasks, dependencies, acceptance criteria, and open questions.
+
+## Planning Assumptions
+
+- MVP is a Flutter app targeting Windows, iOS, and Android.
+- MVP is local-only: no accounts, cloud sync, backend service, or remote content service.
+- Built-in official passages are public-domain or properly licensed.
+- User-pasted passages are stored locally and can be used for practice and analytics.
+- Official certification and mastery use official bundled passages by default.
+- Standard progression requires at least 70% comprehension.
+- 800 WPM Mastery is a higher track requiring 100% immediate comprehension and delayed recall.
+- Social support means user-initiated progress sharing only, not social accounts, feeds, followers, or cloud identity.
+- State management uses Riverpod.
+- Local persistence uses Drift with SQLite.
+- Initial official content focuses on adventurous public-domain fiction.
+- Passage metadata includes filterable tags.
+- Comprehension question count scales with passage length.
+- Delayed recall reminders use local notifications with edgy, emotionally motivating copy that stays playful rather than abusive.
+
+## Milestone 0: Project Foundation
+
+Goal: Create the Flutter project, baseline architecture, local tooling, and initial CI-ready structure.
+
+### Epic 0.1: Flutter Project Setup
+
+Tasks:
+
+- Scaffold Flutter app in the repo.
+- Enable Windows, iOS, and Android targets.
+- Add project README with setup commands.
+- Add standard linting and formatting configuration.
+- Add test directories for unit, widget, and integration tests.
+- Add Riverpod for state management.
+- Add Drift with SQLite for local persistence.
+- Decide charting package for analytics.
+
+Acceptance criteria:
+
+- `flutter analyze` passes.
+- `flutter test` runs successfully with at least one starter test.
+- App launches on Windows.
+- Android and iOS target folders are present.
+- README documents setup, run, and test commands.
+
+Dependencies:
+
+- Flutter SDK installed locally.
+- Package choices finalized.
+
+### Epic 0.2: App Architecture Skeleton
+
+Tasks:
+
+- Create module folders: `core`, `reading`, `training`, `assessment`, `progress`, `content`, `settings`.
+- Add routing skeleton.
+- Add app theme skeleton with light, dark, and high-contrast-ready tokens.
+- Add shared domain model conventions.
+- Add service interfaces for persistence, content loading, scoring, and sharing.
+
+Acceptance criteria:
+
+- App boots into a placeholder dashboard route.
+- Routes exist for onboarding, dashboard, library, reader, quiz, results, progress, and settings.
+- Module boundaries are documented in code or README.
+
+Dependencies:
+
+- Flutter project setup.
+- State management and routing package selected.
+
+## Milestone 1: Domain Model and Local Data
+
+Goal: Establish the local data model that supports passages, sessions, quizzes, scoring, imported text, and progress history.
+
+### Epic 1.1: Core Domain Models
+
+Tasks:
+
+- Define `Passage` model.
+- Define `PassageMetadata` model with word count, difficulty, topic, source, license, text type, vocabulary density, filterable tags, and official/unofficial flag.
+- Define `ReadingMode`: manual, paced, RSVP, skim, scan, deep read.
+- Define `ReadingSession` model.
+- Define `QuizQuestion` and `QuizResult` models.
+- Define `ProgressSnapshot` model.
+- Define `CertificationAttempt` and `MasteryAttempt` models.
+- Add serialization for local persistence.
+
+Acceptance criteria:
+
+- Models represent every metric listed in PRD section 7.1.
+- Official and imported passages are distinguishable.
+- Unit tests cover serialization and required fields.
+
+Dependencies:
+
+- Persistence package selected.
+
+### Epic 1.2: Local Persistence
+
+Tasks:
+
+- Implement local database schema.
+- Store official passage metadata.
+- Store imported pasted passages.
+- Store reading sessions.
+- Store quiz results.
+- Store progress snapshots.
+- Store user settings.
+- Add export to JSON.
+- Add export to CSV for progress/session history.
+- Add reset-progress flow with confirmation.
+
+Acceptance criteria:
+
+- Data survives app restart.
+- Pasted passages are available after restart.
+- Progress export produces valid JSON and CSV.
+- Reset deletes user progress only after confirmation.
+- Official bundled content is not accidentally deleted by reset.
+
+Dependencies:
+
+- Domain models complete.
+
+### Epic 1.3: Local User Profile
+
+Tasks:
+
+- Create local profile model.
+- Store user goals: school, work, exam, personal learning, general improvement.
+- Store baseline values.
+- Store preferred reading settings.
+- Support local profile initialization without login.
+
+Acceptance criteria:
+
+- First launch creates or prompts for a local profile.
+- No cloud account or network call is required.
+- Profile preferences affect reading-player defaults.
+
+Dependencies:
+
+- Local persistence.
+
+## Milestone 2: Content Library
+
+Goal: Provide official public-domain long-form reading content and local pasted passage support.
+
+### Epic 2.1: Official Passage Library
+
+Tasks:
+
+- Select initial adventurous public-domain fiction source texts.
+- Split long-form texts into passages of useful lengths.
+- Add metadata for difficulty, topic, word count, text type, source, license, and filterable tags.
+- Mark official passages eligible for certification/mastery.
+- Add content loader service.
+- Add library browse/search/filter UI.
+
+Acceptance criteria:
+
+- Library includes short, medium, and long official passages.
+- Each passage has source and license metadata.
+- Official passages can be filtered by difficulty, topic, and tags.
+- App works offline with bundled content.
+
+Dependencies:
+
+- Domain model.
+- Content source decision.
+
+Question:
+
+- Should official passages be bundled as JSON assets, SQLite seed data, or generated Dart assets?
+
+### Epic 2.2: Paste-and-Save Imported Text
+
+Tasks:
+
+- Build paste/import text screen.
+- Add title and optional source fields.
+- Calculate word count.
+- Estimate difficulty.
+- Save pasted passage locally.
+- Allow edit/delete of imported passages.
+- Mark imported passages as practice-only by default.
+
+Acceptance criteria:
+
+- User can paste text and use it in reading modes.
+- Imported passages persist locally.
+- Imported passages contribute to analytics.
+- Imported passages do not count toward official certification/mastery by default.
+- Poor performance on imported text is recorded without disqualifying the text.
+
+Dependencies:
+
+- Local persistence.
+- Reading player can load arbitrary passage text.
+
+## Milestone 3: Onboarding and Baseline Assessment
+
+Goal: Establish each user's starting speed, comprehension, focus, and recommended training level.
+
+### Epic 3.1: Onboarding Flow
+
+Tasks:
+
+- Build welcome screen.
+- Explain WPM plus comprehension measurement.
+- Explain 70% standard threshold and 800 WPM mastery aspiration.
+- Collect user goal.
+- Collect accessibility/preferences basics: font size, theme, reduced motion.
+
+Acceptance criteria:
+
+- User understands that speed without comprehension is not rewarded.
+- Onboarding can be completed without network access.
+- Preferences are saved locally.
+
+Dependencies:
+
+- Local user profile.
+- Theme/settings foundation.
+
+### Epic 3.2: Baseline Assessment
+
+Tasks:
+
+- Select 2-3 official baseline passages.
+- Build timed manual reading assessment.
+- Record elapsed time and calculate WPM.
+- Present comprehension quiz after each passage.
+- Collect self-rated focus and confidence.
+- Calculate baseline ERS.
+- Recommend starting level and first training plan.
+
+Acceptance criteria:
+
+- Baseline records comfortable WPM, comprehension, recall quality, self-rated focus, and text difficulty tolerance.
+- Baseline results appear on dashboard.
+- User can retake baseline.
+
+Dependencies:
+
+- Official passage library.
+- Reading player MVP.
+- Quiz engine MVP.
+- ERS calculation.
+
+## Milestone 4: Reading Player
+
+Goal: Build the core reading experience for manual, paced, and RSVP modes.
+
+### Epic 4.1: Manual Reading Mode
+
+Tasks:
+
+- Render passage text in a distraction-light interface.
+- Support font size, line height, theme, and column width.
+- Track start, pause, resume, and finish.
+- Calculate WPM from word count and active reading time.
+- Prevent accidental exits during active tests.
+
+Acceptance criteria:
+
+- User can complete a manual reading session.
+- WPM calculation excludes paused time.
+- Interrupted attempts are marked unqualified when appropriate.
+- Text is readable on Windows, iOS, and Android layouts.
+
+Dependencies:
+
+- Passage model.
+- Settings model.
+
+### Epic 4.2: Paced Reading Mode
+
+Tasks:
+
+- Add visual pacer overlay.
+- Add adjustable WPM target.
+- Add guided line pacing.
+- Add timed reading windows.
+- Store target WPM and actual completion metrics.
+
+Acceptance criteria:
+
+- User can select target WPM.
+- Pacer timing maps correctly to passage word count and target speed.
+- Session results show target versus actual performance.
+
+Dependencies:
+
+- Manual reading mode.
+
+### Epic 4.3: RSVP Mode
+
+Tasks:
+
+- Tokenize passage into words and optional phrase chunks.
+- Display word-by-word RSVP.
+- Add phrase-by-phrase RSVP option.
+- Add adjustable WPM.
+- Add pause, rewind, and resume controls.
+- Add punctuation-aware timing.
+- Add longer pauses for sentence boundaries.
+- Record mode multiplier for ERS.
+
+Acceptance criteria:
+
+- RSVP timing is stable enough for WPM training.
+- Punctuation and sentence boundary timing are applied.
+- User can pause, rewind, and resume.
+- RSVP results require comprehension quiz to qualify.
+
+Dependencies:
+
+- Tokenization utility.
+- Reading player shell.
+
+### Epic 4.4: Skim and Scan Modes
+
+Tasks:
+
+- Build skimming exercise template.
+- Build scanning exercise template.
+- Add scanning targets: date, number, name, claim, keyword.
+- Track time and accuracy.
+- Apply skim/scan mode multipliers.
+
+Acceptance criteria:
+
+- User can complete skim and scan drills.
+- Results record accuracy and time.
+- Skim/scan performance appears in analytics.
+
+Dependencies:
+
+- Content library.
+- Quiz/check engine.
+
+## Milestone 5: Comprehension and Assessment Engine
+
+Goal: Measure comprehension reliably enough to gate progression and certification.
+
+### Epic 5.1: Quiz Engine
+
+Tasks:
+
+- Support multiple-choice questions.
+- Support main idea questions.
+- Support detail recall questions.
+- Support inference questions.
+- Support vocabulary-in-context questions.
+- Support optional written summary prompt.
+- Score quiz results.
+
+Acceptance criteria:
+
+- Quiz results produce a comprehension percentage.
+- Question categories are stored in results.
+- Results are linked to reading sessions.
+
+Dependencies:
+
+- Passage and quiz models.
+- Local persistence.
+
+### Epic 5.2: Official Passage Question Sets
+
+Tasks:
+
+- Create comprehension questions for each official MVP passage.
+- Tag questions by category.
+- Set answer keys and explanations.
+- Define question-count tiers that scale with passage length.
+- Validate that each official certification passage has enough questions for its length.
+
+Acceptance criteria:
+
+- Each official baseline passage has a quiz.
+- Each certification-eligible passage has enough length-scaled questions to support reliable scoring.
+- Questions include main idea, detail, inference, and vocabulary where appropriate.
+
+Dependencies:
+
+- Official passage selection.
+
+Question:
+
+- Should written summaries be self-scored in MVP or deferred?
+
+## Milestone 6: Scoring, Progression, Certification, and Mastery
+
+Goal: Implement the product's core measurement system.
+
+### Epic 6.1: Effective Reading Score
+
+Tasks:
+
+- Implement ERS formula.
+- Implement comprehension multiplier with heavy penalty below 60%.
+- Implement difficulty multipliers.
+- Implement mode multipliers.
+- Add unit tests for ERS calculations.
+
+Acceptance criteria:
+
+- ERS matches PRD formula.
+- Below-threshold comprehension is penalized.
+- Tests cover edge cases: zero WPM, zero comprehension, 59%, 60%, 70%, 100%.
+
+Dependencies:
+
+- Session and quiz results.
+
+### Epic 6.2: Readiness Rating and Levels
+
+Tasks:
+
+- Implement qualified attempt rules.
+- Implement 800 WPM readiness percentage.
+- Implement levels 1-7.
+- Track best qualified ERS.
+- Track current level.
+
+Acceptance criteria:
+
+- Attempts below 70% comprehension do not qualify.
+- Attempts under 600 words do not qualify for readiness.
+- Interrupted or excessively paused attempts can be marked unqualified.
+- Dashboard shows current level and progress toward 800 WPM.
+
+Dependencies:
+
+- ERS calculation.
+- Session interruption tracking.
+
+### Epic 6.3: Certification
+
+Tasks:
+
+- Implement standard 800 WPM certification rules.
+- Require 3 official standard non-fiction passages at or above 800 WPM with at least 70% comprehension.
+- Require at least 1 non-RSVP attempt.
+- Track certification attempts.
+- Add certification badge/result screen.
+
+Acceptance criteria:
+
+- Certification only uses official eligible passages.
+- Certification cannot be earned from RSVP-only attempts.
+- Certification status persists locally.
+
+Dependencies:
+
+- Official passage eligibility.
+- Qualified attempt logic.
+
+### Epic 6.4: Mastery
+
+Tasks:
+
+- Implement 800 WPM Mastery rules.
+- Require 3 official standard or hard passages at or above 800 WPM with 100% immediate comprehension.
+- Schedule delayed recall checks at least 24 hours later.
+- Require delayed recall score of at least 90% per passage.
+- Track mastery progress.
+- Trigger local notification reminders for delayed recall checks.
+- Write notification copy in a provocative, playful, emotionally motivating tone.
+
+Acceptance criteria:
+
+- Mastery is separate from standard certification.
+- Delayed recall is required only for mastery.
+- Delayed recall checks persist across app restarts.
+- Local notifications are scheduled for delayed recall checks.
+- Notification copy motivates the user to prove the message wrong without using threats, protected-class insults, or abusive language.
+- Mastery status persists locally.
+
+Dependencies:
+
+- Certification attempt infrastructure.
+- Local scheduling/reminder strategy.
+
+## Milestone 7: Training Curriculum and Adaptive Plan
+
+Goal: Deliver structured daily practice that teaches the major speed-reading skills.
+
+### Epic 7.1: Curriculum Structure
+
+Tasks:
+
+- Define curriculum modules: baseline, pacing, chunking, regression control, subvocalization awareness, skimming, scanning, RSVP, vocabulary/familiarity.
+- Define lesson order.
+- Define drill templates.
+- Define unlock criteria.
+- Define 10-20 minute daily session structure.
+
+Acceptance criteria:
+
+- Training plan covers all PRD core concepts.
+- Lessons explain when rapid reading is appropriate versus deep reading.
+- User gets a recommended next drill after assessment.
+
+Dependencies:
+
+- Baseline assessment.
+- Reading modes.
+
+### Epic 7.2: Skill Drills
+
+Tasks:
+
+- Build pacing drills.
+- Build two-word and three-word chunk drills.
+- Build phrase highlighting drills.
+- Build forward-only regression-control drills.
+- Build subvocalization awareness comparison drills.
+- Build skimming gist drills.
+- Build scanning target drills.
+- Build vocabulary capture and review list.
+
+Acceptance criteria:
+
+- Each drill records completion and relevant metrics.
+- Drills are usable in daily training.
+- Drill results affect recommendations.
+
+Dependencies:
+
+- Reading player modes.
+- Analytics events.
+
+### Epic 7.3: Adaptive Recommendation Engine
+
+Tasks:
+
+- Recommend drills based on weak skills.
+- Slow progression when comprehension falls below threshold.
+- Detect plateaued WPM.
+- Detect weak detail recall.
+- Detect weak scanning accuracy.
+- Detect RSVP-only progress without non-RSVP transfer.
+
+Acceptance criteria:
+
+- User receives a next recommended drill after each session.
+- Recommendations change when performance changes.
+- App does not push higher speed when comprehension is collapsing.
+
+Dependencies:
+
+- Progress history.
+- Skill metrics.
+
+## Milestone 8: Dashboard and Analytics
+
+Goal: Show progress clearly without encouraging speed-only behavior.
+
+### Epic 8.1: Home Dashboard
+
+Tasks:
+
+- Show current level.
+- Show progress toward 800 WPM.
+- Show latest WPM and comprehension.
+- Show ERS trend summary.
+- Show daily practice plan.
+- Show streak.
+- Show recommended next drill.
+
+Acceptance criteria:
+
+- Dashboard is the first post-onboarding screen.
+- Dashboard never presents WPM without comprehension context.
+- Recommended next action is visible.
+
+Dependencies:
+
+- Progression system.
+- Training recommendation engine.
+
+### Epic 8.2: Analytics Views
+
+Tasks:
+
+- Build WPM over time chart.
+- Build comprehension over time chart.
+- Build ERS over time chart.
+- Build skill breakdown view.
+- Build passage difficulty distribution view.
+- Build best qualified attempt view.
+
+Acceptance criteria:
+
+- Charts load within 1 second for typical local history.
+- Charts are color-blind safe.
+- User can distinguish official and imported text performance.
+
+Dependencies:
+
+- Local progress history.
+- Charting package.
+
+### Epic 8.3: Shareable Progress Summary
+
+Tasks:
+
+- Create local progress summary card.
+- Include level, ERS, qualified WPM/comprehension, streak, and certification status.
+- Exclude private imported passage text.
+- Add platform share sheet integration where available.
+
+Acceptance criteria:
+
+- User can share progress manually.
+- Sharing does not require account linking.
+- Shared summary excludes private passage content.
+
+Dependencies:
+
+- Dashboard metrics.
+- Platform sharing package.
+
+## Milestone 9: Settings, Accessibility, Privacy, and Reliability
+
+Goal: Make the app comfortable, private, and resilient across target platforms.
+
+### Epic 9.1: Settings
+
+Tasks:
+
+- Add font size setting.
+- Add line height setting.
+- Add theme setting.
+- Add column width setting.
+- Add reduced motion setting.
+- Add export data screen.
+- Add reset progress screen.
+
+Acceptance criteria:
+
+- Settings persist locally.
+- Settings affect reading player.
+- Reset progress requires confirmation.
+
+Dependencies:
+
+- Local persistence.
+
+### Epic 9.2: Accessibility
+
+Tasks:
+
+- Add scalable text support.
+- Add high contrast themes.
+- Add screen reader labels for navigation and non-test UI.
+- Add reduced motion behavior.
+- Add keyboard navigation for Windows.
+- Verify controls on mobile sizes.
+
+Acceptance criteria:
+
+- Core navigation works with keyboard on Windows.
+- Text can be enlarged without overlapping core UI.
+- Motion-sensitive features honor reduced motion setting.
+
+Dependencies:
+
+- UI foundations.
+
+### Epic 9.3: Session Reliability
+
+Tasks:
+
+- Autosave active test/session state.
+- Recover after app interruption.
+- Mark interrupted attempts unqualified when needed.
+- Prevent accidental test exit.
+- Add platform lifecycle handling.
+
+Acceptance criteria:
+
+- Mobile interruption does not corrupt progress history.
+- Session recovery behavior is predictable.
+- Certification attempts cannot be accidentally qualified after invalid interruption.
+
+Dependencies:
+
+- Reading session persistence.
+
+## Milestone 10: Platform Packaging and Release Readiness
+
+Goal: Prepare MVP for Windows, Android, and iOS delivery.
+
+### Epic 10.1: Windows Readiness
+
+Tasks:
+
+- Validate desktop layout.
+- Validate keyboard navigation.
+- Validate local storage path.
+- Validate export file behavior.
+- Validate app packaging/build.
+
+Acceptance criteria:
+
+- Windows build succeeds.
+- App can run local-only with bundled content.
+- Export works on Windows.
+
+Dependencies:
+
+- MVP features complete.
+
+### Epic 10.2: Android Readiness
+
+Tasks:
+
+- Validate mobile layout.
+- Validate lifecycle interruptions.
+- Validate local storage.
+- Validate share sheet.
+- Validate Android build.
+
+Acceptance criteria:
+
+- Android build succeeds.
+- Reading player is usable on phone-sized viewport.
+- Session recovery works after backgrounding.
+
+Dependencies:
+
+- MVP features complete.
+
+### Epic 10.3: iOS Readiness
+
+Tasks:
+
+- Validate mobile layout.
+- Validate lifecycle interruptions.
+- Validate local storage.
+- Validate share sheet.
+- Validate iOS build configuration.
+
+Acceptance criteria:
+
+- iOS build configuration is present and documented.
+- Reading player is usable on phone-sized viewport.
+- Session recovery works after backgrounding.
+
+Dependencies:
+
+- MVP features complete.
+- macOS/iOS build environment for final validation.
+
+## Milestone 11: Verification and Quality
+
+Goal: Prove the app behaves correctly before release.
+
+### Epic 11.1: Unit Test Coverage
+
+Tasks:
+
+- Test ERS calculation.
+- Test readiness calculation.
+- Test level thresholds.
+- Test certification rules.
+- Test mastery rules.
+- Test passage word count.
+- Test RSVP timing calculations.
+- Test local serialization.
+
+Acceptance criteria:
+
+- Core scoring and qualification logic is covered by unit tests.
+- Edge cases around 70%, 800 WPM, and interrupted attempts are covered.
+
+Dependencies:
+
+- Core logic implemented.
+
+### Epic 11.2: Widget and Integration Tests
+
+Tasks:
+
+- Test onboarding flow.
+- Test baseline assessment flow.
+- Test manual reading session flow.
+- Test RSVP session flow.
+- Test quiz/results flow.
+- Test paste-and-save flow.
+- Test reset/export flows.
+
+Acceptance criteria:
+
+- Critical MVP flows have automated coverage.
+- Tests can run locally without network access.
+
+Dependencies:
+
+- UI flows implemented.
+
+### Epic 11.3: Manual QA Checklist
+
+Tasks:
+
+- Create Windows QA checklist.
+- Create Android QA checklist.
+- Create iOS QA checklist.
+- Verify text does not overlap at large font sizes.
+- Verify reduced motion.
+- Verify high contrast mode.
+- Verify offline launch.
+- Verify progress sharing excludes private text.
+
+Acceptance criteria:
+
+- Manual QA checklist exists.
+- Known release blockers are documented.
+
+Dependencies:
+
+- Platform builds.
+
+## Post-MVP Backlog
+
+These items are explicitly outside initial MVP unless reprioritized.
+
+- PDF import.
+- EPUB import.
+- Web article import.
+- Cloud sync.
+- Optional accounts.
+- Paid subscriptions.
+- AI-generated comprehension questions.
+- Social feeds, followers, or account linking.
+- macOS, web, and Linux targets.
+- Advanced reading diagnostics.
+- Remote content catalog.
+
+## Small Initial Task List
+
+These are the first implementation-ready tasks to start development:
+
+1. Scaffold Flutter project with Windows, iOS, and Android enabled.
+2. Add README with local setup, run, and test commands.
+3. Add Riverpod for state management.
+4. Add Drift with SQLite for local persistence.
+5. Create module folders: `core`, `reading`, `training`, `assessment`, `progress`, `content`, `settings`.
+6. Add app routing skeleton.
+7. Add placeholder dashboard route.
+8. Define domain enums for reading mode, passage type, passage source, difficulty, and attempt qualification status.
+9. Define `Passage`, `ReadingSession`, `QuizQuestion`, `QuizResult`, and `ProgressSnapshot` models.
+10. Implement word-count utility with unit tests.
+11. Implement ERS calculator with unit tests.
+12. Implement level/readiness calculator with unit tests.
+13. Add starter official passage asset format.
+14. Build official passage loader.
+15. Build local profile initialization.
+16. Build manual reading player MVP.
+17. Build quiz MVP.
+18. Connect manual reading session to quiz result and ERS calculation.
+19. Build dashboard summary for latest session.
+20. Add paste-and-save imported text MVP.
+
+## Cross-Cutting Acceptance Criteria
+
+- No network access is required for core MVP use.
+- Imported text remains local unless the user explicitly shares a progress summary.
+- Certification and mastery use official eligible passages unless a future approved passage workflow is added.
+- WPM is always presented with comprehension context.
+- Attempts below 70% comprehension do not advance standard certification.
+- RSVP improvements must transfer to at least one non-RSVP attempt for certification/mastery.
+- Reading player timing and pause behavior are tested.
+- Windows, iOS, and Android remain first-class targets.
+
+## Open Questions
+
+These questions should be answered before or during the relevant milestone:
+
+- Should official passages be stored as JSON assets, SQLite seed data, or generated Dart assets?
+- Should written summaries be self-scored in MVP or deferred?
+- Should certification require only non-fiction, or should official fiction passages also support separate fiction certification later?
+
+Resolved decisions:
+
+- Use Riverpod for state management.
+- Use Drift with SQLite for local persistence.
+- Start official content with adventurous public-domain fiction.
+- Add filterable tags to each passage.
+- Scale comprehension question count with passage length.
+- Use local notifications for delayed recall reminders.
+- Notification copy should be edgy and motivating in a playful Duolingo-like way, while avoiding harassment, threats, protected-class insults, or abusive language.
