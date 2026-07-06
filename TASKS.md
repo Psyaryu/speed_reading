@@ -817,6 +817,8 @@ Goal: Deliver structured daily practice that teaches the major speed-reading ski
 
 ### Epic 7.1: Curriculum Structure
 
+Status: In Progress
+
 Tasks:
 
 - Define curriculum modules: baseline, pacing, chunking, regression control, subvocalization awareness, skimming, scanning, RSVP, vocabulary/familiarity.
@@ -835,6 +837,18 @@ Dependencies:
 
 - Baseline assessment.
 - Reading modes.
+
+Completed task log:
+
+```text
+Task: Add curriculum module structure
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/training/domain/curriculum.dart, test/curriculum_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for required concept coverage and level-based unlocks.
+Commit: See Git history for `feat: add curriculum structure`
+Notes: Dedicated vocabulary capture and review UI remains open.
+```
 
 ### Epic 7.2: Skill Drills
 
