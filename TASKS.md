@@ -332,6 +332,8 @@ Notes: Filtering supports query, difficulty, topic, source, and all-selected-tag
 
 ### Epic 2.2: Paste-and-Save Imported Text
 
+Status: In Progress
+
 Tasks:
 
 - Build paste/import text screen.
@@ -354,6 +356,18 @@ Dependencies:
 
 - Local persistence.
 - Reading player can load arbitrary passage text.
+
+Completed task log:
+
+```text
+Task: Add imported passage factory
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/content/domain/imported_passage_factory.dart, test/imported_passage_factory_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for word count, practice-only eligibility, fallback title, fallback license, and imported tags.
+Commit: See Git history for `feat: add imported passage factory`
+Notes: UI and local persistence wiring remain open. Imported passages are explicitly not certification or mastery eligible by default.
+```
 
 ## Milestone 3: Onboarding and Baseline Assessment
 
