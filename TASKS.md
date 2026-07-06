@@ -491,6 +491,8 @@ Dependencies:
 
 ### Epic 4.3: RSVP Mode
 
+Status: In Progress
+
 Tasks:
 
 - Tokenize passage into words and optional phrase chunks.
@@ -513,6 +515,18 @@ Dependencies:
 
 - Tokenization utility.
 - Reading player shell.
+
+Completed task log:
+
+```text
+Task: Add RSVP tokenization and timing
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/reading/domain/rsvp_timing.dart, test/rsvp_timing_test.dart, TASKS.md
+Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for tokenization, base WPM timing, punctuation pauses, sentence-boundary pauses, and invalid WPM.
+Commit: See Git history for `feat: add RSVP timing`
+Notes: RSVP UI controls remain open. Timing supports punctuation-aware scheduling for future player implementation.
+```
 
 ### Epic 4.4: Skim and Scan Modes
 
