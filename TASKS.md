@@ -143,6 +143,16 @@ Commit: See Git history for `chore: add app architecture skeleton`
 Notes: Added GoRouter route definitions for onboarding, dashboard, library, reader, quiz, results, progress, and settings. Added app theme helper and shared placeholder page.
 ```
 
+```text
+Task: Add local service interfaces
+Status: Done
+Completed: 2026-07-06
+Changed files: lib/core/services/local_data_store.dart, lib/content/data/passage_repository.dart, lib/progress/data/progress_repository.dart, TASKS.md
+Verification: Could not run flutter analyze because Flutter is not installed or not on PATH. Manual file review completed.
+Commit: See Git history for `chore: add local service interfaces`
+Notes: Added repository contracts for local profile, passages, sessions, quiz results, progress snapshots, certification, mastery, export, and reset workflows.
+```
+
 ## Milestone 1: Domain Model and Local Data
 
 Goal: Establish the local data model that supports passages, sessions, quizzes, scoring, imported text, and progress history.
