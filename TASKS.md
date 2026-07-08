@@ -412,6 +412,16 @@ Commit: See Git history for `feat: add passage filtering service`
 Notes: Filtering supports query, difficulty, topic, source, and all-selected-tags matching for future library UI.
 ```
 
+```text
+Task: Implement passage repository
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/content/data/official_passage_loader.dart, lib/content/data/default_passage_repository.dart, test/default_passage_repository_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: implement passage repository`
+Notes: Repository merges official bundled content with local imported passages and applies existing filters.
+```
+
 ### Epic 2.2: Paste-and-Save Imported Text
 
 Status: In Progress

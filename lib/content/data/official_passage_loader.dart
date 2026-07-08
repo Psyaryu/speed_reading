@@ -4,13 +4,18 @@ import 'package:flutter/services.dart';
 
 import '../domain/passage.dart';
 
-class OfficialPassageLoader {
+abstract interface class OfficialPassageSource {
+  Future<List<Passage>> load();
+}
+
+class OfficialPassageLoader implements OfficialPassageSource {
   const OfficialPassageLoader({
     this.assetPath = 'assets/passages/official_passages.json',
   });
 
   final String assetPath;
 
+  @override
   Future<List<Passage>> load() async {
     final rawJson = await rootBundle.loadString(assetPath);
     return parse(rawJson);
@@ -23,4 +28,3 @@ class OfficialPassageLoader {
         .toList(growable: false);
   }
 }
-
