@@ -792,6 +792,16 @@ Commit: See Git history for `feat: build latest results screen`
 Notes: Results now shows the latest saved session WPM, quiz comprehension, and the 70% standard progress gate. ERS display remains open until result scoring is connected to passage difficulty metadata.
 ```
 
+```text
+Task: Link quiz completion to results flow
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/assessment/presentation/quiz_screen.dart, test/quiz_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 107 tests passed.
+Commit: See Git history for `feat: link quiz completion to results`
+Notes: After a quiz is scored and saved, the quiz screen now shows a View Results action that navigates to the results route.
+```
+
 ### Epic 5.2: Official Passage Question Sets
 
 Status: In Progress

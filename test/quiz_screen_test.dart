@@ -2,6 +2,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:speed_reading/assessment/data/official_question_loader.dart';
 import 'package:speed_reading/assessment/domain/quiz.dart';
 import 'package:speed_reading/assessment/presentation/quiz_screen.dart';
@@ -67,6 +68,62 @@ void main() {
     expect(rows.single.sessionId, 'session-1');
     expect(rows.single.correctCount, 1);
     expect(rows.single.totalQuestions, 2);
+  });
+
+  testWidgets('navigates to results after submitting quiz', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    final router = GoRouter(
+      initialLocation: '/quiz',
+      routes: [
+        GoRoute(
+          path: '/quiz',
+          name: 'quiz',
+          builder: (context, state) => const QuizScreen(),
+        ),
+        GoRoute(
+          path: '/results',
+          name: 'results',
+          builder: (context, state) => const Scaffold(
+            body: Center(child: Text('Results Route')),
+          ),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(
+            () => DateTime.utc(2026, 7, 8, 12, 2),
+          ),
+          latestQuizSessionProvider.overrideWith((ref) async => _session()),
+          officialQuestionSourceProvider.overrideWithValue(
+            const _FakeOfficialQuestionSource(),
+          ),
+          quizResultIdProvider.overrideWithValue(() => 'quiz-1'),
+        ],
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('The signal fire'));
+    await tester.pump();
+    await tester.tap(find.text('A compass'));
+    await tester.pump();
+    await tester.ensureVisible(find.text('Submit Quiz'));
+    await tester.tap(find.text('Submit Quiz'));
+    await tester.pumpAndSettle();
+    expect(find.text('Comprehension: 100%'), findsOneWidget);
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('View Results'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Results Route'), findsOneWidget);
   });
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/providers/app_providers.dart';
 import '../../reading/domain/reading_session.dart';
@@ -130,6 +131,15 @@ class _QuizFormState extends ConsumerState<_QuizForm> {
           const SizedBox(height: 16),
           Text('Comprehension: ${(result.comprehensionScore * 100).round()}%'),
           Text('${result.correctCount}/${result.totalQuestions} correct'),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilledButton.icon(
+              onPressed: () => context.goNamed('results'),
+              icon: const Icon(Icons.assessment),
+              label: const Text('View Results'),
+            ),
+          ),
         ],
       ],
     );
