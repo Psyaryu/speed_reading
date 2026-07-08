@@ -820,6 +820,16 @@ Commit: See Git history for `feat: add question count policy`
 Notes: Policy starts at 5 questions for short passages, 10 for 600+ words, 15 for 1200+ words, and 20 for 2400+ words.
 ```
 
+```text
+Task: Add official question asset loader
+Status: Done
+Completed: 2026-07-08
+Changed files: assets/passages/official_questions.json, lib/assessment/data/official_question_loader.dart, lib/core/providers/app_providers.dart, lib/assessment/presentation/quiz_screen.dart, test/official_question_loader_test.dart, test/app_providers_test.dart, test/quiz_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 105 tests passed.
+Commit: See Git history for `feat: add official question asset loader`
+Notes: Added official JSON-backed questions for the starter Treasure Island passage, a loader/provider, and production quiz filtering by passage id. More official passages and full length-scaled certification question coverage remain open.
+```
+
 ## Milestone 6: Scoring, Progression, Certification, and Mastery
 
 Goal: Implement the product's core measurement system.

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "treasure-island-001-main-idea",
+    "passageId": "treasure-island-001",
+    "type": "mainIdea",
+    "prompt": "What is Jim Hawkins preparing to record?",
+    "options": [
+      "The complete account of Treasure Island, except its exact bearings",
+      "A list of every ship that visited the Admiral Benbow",
+      "A private letter from Dr. Livesey to Squire Trelawney",
+      "The rules of his father's inn"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "The narrator says he was asked to write the whole particulars while keeping back only the island's bearings."
+  },
+  {
+    "id": "treasure-island-001-detail-inn",
+    "passageId": "treasure-island-001",
+    "type": "detailRecall",
+    "prompt": "Where did Jim's father keep his inn?",
+    "options": [
+      "The Spy-glass tavern",
+      "The Admiral Benbow",
+      "Bristol harbor",
+      "Treasure Island"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "The passage identifies the family inn as the Admiral Benbow."
+  },
+  {
+    "id": "treasure-island-001-inference-secret",
+    "passageId": "treasure-island-001",
+    "type": "inference",
+    "prompt": "Why does the narrator keep back the island's bearings?",
+    "options": [
+      "The narrator forgot the location",
+      "The island has no treasure left",
+      "Some treasure may still remain there",
+      "Dr. Livesey ordered him to destroy the map"
+    ],
+    "correctOptionIndex": 2,
+    "explanation": "The narrator withholds the bearings because there is still treasure not yet lifted."
+  },
+  {
+    "id": "treasure-island-001-vocabulary-bearings",
+    "passageId": "treasure-island-001",
+    "type": "vocabularyInContext",
+    "prompt": "In this passage, what does \"bearings\" most nearly mean?",
+    "options": [
+      "Heavy metal parts",
+      "A person's posture",
+      "Directions or location",
+      "A kind of shipboard meal"
+    ],
+    "correctOptionIndex": 2,
+    "explanation": "The island's bearings are its location or navigational directions."
+  },
+  {
+    "id": "treasure-island-001-detail-seaman",
+    "passageId": "treasure-island-001",
+    "type": "detailRecall",
+    "prompt": "What notable mark does the old seaman have?",
+    "options": [
+      "A missing hand",
+      "A sabre cut",
+      "A silver eye patch",
+      "A tattoo of the island"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "The seaman is described as having a sabre cut."
+  }
+]

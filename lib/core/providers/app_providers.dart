@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../assessment/data/official_question_loader.dart';
 import '../../content/data/default_passage_repository.dart';
 import '../../content/data/official_passage_loader.dart';
 import '../../content/data/passage_repository.dart';
@@ -29,6 +30,10 @@ final passageRepositoryProvider = Provider<PassageRepository>((ref) {
     officialPassageSource: ref.watch(officialPassageSourceProvider),
     localDataStore: ref.watch(localDataStoreProvider),
   );
+});
+
+final officialQuestionSourceProvider = Provider<OfficialQuestionSource>((ref) {
+  return const OfficialQuestionLoader();
 });
 
 final currentDateTimeProvider = Provider<DateTime Function()>((ref) {

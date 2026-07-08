@@ -1,6 +1,8 @@
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:speed_reading/assessment/data/official_question_loader.dart';
+import 'package:speed_reading/assessment/domain/quiz.dart';
 import 'package:speed_reading/content/data/official_passage_loader.dart';
 import 'package:speed_reading/content/domain/passage.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
@@ -49,6 +51,21 @@ void main() {
 
     expect(passages.single.id, 'official');
   });
+
+  test('official question provider can be overridden', () async {
+    final container = ProviderContainer(
+      overrides: [
+        officialQuestionSourceProvider.overrideWithValue(
+          const _FakeOfficialQuestionSource(),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final questions = await container.read(officialQuestionSourceProvider).load();
+
+    expect(questions.single.passageId, 'official');
+  });
 }
 
 class _FakeOfficialPassageSource implements OfficialPassageSource {
@@ -73,6 +90,24 @@ class _FakeOfficialPassageSource implements OfficialPassageSource {
           isCertificationEligible: false,
           isMasteryEligible: false,
         ),
+      ),
+    ];
+  }
+}
+
+class _FakeOfficialQuestionSource implements OfficialQuestionSource {
+  const _FakeOfficialQuestionSource();
+
+  @override
+  Future<List<QuizQuestion>> load() async {
+    return const [
+      QuizQuestion(
+        id: 'q1',
+        passageId: 'official',
+        type: QuestionType.mainIdea,
+        prompt: 'Question?',
+        options: ['A', 'B'],
+        correctOptionIndex: 0,
       ),
     ];
   }

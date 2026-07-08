@@ -2,6 +2,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:speed_reading/assessment/data/official_question_loader.dart';
 import 'package:speed_reading/assessment/domain/quiz.dart';
 import 'package:speed_reading/assessment/presentation/quiz_screen.dart';
 import 'package:speed_reading/core/data/app_database.dart';
@@ -40,8 +41,8 @@ void main() {
             () => DateTime.utc(2026, 7, 8, 12, 2),
           ),
           latestQuizSessionProvider.overrideWith((ref) async => _session()),
-          quizQuestionsProvider('passage-1').overrideWith(
-            (ref) async => _questions(),
+          officialQuestionSourceProvider.overrideWithValue(
+            const _FakeOfficialQuestionSource(),
           ),
           quizResultIdProvider.overrideWithValue(() => 'quiz-1'),
         ],
@@ -100,4 +101,11 @@ List<QuizQuestion> _questions() {
       correctOptionIndex: 0,
     ),
   ];
+}
+
+class _FakeOfficialQuestionSource implements OfficialQuestionSource {
+  const _FakeOfficialQuestionSource();
+
+  @override
+  Future<List<QuizQuestion>> load() async => _questions();
 }

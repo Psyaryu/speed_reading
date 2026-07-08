@@ -17,7 +17,10 @@ final latestQuizSessionProvider = FutureProvider<ReadingSession?>((ref) async {
 
 final quizQuestionsProvider =
     FutureProvider.family<List<QuizQuestion>, String>((ref, passageId) async {
-  return const [];
+  final questions = await ref.watch(officialQuestionSourceProvider).load();
+  return questions
+      .where((question) => question.passageId == passageId)
+      .toList(growable: false);
 });
 
 final quizResultIdProvider = Provider<String Function()>((ref) {
