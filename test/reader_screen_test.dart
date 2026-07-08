@@ -37,7 +37,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Cliff Signal'), findsOneWidget);
+    expect(find.text('Cliff Signal'), findsWidgets);
     expect(find.textContaining('A flare tore through the fog'), findsOneWidget);
 
     await tester.tap(find.text('Start'));
@@ -121,6 +121,43 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('No passages available.'), findsOneWidget);
+  });
+
+  testWidgets('selects which passage to read', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          localProfileProvider.overrideWith((ref) async => _profile()),
+          readerPassagesProvider.overrideWith((ref) async => [
+                _passage(),
+                _passage(
+                  id: 'passage-2',
+                  title: 'Ridge Escape',
+                  body: 'The courier crossed the ridge before the searchlight.',
+                ),
+              ]),
+        ],
+        child: const MaterialApp(home: ReaderScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('A flare tore through the fog'), findsOneWidget);
+
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Ridge Escape').last);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining('The courier crossed the ridge'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('applies local reader text preferences', (tester) async {
@@ -212,11 +249,16 @@ void main() {
   });
 }
 
-Passage _passage({int wordCount = 800}) {
+Passage _passage({
+  String id = 'passage-1',
+  String title = 'Cliff Signal',
+  String body = 'A flare tore through the fog while the runner climbed higher.',
+  int wordCount = 800,
+}) {
   return Passage(
-    id: 'passage-1',
-    title: 'Cliff Signal',
-    body: 'A flare tore through the fog while the runner climbed higher.',
+    id: id,
+    title: title,
+    body: body,
     metadata: PassageMetadata(
       wordCount: wordCount,
       difficulty: PassageDifficulty.standard,

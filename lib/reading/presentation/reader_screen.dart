@@ -25,6 +25,7 @@ class ReaderScreen extends ConsumerStatefulWidget {
 }
 
 class _ReaderScreenState extends ConsumerState<ReaderScreen> {
+  String? _selectedPassageId;
   DateTime? _startedAt;
   DateTime? _pausedAt;
   Duration _pausedDuration = Duration.zero;
@@ -55,8 +56,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             if (items.isEmpty) {
               return const Center(child: Text('No passages available.'));
             }
+            final selectedPassage = _selectedPassage(items);
             return _ReaderBody(
-              passage: items.first,
+              passages: items,
+              selectedPassage: selectedPassage,
               isReading: _isReading,
               isPaused: _isPaused,
               isSaving: _isSaving,
@@ -66,7 +69,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               onStart: _startReading,
               onPause: _pauseReading,
               onResume: _resumeReading,
-              onFinish: () => _finishReading(items.first),
+              onSelectPassage: _selectPassage,
+              onFinish: () => _finishReading(selectedPassage),
             );
           },
           error: (error, stackTrace) => Center(
@@ -76,6 +80,29 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
         ),
       ),
     );
+  }
+
+  Passage _selectedPassage(List<Passage> passages) {
+    final selectedId = _selectedPassageId;
+    if (selectedId == null) {
+      return passages.first;
+    }
+
+    return passages.firstWhere(
+      (passage) => passage.id == selectedId,
+      orElse: () => passages.first,
+    );
+  }
+
+  void _selectPassage(String? passageId) {
+    if (passageId == null || _isReading) {
+      return;
+    }
+
+    setState(() {
+      _selectedPassageId = passageId;
+      _completedSession = null;
+    });
   }
 
   void _startReading() {
@@ -190,7 +217,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
 class _ReaderBody extends StatelessWidget {
   const _ReaderBody({
-    required this.passage,
+    required this.passages,
+    required this.selectedPassage,
     required this.isReading,
     required this.isPaused,
     required this.isSaving,
@@ -200,10 +228,12 @@ class _ReaderBody extends StatelessWidget {
     required this.onStart,
     required this.onPause,
     required this.onResume,
+    required this.onSelectPassage,
     required this.onFinish,
   });
 
-  final Passage passage;
+  final List<Passage> passages;
+  final Passage selectedPassage;
   final bool isReading;
   final bool isPaused;
   final bool isSaving;
@@ -213,6 +243,7 @@ class _ReaderBody extends StatelessWidget {
   final VoidCallback onStart;
   final VoidCallback onPause;
   final VoidCallback onResume;
+  final ValueChanged<String?> onSelectPassage;
   final VoidCallback onFinish;
 
   @override
@@ -229,17 +260,32 @@ class _ReaderBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(passage.title, style: textTheme.headlineSmall),
+                DropdownButtonFormField<String>(
+                  initialValue: selectedPassage.id,
+                  onChanged: isReading ? null : onSelectPassage,
+                  decoration: const InputDecoration(
+                    labelText: 'Passage',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: passages.map((passage) {
+                    return DropdownMenuItem(
+                      value: passage.id,
+                      child: Text(passage.title),
+                    );
+                  }).toList(growable: false),
+                ),
+                const SizedBox(height: 20),
+                Text(selectedPassage.title, style: textTheme.headlineSmall),
                 const SizedBox(height: 8),
                 Text(
-                  '${passage.metadata.topic} - ${passage.metadata.wordCount} words',
+                  '${selectedPassage.metadata.topic} - ${selectedPassage.metadata.wordCount} words',
                   style: textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: passage.metadata.tags
+                  children: selectedPassage.metadata.tags
                       .map((tag) => Chip(label: Text(tag)))
                       .toList(growable: false),
                 ),
@@ -292,7 +338,7 @@ class _ReaderBody extends StatelessWidget {
                 ],
                 const SizedBox(height: 24),
                 Text(
-                  passage.body,
+                  selectedPassage.body,
                   style: textTheme.bodyLarge?.copyWith(
                     fontSize: fontSize,
                     height: lineHeight,

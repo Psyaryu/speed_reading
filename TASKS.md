@@ -631,6 +631,16 @@ Commit: See Git history for `feat: guard active reader exits`
 Notes: Active manual sessions now intercept back navigation and require the user to keep reading or discard the unsaved attempt before leaving.
 ```
 
+```text
+Task: Add manual reader passage selection
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/reading/presentation/reader_screen.dart, test/reader_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 90 tests passed.
+Commit: See Git history for `feat: add manual reader passage selection`
+Notes: Manual reader now lets the user select among loaded passages before starting, disables selection during active reading, and reads/saves against the selected passage.
+```
+
 ### Epic 4.2: Paced Reading Mode
 
 Tasks:
