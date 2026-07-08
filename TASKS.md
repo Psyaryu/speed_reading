@@ -280,6 +280,16 @@ Notes: Added a primary key to reading session records so session history can be 
 ```
 
 ```text
+Task: Implement Drift local data store
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/core/data/drift_local_data_store.dart, test/drift_local_data_store_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: implement Drift local data store`
+Notes: Implements local profile, imported passages, reading sessions, quiz results, progress snapshots, certification/mastery attempts, JSON/CSV export, and reset-progress behavior.
+```
+
+```text
 Task: Add local progress export formatter
 Status: Done
 Completed: 2026-07-06
