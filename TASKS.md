@@ -432,6 +432,16 @@ Commit: See Git history for `feat: implement passage repository`
 Notes: Repository merges official bundled content with local imported passages and applies existing filters.
 ```
 
+```text
+Task: Build library passage list UI
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/content/presentation/library_screen.dart, test/library_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: build library passage list`
+Notes: Replaces placeholder with a Riverpod-backed list of official/imported passages and tag chips.
+```
+
 ### Epic 2.2: Paste-and-Save Imported Text
 
 Status: In Progress
