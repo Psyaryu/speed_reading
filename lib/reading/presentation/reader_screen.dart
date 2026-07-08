@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../content/domain/passage.dart';
 import '../../content/domain/passage_filter.dart';
@@ -332,10 +333,19 @@ class _ReaderBody extends StatelessWidget {
                         : 'Reading session active.',
                   ),
                 ],
-                if (session != null) ...[
-                  const SizedBox(height: 12),
-                  Text('WPM: ${session.wpm.round()}'),
-                ],
+        if (session != null) ...[
+          const SizedBox(height: 12),
+          Text('WPM: ${session.wpm.round()}'),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilledButton.icon(
+              onPressed: () => context.goNamed('quiz'),
+              icon: const Icon(Icons.quiz),
+              label: const Text('Take Quiz'),
+            ),
+          ),
+        ],
                 const SizedBox(height: 24),
                 Text(
                   selectedPassage.body,

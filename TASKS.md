@@ -641,6 +641,16 @@ Commit: See Git history for `feat: add manual reader passage selection`
 Notes: Manual reader now lets the user select among loaded passages before starting, disables selection during active reading, and reads/saves against the selected passage.
 ```
 
+```text
+Task: Link completed reader sessions to quiz flow
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/reading/presentation/reader_screen.dart, test/reader_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 106 tests passed.
+Commit: See Git history for `feat: link reader completion to quiz`
+Notes: After a manual session is saved, the reader now shows a Take Quiz action that navigates to the quiz route. End-to-end automatic result/ERS progression remains open.
+```
+
 ### Epic 4.2: Paced Reading Mode
 
 Tasks:

@@ -4,6 +4,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:speed_reading/content/domain/passage.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
@@ -187,6 +188,58 @@ void main() {
 
     expect(bodyText.style?.fontSize, 24);
     expect(bodyText.style?.height, 1.8);
+  });
+
+  testWidgets('navigates to quiz after completing a session', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    final clock = _FakeClock([
+      DateTime.utc(2026, 7, 7, 12),
+      DateTime.utc(2026, 7, 7, 12, 1),
+    ]);
+    addTearDown(database.close);
+
+    final router = GoRouter(
+      initialLocation: '/reader',
+      routes: [
+        GoRoute(
+          path: '/reader',
+          name: 'reader',
+          builder: (context, state) => const ReaderScreen(),
+        ),
+        GoRoute(
+          path: '/quiz',
+          name: 'quiz',
+          builder: (context, state) => const Scaffold(
+            body: Center(child: Text('Quiz Route')),
+          ),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(clock.call),
+          localProfileProvider.overrideWith((ref) async => _profile()),
+          readerSessionIdProvider.overrideWithValue(() => 'session-1'),
+          readerPassagesProvider.overrideWith((ref) async => [
+                _passage(),
+              ]),
+        ],
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start'));
+    await tester.pump();
+    await tester.tap(find.text('Finish'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Take Quiz'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Quiz Route'), findsOneWidget);
   });
 
   testWidgets('asks before leaving an active manual session', (tester) async {
