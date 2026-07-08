@@ -92,4 +92,64 @@ void main() {
     expect(find.text('Progress reset.'), findsOneWidget);
     expect(await store.loadReadingSessions(), isEmpty);
   });
+
+  testWidgets('shows JSON and CSV export previews', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(
+            () => DateTime.utc(2026, 7, 8),
+          ),
+        ],
+        child: const MaterialApp(home: SettingsScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    final store = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsScreen)),
+    ).read(localDataStoreProvider);
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'session-1',
+        passageId: 'passage-1',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8),
+        activeReadingSeconds: 60,
+        wordCount: 800,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+
+    await tester.ensureVisible(find.text('Export JSON'));
+    await tester.tap(find.text('Export JSON'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Export Preview'));
+    expect(find.text('Export Preview'), findsOneWidget);
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+    final jsonPreview = tester.widget<SelectableText>(
+      find.byKey(const ValueKey('settings-export-preview-text')),
+    );
+    expect(jsonPreview.data, contains('"sessions"'));
+    expect(jsonPreview.data, contains('session-1'));
+
+    await tester.ensureVisible(find.text('Export CSV'));
+    await tester.tap(find.text('Export CSV'));
+    await tester.pumpAndSettle();
+
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+    final csvPreview = tester.widget<SelectableText>(
+      find.byKey(const ValueKey('settings-export-preview-text')),
+    );
+    expect(csvPreview.data, contains('id,passageId,mode'));
+    expect(csvPreview.data, contains('session-1,passage-1,manual'));
+  });
 }

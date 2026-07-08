@@ -39,6 +39,8 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late bool _reducedMotion;
   bool _isSaving = false;
   bool _isResetting = false;
+  bool _isExporting = false;
+  String? _exportText;
 
   @override
   void initState() {
@@ -138,6 +140,49 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             label: const Text('Reset Progress'),
           ),
         ),
+        const SizedBox(height: 24),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            OutlinedButton.icon(
+              onPressed: _isExporting ? null : () => _exportData(_ExportFormat.json),
+              icon: const Icon(Icons.data_object),
+              label: const Text('Export JSON'),
+            ),
+            OutlinedButton.icon(
+              onPressed: _isExporting ? null : () => _exportData(_ExportFormat.csv),
+              icon: const Icon(Icons.table_chart),
+              label: const Text('Export CSV'),
+            ),
+          ],
+        ),
+        if (_isExporting) ...[
+          const SizedBox(height: 12),
+          const LinearProgressIndicator(),
+        ],
+        if (_exportText != null) ...[
+          const SizedBox(height: 16),
+          Text(
+            'Export Preview',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+          Container(
+            constraints: const BoxConstraints(maxHeight: 220),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).dividerColor),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: SingleChildScrollView(
+              child: SelectableText(
+                _exportText!,
+                key: const ValueKey('settings-export-preview-text'),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -214,7 +259,30 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
       const SnackBar(content: Text('Progress reset.')),
     );
   }
+
+  Future<void> _exportData(_ExportFormat format) async {
+    setState(() {
+      _isExporting = true;
+    });
+
+    final store = ref.read(localDataStoreProvider);
+    final exported = switch (format) {
+      _ExportFormat.json => await store.exportJson(),
+      _ExportFormat.csv => await store.exportCsv(),
+    };
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _exportText = exported;
+      _isExporting = false;
+    });
+  }
 }
+
+enum _ExportFormat { json, csv }
 
 class _SliderSetting extends StatelessWidget {
   const _SliderSetting({

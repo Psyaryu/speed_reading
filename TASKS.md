@@ -1225,6 +1225,16 @@ Commit: See Git history for `feat: add reset progress settings flow`
 Notes: Settings now exposes a confirmed reset action that clears local progress while keeping imported passages and settings through the existing local data store reset behavior.
 ```
 
+```text
+Task: Add local progress export preview
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/settings/presentation/settings_screen.dart, test/settings_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 95 tests passed.
+Commit: See Git history for `feat: add local progress export preview`
+Notes: Settings now generates JSON and CSV progress exports from local storage and displays a selectable preview. Platform file save/share behavior remains open.
+```
+
 ### Epic 9.2: Accessibility
 
 Tasks:
