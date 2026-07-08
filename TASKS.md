@@ -260,6 +260,16 @@ Dependencies:
 Completed task log:
 
 ```text
+Task: Add Drift database schema
+Status: Done
+Completed: 2026-07-07
+Changed files: .gitignore, lib/core/data/app_database.dart, lib/core/data/app_database.g.dart, test/app_database_test.dart, TASKS.md
+Verification: Ran `flutter pub run build_runner build --delete-conflicting-outputs`, `flutter analyze`, and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: add Drift database schema`
+Notes: Defines local tables for profile, passages, reading sessions, quiz results, progress snapshots, certification attempts, and mastery attempts.
+```
+
+```text
 Task: Add local progress export formatter
 Status: Done
 Completed: 2026-07-06
