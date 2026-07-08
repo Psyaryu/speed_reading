@@ -1119,6 +1119,16 @@ Commit: See Git history for `feat: show local profile on dashboard`
 Notes: Dashboard now consumes the local profile provider, which creates the local-only profile on first load.
 ```
 
+```text
+Task: Show latest progress summary on dashboard
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/training/presentation/dashboard_screen.dart, test/dashboard_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 98 tests passed.
+Commit: See Git history for `feat: show dashboard progress summary`
+Notes: Dashboard now shows latest WPM with comprehension context from local quiz results, or an empty-state message when no sessions exist. Full level, streak, ERS trend, and recommendation cards remain open.
+```
+
 ### Epic 8.2: Analytics Views
 
 Status: In Progress

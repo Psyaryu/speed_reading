@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/providers/app_providers.dart';
+import '../../progress/presentation/progress_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -10,6 +11,7 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(localProfileProvider);
+    final history = ref.watch(progressHistoryProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Speed Reading Trainer')),
@@ -35,6 +37,15 @@ class DashboardScreen extends ConsumerWidget {
             ),
             error: (error, stackTrace) => Text(
               'Profile unavailable: $error',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+            loading: () => const LinearProgressIndicator(),
+          ),
+          const SizedBox(height: 24),
+          history.when(
+            data: (history) => _ProgressSummary(history: history),
+            error: (error, stackTrace) => Text(
+              'Progress unavailable: $error',
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
             loading: () => const LinearProgressIndicator(),
@@ -72,6 +83,38 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ProgressSummary extends StatelessWidget {
+  const _ProgressSummary({required this.history});
+
+  final ProgressHistory history;
+
+  @override
+  Widget build(BuildContext context) {
+    final sessions = history.newestSessions;
+    if (sessions.isEmpty) {
+      return const Text('No completed sessions yet.');
+    }
+
+    final latest = sessions.first;
+    final quiz = history.quizForSession(latest.id);
+    final comprehension = quiz == null
+        ? 'Pending quiz'
+        : '${(quiz.comprehensionScore * 100).round()}%';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Latest Progress',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 8),
+        Text('${latest.wpm.round()} WPM - Comprehension: $comprehension'),
+      ],
     );
   }
 }
