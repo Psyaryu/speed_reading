@@ -591,6 +591,16 @@ Commit: See Git history for `feat: add reading session factory`
 Notes: Manual reading UI remains open. This domain factory supports WPM calculation from active reading time.
 ```
 
+```text
+Task: Build manual reader screen
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/reading/presentation/reader_screen.dart, test/reader_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 86 tests passed.
+Commit: See Git history for `feat: build manual reader screen`
+Notes: Renders the first available passage, starts and finishes a manual session, saves the session locally, and displays WPM. Pause/resume, accidental-exit protection, reader preferences, and passage selection remain open.
+```
+
 ### Epic 4.2: Paced Reading Mode
 
 Tasks:
