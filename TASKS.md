@@ -481,6 +481,16 @@ Commit: See Git history for `feat: add imported passage factory`
 Notes: UI and local persistence wiring remain open. Imported passages are explicitly not certification or mastery eligible by default.
 ```
 
+```text
+Task: Build import passage screen
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/content/presentation/import_passage_screen.dart, lib/core/router/app_router.dart, lib/content/presentation/library_screen.dart, test/import_passage_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: build import passage screen`
+Notes: Adds paste form with title, source, tags, body validation, and repository save wiring.
+```
+
 ## Milestone 3: Onboarding and Baseline Assessment
 
 Goal: Establish each user's starting speed, comprehension, focus, and recommended training level.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../domain/passage.dart';
 import '../domain/passage_filter.dart';
@@ -17,7 +18,16 @@ class LibraryScreen extends ConsumerWidget {
     final passages = ref.watch(libraryPassagesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Library')),
+      appBar: AppBar(
+        title: const Text('Library'),
+        actions: [
+          IconButton(
+            tooltip: 'Import passage',
+            onPressed: () => context.pushNamed('import'),
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
       body: passages.when(
         data: (items) => _PassageList(passages: items),
         error: (error, stackTrace) => Center(

@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../assessment/presentation/quiz_screen.dart';
 import '../../assessment/presentation/results_screen.dart';
+import '../../content/presentation/import_passage_screen.dart';
 import '../../content/presentation/library_screen.dart';
 import '../../progress/presentation/progress_screen.dart';
 import '../../reading/presentation/reader_screen.dart';
@@ -25,6 +26,11 @@ final appRouter = GoRouter(
       path: '/library',
       name: 'library',
       builder: (context, state) => const LibraryScreen(),
+    ),
+    GoRoute(
+      path: '/import',
+      name: 'import',
+      builder: (context, state) => const ImportPassageScreen(),
     ),
     GoRoute(
       path: '/reader',
@@ -53,4 +59,3 @@ final appRouter = GoRouter(
     ),
   ],
 );
-
