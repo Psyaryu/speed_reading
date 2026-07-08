@@ -802,6 +802,16 @@ Commit: See Git history for `feat: link quiz completion to results`
 Notes: After a quiz is scored and saved, the quiz screen now shows a View Results action that navigates to the results route.
 ```
 
+```text
+Task: Connect results screen to ERS scoring
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/assessment/presentation/results_screen.dart, test/results_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 107 tests passed.
+Commit: See Git history for `feat: show ERS on results screen`
+Notes: Results now loads passage metadata, computes Effective Reading Score from WPM, comprehension, difficulty, and mode, and displays it alongside the 70% comprehension gate.
+```
+
 ### Epic 5.2: Official Passage Question Sets
 
 Status: In Progress

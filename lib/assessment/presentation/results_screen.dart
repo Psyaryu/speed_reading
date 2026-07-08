@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../content/domain/passage.dart';
+import '../../content/domain/passage_filter.dart';
+import '../../core/providers/app_providers.dart';
+import '../../progress/domain/effective_reading_score.dart';
 import '../../progress/presentation/progress_screen.dart';
+
+final resultPassagesProvider = FutureProvider<List<Passage>>((ref) {
+  return ref.watch(passageRepositoryProvider).search(const PassageFilter());
+});
 
 class ResultsScreen extends ConsumerWidget {
   const ResultsScreen({super.key});
@@ -9,24 +17,33 @@ class ResultsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final history = ref.watch(progressHistoryProvider);
+    final passages = ref.watch(resultPassagesProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Results')),
-      body: history.when(
-        data: (history) => _ResultsBody(history: history),
-        error: (error, stackTrace) => Center(
-          child: Text('Unable to load results: $error'),
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-      ),
+      body: switch ((history, passages)) {
+        (AsyncData(value: final history), AsyncData(value: final passages)) =>
+          _ResultsBody(
+            history: history,
+            passages: passages,
+          ),
+        (AsyncError(error: final error), _) ||
+        (_, AsyncError(error: final error)) =>
+          Center(child: Text('Unable to load results: $error')),
+        _ => const Center(child: CircularProgressIndicator()),
+      },
     );
   }
 }
 
 class _ResultsBody extends StatelessWidget {
-  const _ResultsBody({required this.history});
+  const _ResultsBody({
+    required this.history,
+    required this.passages,
+  });
 
   final ProgressHistory history;
+  final List<Passage> passages;
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +54,19 @@ class _ResultsBody extends StatelessWidget {
 
     final session = sessions.first;
     final quiz = history.quizForSession(session.id);
+    final passage = _passageFor(session.passageId);
     final comprehensionScore = quiz?.comprehensionScore;
     final comprehensionLabel = comprehensionScore == null
         ? 'Pending quiz'
         : '${(comprehensionScore * 100).round()}%';
+    final effectiveReadingScore = comprehensionScore == null || passage == null
+        ? null
+        : EffectiveReadingScore.calculate(
+            wpm: session.wpm,
+            comprehensionScore: comprehensionScore,
+            difficulty: passage.metadata.difficulty,
+            mode: session.mode,
+          );
     final meetsThreshold =
         comprehensionScore != null && comprehensionScore >= 0.7;
 
@@ -61,6 +87,12 @@ class _ResultsBody extends StatelessWidget {
           value: comprehensionLabel,
         ),
         _ResultTile(
+          label: 'Effective Reading Score',
+          value: effectiveReadingScore == null
+              ? 'Pending quiz'
+              : effectiveReadingScore.round().toString(),
+        ),
+        _ResultTile(
           label: 'Standard Progress Gate',
           value: comprehensionScore == null
               ? 'Pending quiz'
@@ -68,13 +100,17 @@ class _ResultsBody extends StatelessWidget {
                   ? 'Qualified'
                   : 'Below 70%',
         ),
-        const SizedBox(height: 16),
-        Text(
-          'ERS requires passage difficulty metadata and will be shown once result scoring is connected to passage records.',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
       ],
     );
+  }
+
+  Passage? _passageFor(String passageId) {
+    for (final passage in passages) {
+      if (passage.id == passageId) {
+        return passage;
+      }
+    }
+    return null;
   }
 }
 

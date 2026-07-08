@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_reading/assessment/domain/quiz.dart';
 import 'package:speed_reading/assessment/presentation/results_screen.dart';
+import 'package:speed_reading/content/domain/passage.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/progress/presentation/progress_screen.dart';
 import 'package:speed_reading/reading/domain/reading_session.dart';
@@ -18,6 +19,7 @@ void main() {
               quizResults: [],
             ),
           ),
+          resultPassagesProvider.overrideWith((ref) async => const []),
         ],
         child: const MaterialApp(home: ResultsScreen()),
       ),
@@ -58,6 +60,9 @@ void main() {
               ],
             ),
           ),
+          resultPassagesProvider.overrideWith((ref) async => [
+                _passage(),
+              ]),
         ],
         child: const MaterialApp(home: ResultsScreen()),
       ),
@@ -68,6 +73,27 @@ void main() {
     expect(find.text('Latest Result'), findsOneWidget);
     expect(find.text('800 WPM'), findsOneWidget);
     expect(find.text('70%'), findsOneWidget);
+    expect(find.text('560'), findsOneWidget);
     expect(find.text('Qualified'), findsOneWidget);
   });
+}
+
+Passage _passage() {
+  return const Passage(
+    id: 'passage-1',
+    title: 'Passage',
+    body: 'A public domain passage.',
+    metadata: PassageMetadata(
+      wordCount: 800,
+      difficulty: PassageDifficulty.standard,
+      topic: 'Adventure',
+      source: PassageSource.official,
+      license: 'Public Domain',
+      type: PassageType.fiction,
+      vocabularyDensity: 0.2,
+      tags: ['adventure'],
+      isCertificationEligible: true,
+      isMasteryEligible: false,
+    ),
+  );
 }
