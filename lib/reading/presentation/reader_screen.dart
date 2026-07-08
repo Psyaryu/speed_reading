@@ -38,6 +38,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   @override
   Widget build(BuildContext context) {
     final passages = ref.watch(readerPassagesProvider);
+    final profile = ref.watch(localProfileProvider).valueOrNull;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Reader')),
@@ -51,6 +52,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             isReading: _isReading,
             isPaused: _isPaused,
             isSaving: _isSaving,
+            fontSize: profile?.preferredFontSize ?? 18,
+            lineHeight: profile?.preferredLineHeight ?? 1.5,
             completedSession: _completedSession,
             onStart: _startReading,
             onPause: _pauseReading,
@@ -149,6 +152,8 @@ class _ReaderBody extends StatelessWidget {
     required this.isReading,
     required this.isPaused,
     required this.isSaving,
+    required this.fontSize,
+    required this.lineHeight,
     required this.completedSession,
     required this.onStart,
     required this.onPause,
@@ -160,6 +165,8 @@ class _ReaderBody extends StatelessWidget {
   final bool isReading;
   final bool isPaused;
   final bool isSaving;
+  final double fontSize;
+  final double lineHeight;
   final ReadingSession? completedSession;
   final VoidCallback onStart;
   final VoidCallback onPause;
@@ -174,67 +181,84 @@ class _ReaderBody extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text(passage.title, style: textTheme.headlineSmall),
-        const SizedBox(height: 8),
-        Text(
-          '${passage.metadata.topic} - ${passage.metadata.wordCount} words',
-          style: textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: passage.metadata.tags
-              .map((tag) => Chip(label: Text(tag)))
-              .toList(growable: false),
-        ),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            FilledButton.icon(
-              onPressed: isReading || isSaving ? null : onStart,
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('Start'),
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(passage.title, style: textTheme.headlineSmall),
+                const SizedBox(height: 8),
+                Text(
+                  '${passage.metadata.topic} - ${passage.metadata.wordCount} words',
+                  style: textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: passage.metadata.tags
+                      .map((tag) => Chip(label: Text(tag)))
+                      .toList(growable: false),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: isReading || isSaving ? null : onStart,
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('Start'),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed:
+                          isReading && !isPaused && !isSaving ? onPause : null,
+                      icon: const Icon(Icons.pause),
+                      label: const Text('Pause'),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed:
+                          isReading && isPaused && !isSaving ? onResume : null,
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('Resume'),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: isReading && !isSaving ? onFinish : null,
+                      icon: isSaving
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.flag),
+                      label: const Text('Finish'),
+                    ),
+                  ],
+                ),
+                if (isReading) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    isPaused
+                        ? 'Reading session paused.'
+                        : 'Reading session active.',
+                  ),
+                ],
+                if (session != null) ...[
+                  const SizedBox(height: 12),
+                  Text('WPM: ${session.wpm.round()}'),
+                ],
+                const SizedBox(height: 24),
+                Text(
+                  passage.body,
+                  style: textTheme.bodyLarge?.copyWith(
+                    fontSize: fontSize,
+                    height: lineHeight,
+                  ),
+                ),
+              ],
             ),
-            OutlinedButton.icon(
-              onPressed: isReading && !isPaused && !isSaving ? onPause : null,
-              icon: const Icon(Icons.pause),
-              label: const Text('Pause'),
-            ),
-            OutlinedButton.icon(
-              onPressed: isReading && isPaused && !isSaving ? onResume : null,
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('Resume'),
-            ),
-            OutlinedButton.icon(
-              onPressed: isReading && !isSaving ? onFinish : null,
-              icon: isSaving
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.flag),
-              label: const Text('Finish'),
-            ),
-          ],
-        ),
-        if (isReading) ...[
-          const SizedBox(height: 12),
-          Text(
-            isPaused ? 'Reading session paused.' : 'Reading session active.',
           ),
-        ],
-        if (session != null) ...[
-          const SizedBox(height: 12),
-          Text('WPM: ${session.wpm.round()}'),
-        ],
-        const SizedBox(height: 24),
-        Text(
-          passage.body,
-          style: textTheme.bodyLarge?.copyWith(height: 1.55),
         ),
       ],
     );

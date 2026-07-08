@@ -9,6 +9,7 @@ import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
 import 'package:speed_reading/reading/presentation/reader_screen.dart';
+import 'package:speed_reading/settings/domain/local_user_profile.dart';
 
 void main() {
   testWidgets('completes and saves a manual reading session', (tester) async {
@@ -24,6 +25,7 @@ void main() {
         overrides: [
           appDatabaseProvider.overrideWithValue(database),
           currentDateTimeProvider.overrideWithValue(clock.call),
+          localProfileProvider.overrideWith((ref) async => _profile()),
           readerSessionIdProvider.overrideWithValue(() => 'session-1'),
           readerPassagesProvider.overrideWith((ref) async => [
                 _passage(),
@@ -70,6 +72,7 @@ void main() {
         overrides: [
           appDatabaseProvider.overrideWithValue(database),
           currentDateTimeProvider.overrideWithValue(clock.call),
+          localProfileProvider.overrideWith((ref) async => _profile()),
           readerSessionIdProvider.overrideWithValue(() => 'paused-session'),
           readerPassagesProvider.overrideWith((ref) async => [
                 _passage(wordCount: 600),
@@ -108,6 +111,7 @@ void main() {
       ProviderScope(
         overrides: [
           appDatabaseProvider.overrideWithValue(database),
+          localProfileProvider.overrideWith((ref) async => _profile()),
           readerPassagesProvider.overrideWith((ref) async => []),
         ],
         child: const MaterialApp(home: ReaderScreen()),
@@ -117,6 +121,35 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('No passages available.'), findsOneWidget);
+  });
+
+  testWidgets('applies local reader text preferences', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          localProfileProvider.overrideWith(
+            (ref) async => _profile(fontSize: 24, lineHeight: 1.8),
+          ),
+          readerPassagesProvider.overrideWith((ref) async => [
+                _passage(),
+              ]),
+        ],
+        child: const MaterialApp(home: ReaderScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    final bodyText = tester.widget<Text>(
+      find.textContaining('A flare tore through the fog'),
+    );
+
+    expect(bodyText.style?.fontSize, 24);
+    expect(bodyText.style?.height, 1.8);
   });
 }
 
@@ -137,6 +170,20 @@ Passage _passage({int wordCount = 800}) {
       isCertificationEligible: true,
       isMasteryEligible: true,
     ),
+  );
+}
+
+LocalUserProfile _profile({
+  double fontSize = 18,
+  double lineHeight = 1.5,
+}) {
+  return LocalUserProfile(
+    id: 'local',
+    createdAt: DateTime.utc(2026, 7, 7),
+    goals: const [TrainingGoal.generalImprovement],
+    preferredFontSize: fontSize,
+    preferredLineHeight: lineHeight,
+    reducedMotion: false,
   );
 }
 

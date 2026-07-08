@@ -611,6 +611,16 @@ Commit: See Git history for `feat: add manual reader pause tracking`
 Notes: Manual sessions now track pause count and paused duration, exclude paused time from WPM, and keep controls responsive on narrow layouts. Accidental-exit protection, reader preferences, and passage selection remain open.
 ```
 
+```text
+Task: Apply local reader text preferences
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/reading/presentation/reader_screen.dart, test/reader_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 88 tests passed.
+Commit: See Git history for `feat: apply reader text preferences`
+Notes: Manual reader text now uses the local profile font size and line height, with a constrained reading column for desktop/tablet readability. Theme selection UI and passage selection remain open.
+```
+
 ### Epic 4.2: Paced Reading Mode
 
 Tasks:
