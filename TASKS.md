@@ -762,6 +762,16 @@ Commit: See Git history for `feat: add quiz scoring engine`
 Notes: UI rendering and written-summary handling remain open.
 ```
 
+```text
+Task: Build multiple-choice quiz MVP
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/assessment/presentation/quiz_screen.dart, test/quiz_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 100 tests passed.
+Commit: See Git history for `feat: build multiple-choice quiz mvp`
+Notes: Quiz screen now loads the latest session, renders provider-supplied multiple-choice questions, scores selected answers, saves quiz results locally, and displays comprehension percentage. Official question assets and written-summary handling remain open.
+```
+
 ### Epic 5.2: Official Passage Question Sets
 
 Status: In Progress
