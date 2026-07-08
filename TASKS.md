@@ -363,6 +363,16 @@ Commit: See Git history for `feat: add local user profile model`
 Notes: Persistence wiring remains open under local persistence.
 ```
 
+```text
+Task: Add local profile initialization controller
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/settings/application/local_profile_controller.dart, lib/core/providers/app_providers.dart, test/local_profile_controller_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: add local profile initialization`
+Notes: Adds load-or-create behavior for the local-only profile and exposes it through Riverpod.
+```
+
 ## Milestone 2: Content Library
 
 Goal: Provide official public-domain long-form reading content and local pasted passage support.

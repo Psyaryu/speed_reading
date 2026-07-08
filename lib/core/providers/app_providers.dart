@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../content/data/default_passage_repository.dart';
 import '../../content/data/official_passage_loader.dart';
 import '../../content/data/passage_repository.dart';
+import '../../settings/application/local_profile_controller.dart';
+import '../../settings/domain/local_user_profile.dart';
 import '../data/app_database.dart';
 import '../data/database_connection.dart';
 import '../data/drift_local_data_store.dart';
@@ -27,4 +29,19 @@ final passageRepositoryProvider = Provider<PassageRepository>((ref) {
     officialPassageSource: ref.watch(officialPassageSourceProvider),
     localDataStore: ref.watch(localDataStoreProvider),
   );
+});
+
+final currentDateTimeProvider = Provider<DateTime Function()>((ref) {
+  return DateTime.now;
+});
+
+final localProfileControllerProvider = Provider<LocalProfileController>((ref) {
+  return LocalProfileController(
+    localDataStore: ref.watch(localDataStoreProvider),
+    now: ref.watch(currentDateTimeProvider),
+  );
+});
+
+final localProfileProvider = FutureProvider<LocalUserProfile>((ref) {
+  return ref.watch(localProfileControllerProvider).loadOrCreate();
 });
