@@ -151,6 +151,65 @@ void main() {
     expect(bodyText.style?.fontSize, 24);
     expect(bodyText.style?.height, 1.8);
   });
+
+  testWidgets('asks before leaving an active manual session', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    final clock = _FakeClock([
+      DateTime.utc(2026, 7, 7, 12),
+    ]);
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(clock.call),
+          localProfileProvider.overrideWith((ref) async => _profile()),
+          readerPassagesProvider.overrideWith((ref) async => [
+                _passage(),
+              ]),
+        ],
+        child: MaterialApp(
+          home: Builder(
+            builder: (context) {
+              return TextButton(
+                onPressed: () {
+                  Navigator.of(context).push<void>(
+                    MaterialPageRoute(
+                      builder: (context) => const ReaderScreen(),
+                    ),
+                  );
+                },
+                child: const Text('Open Reader'),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open Reader'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start'));
+    await tester.pump();
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Discard active session?'), findsOneWidget);
+
+    await tester.tap(find.text('Keep Reading'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Reading session active.'), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Discard'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Open Reader'), findsOneWidget);
+  });
 }
 
 Passage _passage({int wordCount = 800}) {

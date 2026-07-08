@@ -40,31 +40,40 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final passages = ref.watch(readerPassagesProvider);
     final profile = ref.watch(localProfileProvider).valueOrNull;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Reader')),
-      body: passages.when(
-        data: (items) {
-          if (items.isEmpty) {
-            return const Center(child: Text('No passages available.'));
-          }
-          return _ReaderBody(
-            passage: items.first,
-            isReading: _isReading,
-            isPaused: _isPaused,
-            isSaving: _isSaving,
-            fontSize: profile?.preferredFontSize ?? 18,
-            lineHeight: profile?.preferredLineHeight ?? 1.5,
-            completedSession: _completedSession,
-            onStart: _startReading,
-            onPause: _pauseReading,
-            onResume: _resumeReading,
-            onFinish: () => _finishReading(items.first),
-          );
-        },
-        error: (error, stackTrace) => Center(
-          child: Text('Unable to load reader passage: $error'),
+    return PopScope<void>(
+      canPop: !_isReading,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop || !_isReading) {
+          return;
+        }
+        _confirmDiscardSession();
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Reader')),
+        body: passages.when(
+          data: (items) {
+            if (items.isEmpty) {
+              return const Center(child: Text('No passages available.'));
+            }
+            return _ReaderBody(
+              passage: items.first,
+              isReading: _isReading,
+              isPaused: _isPaused,
+              isSaving: _isSaving,
+              fontSize: profile?.preferredFontSize ?? 18,
+              lineHeight: profile?.preferredLineHeight ?? 1.5,
+              completedSession: _completedSession,
+              onStart: _startReading,
+              onPause: _pauseReading,
+              onResume: _resumeReading,
+              onFinish: () => _finishReading(items.first),
+            );
+          },
+          error: (error, stackTrace) => Center(
+            child: Text('Unable to load reader passage: $error'),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
         ),
-        loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
   }
@@ -143,6 +152,39 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       _completedSession = session;
       _isSaving = false;
     });
+  }
+
+  Future<void> _confirmDiscardSession() async {
+    final shouldDiscard = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Discard active session?'),
+        content: const Text('Your current reading attempt has not been saved.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Keep Reading'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Discard'),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted || shouldDiscard != true) {
+      return;
+    }
+
+    setState(() {
+      _startedAt = null;
+      _pausedAt = null;
+      _pausedDuration = Duration.zero;
+      _pauseCount = 0;
+    });
+
+    Navigator.of(context).pop();
   }
 }
 

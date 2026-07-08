@@ -621,6 +621,16 @@ Commit: See Git history for `feat: apply reader text preferences`
 Notes: Manual reader text now uses the local profile font size and line height, with a constrained reading column for desktop/tablet readability. Theme selection UI and passage selection remain open.
 ```
 
+```text
+Task: Prevent accidental exits during active manual sessions
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/reading/presentation/reader_screen.dart, test/reader_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 89 tests passed.
+Commit: See Git history for `feat: guard active reader exits`
+Notes: Active manual sessions now intercept back navigation and require the user to keep reading or discard the unsaved attempt before leaving.
+```
+
 ### Epic 4.2: Paced Reading Mode
 
 Tasks:
