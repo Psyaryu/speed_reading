@@ -55,6 +55,51 @@ void main() {
     expect(sessions.single.wordCount, 800);
   });
 
+  testWidgets('excludes paused time from manual reading speed', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    final clock = _FakeClock([
+      DateTime.utc(2026, 7, 7, 12),
+      DateTime.utc(2026, 7, 7, 12, 0, 30),
+      DateTime.utc(2026, 7, 7, 12, 1, 30),
+      DateTime.utc(2026, 7, 7, 12, 2),
+    ]);
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(clock.call),
+          readerSessionIdProvider.overrideWithValue(() => 'paused-session'),
+          readerPassagesProvider.overrideWith((ref) async => [
+                _passage(wordCount: 600),
+              ]),
+        ],
+        child: const MaterialApp(home: ReaderScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start'));
+    await tester.pump();
+    await tester.tap(find.text('Pause'));
+    await tester.pump();
+
+    expect(find.text('Reading session paused.'), findsOneWidget);
+
+    await tester.tap(find.text('Resume'));
+    await tester.pump();
+    await tester.tap(find.text('Finish'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('WPM: 600'), findsOneWidget);
+
+    final sessions = await database.select(database.readingSessionRecords).get();
+    expect(sessions.single.id, 'paused-session');
+    expect(sessions.single.activeReadingSeconds, 60);
+    expect(sessions.single.pauseCount, 1);
+  });
+
   testWidgets('shows empty state when no passages are available', (tester) async {
     final database = AppDatabase(NativeDatabase.memory());
     addTearDown(database.close);
@@ -75,13 +120,13 @@ void main() {
   });
 }
 
-Passage _passage() {
-  return const Passage(
+Passage _passage({int wordCount = 800}) {
+  return Passage(
     id: 'passage-1',
     title: 'Cliff Signal',
     body: 'A flare tore through the fog while the runner climbed higher.',
     metadata: PassageMetadata(
-      wordCount: 800,
+      wordCount: wordCount,
       difficulty: PassageDifficulty.standard,
       topic: 'Adventure',
       source: PassageSource.official,

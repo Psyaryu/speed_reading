@@ -26,10 +26,14 @@ class ReaderScreen extends ConsumerStatefulWidget {
 
 class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   DateTime? _startedAt;
+  DateTime? _pausedAt;
+  Duration _pausedDuration = Duration.zero;
+  int _pauseCount = 0;
   ReadingSession? _completedSession;
   bool _isSaving = false;
 
   bool get _isReading => _startedAt != null && _completedSession == null;
+  bool get _isPaused => _pausedAt != null;
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +49,12 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           return _ReaderBody(
             passage: items.first,
             isReading: _isReading,
+            isPaused: _isPaused,
             isSaving: _isSaving,
             completedSession: _completedSession,
             onStart: _startReading,
+            onPause: _pauseReading,
+            onResume: _resumeReading,
             onFinish: () => _finishReading(items.first),
           );
         },
@@ -62,7 +69,34 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   void _startReading() {
     setState(() {
       _startedAt = ref.read(currentDateTimeProvider).call();
+      _pausedAt = null;
+      _pausedDuration = Duration.zero;
+      _pauseCount = 0;
       _completedSession = null;
+    });
+  }
+
+  void _pauseReading() {
+    if (!_isReading || _isPaused) {
+      return;
+    }
+
+    setState(() {
+      _pausedAt = ref.read(currentDateTimeProvider).call();
+      _pauseCount += 1;
+    });
+  }
+
+  void _resumeReading() {
+    final pausedAt = _pausedAt;
+    if (pausedAt == null) {
+      return;
+    }
+
+    final resumedAt = ref.read(currentDateTimeProvider).call();
+    setState(() {
+      _pausedDuration += resumedAt.difference(pausedAt);
+      _pausedAt = null;
     });
   }
 
@@ -77,6 +111,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     });
 
     final completedAt = ref.read(currentDateTimeProvider).call();
+    final pausedAt = _pausedAt;
+    final pausedDuration = pausedAt == null
+        ? _pausedDuration
+        : _pausedDuration + completedAt.difference(pausedAt);
     final session = ReadingSessionFactory.complete(
       id: ref.read(readerSessionIdProvider).call(),
       passageId: passage.id,
@@ -84,6 +122,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       startedAt: startedAt,
       completedAt: completedAt,
       wordCount: passage.metadata.wordCount,
+      pausedDuration: pausedDuration,
+      pauseCount: _pauseCount,
     );
 
     await ref.read(localDataStoreProvider).saveReadingSession(session);
@@ -94,6 +134,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
     setState(() {
       _startedAt = null;
+      _pausedAt = null;
+      _pausedDuration = Duration.zero;
+      _pauseCount = 0;
       _completedSession = session;
       _isSaving = false;
     });
@@ -104,17 +147,23 @@ class _ReaderBody extends StatelessWidget {
   const _ReaderBody({
     required this.passage,
     required this.isReading,
+    required this.isPaused,
     required this.isSaving,
     required this.completedSession,
     required this.onStart,
+    required this.onPause,
+    required this.onResume,
     required this.onFinish,
   });
 
   final Passage passage;
   final bool isReading;
+  final bool isPaused;
   final bool isSaving;
   final ReadingSession? completedSession;
   final VoidCallback onStart;
+  final VoidCallback onPause;
+  final VoidCallback onResume;
   final VoidCallback onFinish;
 
   @override
@@ -140,14 +189,25 @@ class _ReaderBody extends StatelessWidget {
               .toList(growable: false),
         ),
         const SizedBox(height: 16),
-        Row(
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
           children: [
             FilledButton.icon(
               onPressed: isReading || isSaving ? null : onStart,
               icon: const Icon(Icons.play_arrow),
               label: const Text('Start'),
             ),
-            const SizedBox(width: 12),
+            OutlinedButton.icon(
+              onPressed: isReading && !isPaused && !isSaving ? onPause : null,
+              icon: const Icon(Icons.pause),
+              label: const Text('Pause'),
+            ),
+            OutlinedButton.icon(
+              onPressed: isReading && isPaused && !isSaving ? onResume : null,
+              icon: const Icon(Icons.play_arrow),
+              label: const Text('Resume'),
+            ),
             OutlinedButton.icon(
               onPressed: isReading && !isSaving ? onFinish : null,
               icon: isSaving
@@ -163,7 +223,9 @@ class _ReaderBody extends StatelessWidget {
         ),
         if (isReading) ...[
           const SizedBox(height: 12),
-          const Text('Reading session active.'),
+          Text(
+            isPaused ? 'Reading session paused.' : 'Reading session active.',
+          ),
         ],
         if (session != null) ...[
           const SizedBox(height: 12),
