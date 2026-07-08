@@ -300,6 +300,16 @@ Notes: Opens the Drift database from the application documents directory using a
 ```
 
 ```text
+Task: Add Riverpod persistence providers
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/core/providers/app_providers.dart, test/app_providers_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: add persistence providers`
+Notes: Provides AppDatabase and LocalDataStore through Riverpod with a test override path.
+```
+
+```text
 Task: Add local progress export formatter
 Status: Done
 Completed: 2026-07-06
