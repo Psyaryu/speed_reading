@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -7,29 +8,81 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Speed Reading Trainer')),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: const Padding(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Dashboard',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
+      body: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          Text(
+            'Dashboard',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
                 ),
-                SizedBox(height: 12),
-                Text(
-                  'Comprehension-first speed reading practice starts here.',
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
           ),
-        ),
+          const SizedBox(height: 8),
+          Text(
+            'Comprehension-first speed reading practice starts here.',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 24),
+          _DashboardTile(
+            title: 'Library',
+            subtitle: 'Browse adventure passages and local imports.',
+            icon: Icons.menu_book,
+            onTap: () => context.goNamed('library'),
+          ),
+          _DashboardTile(
+            title: 'Import Passage',
+            subtitle: 'Paste text and store it locally for practice.',
+            icon: Icons.post_add,
+            onTap: () => context.goNamed('import'),
+          ),
+          _DashboardTile(
+            title: 'Reader',
+            subtitle: 'Manual, paced, RSVP, skim, and scan modes.',
+            icon: Icons.speed,
+            onTap: () => context.goNamed('reader'),
+          ),
+          _DashboardTile(
+            title: 'Progress',
+            subtitle: 'Track WPM, comprehension, ERS, and levels.',
+            icon: Icons.insights,
+            onTap: () => context.goNamed('progress'),
+          ),
+          _DashboardTile(
+            title: 'Settings',
+            subtitle: 'Adjust local preferences and exports.',
+            icon: Icons.settings,
+            onTap: () => context.goNamed('settings'),
+          ),
+        ],
       ),
     );
   }
 }
 
+class _DashboardTile extends StatelessWidget {
+  const _DashboardTile({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
+      ),
+    );
+  }
+}

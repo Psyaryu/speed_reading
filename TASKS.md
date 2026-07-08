@@ -1014,6 +1014,8 @@ Goal: Show progress clearly without encouraging speed-only behavior.
 
 ### Epic 8.1: Home Dashboard
 
+Status: In Progress
+
 Tasks:
 
 - Show current level.
@@ -1034,6 +1036,18 @@ Dependencies:
 
 - Progression system.
 - Training recommendation engine.
+
+Completed task log:
+
+```text
+Task: Add dashboard navigation entry points
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/training/presentation/dashboard_screen.dart, test/dashboard_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: add dashboard navigation`
+Notes: Dashboard now links to Library, Import Passage, Reader, Progress, and Settings. Live metrics remain open.
+```
 
 ### Epic 8.2: Analytics Views
 
