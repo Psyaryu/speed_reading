@@ -772,6 +772,16 @@ Commit: See Git history for `feat: build multiple-choice quiz mvp`
 Notes: Quiz screen now loads the latest session, renders provider-supplied multiple-choice questions, scores selected answers, saves quiz results locally, and displays comprehension percentage. Official question assets and written-summary handling remain open.
 ```
 
+```text
+Task: Build latest results screen
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/assessment/presentation/results_screen.dart, test/results_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 102 tests passed.
+Commit: See Git history for `feat: build latest results screen`
+Notes: Results now shows the latest saved session WPM, quiz comprehension, and the 70% standard progress gate. ERS display remains open until result scoring is connected to passage difficulty metadata.
+```
+
 ### Epic 5.2: Official Passage Question Sets
 
 Status: In Progress
