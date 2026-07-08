@@ -310,6 +310,16 @@ Notes: Provides AppDatabase and LocalDataStore through Riverpod with a test over
 ```
 
 ```text
+Task: Add content repository providers
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/core/providers/app_providers.dart, test/app_providers_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: add content repository providers`
+Notes: Exposes official passage source and passage repository through Riverpod.
+```
+
+```text
 Task: Add local progress export formatter
 Status: Done
 Completed: 2026-07-06
