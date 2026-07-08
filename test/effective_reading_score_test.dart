@@ -44,7 +44,7 @@ void main() {
       mode: ReadingMode.rsvp,
     );
 
-    expect(score, 828);
+    expect(score, closeTo(828, 0.001));
   });
 
   test('clamps comprehension score to valid range', () {
@@ -58,4 +58,3 @@ void main() {
     expect(score, 800);
   });
 }
-

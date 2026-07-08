@@ -108,9 +108,13 @@ Follow-up tasks:
   Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat create . --platforms=windows,android,ios`. Flutter generated platform scaffolding and resolved dependencies, then exited with a Developer Mode symlink warning for plugin builds.
   Commit: See Git history for `chore: generate Flutter platform scaffolding`
   Notes: Flutter SDK is installed locally at `C:\Users\Psyaryu\tools\flutter`. Enable Windows Developer Mode to allow plugin symlink creation for desktop builds.
-- Status: Blocked
+- Status: Done
   Task: Run `flutter pub get`, `flutter analyze`, and `flutter test`.
-  Blocker: Windows Developer Mode is not enabled, so Flutter plugin symlink support is blocked.
+  Completed: 2026-07-07
+  Changed files: windows/flutter/generated_plugin_registrant.cc, windows/flutter/generated_plugin_registrant.h, windows/flutter/generated_plugins.cmake, test/effective_reading_score_test.dart, TASKS.md
+  Verification: Ran `flutter pub get`, `flutter analyze`, and `flutter test` with local SDK at `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat`. Analyze passed with no issues. Test suite passed after changing one floating-point ERS assertion to use a tolerance.
+  Commit: See Git history for `test: verify Flutter analysis and tests`
+  Notes: `flutter create` previously reported a Windows Developer Mode symlink warning. Current `pub get`, `analyze`, and `test` all pass.
 
 ### Epic 0.2: App Architecture Skeleton
 
