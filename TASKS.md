@@ -1178,7 +1178,7 @@ Goal: Prepare MVP for Windows, Android, and iOS delivery.
 
 ### Epic 10.1: Windows Readiness
 
-Status: Blocked
+Status: In Progress
 
 Tasks:
 
@@ -1202,12 +1202,12 @@ Blocked task log:
 
 ```text
 Task: Verify Windows build
-Status: Blocked
-Completed:
+Status: Done
+Completed: 2026-07-07
 Changed files: TASKS.md
-Verification: Ran `flutter build windows`. Build is blocked by Flutter's plugin symlink requirement.
-Commit: See Git history for `chore: record Windows build blocker`
-Notes: Enable Windows Developer Mode, then rerun `flutter build windows`.
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build windows`. Build succeeded and produced `build\windows\x64\runner\Release\speed_reading.exe`.
+Commit: See Git history for `chore: verify Windows build`
+Notes: Windows Developer Mode is enabled and plugin symlink support works.
 ```
 
 ### Epic 10.2: Android Readiness
