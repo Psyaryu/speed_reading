@@ -1164,6 +1164,8 @@ Goal: Prepare MVP for Windows, Android, and iOS delivery.
 
 ### Epic 10.1: Windows Readiness
 
+Status: Blocked
+
 Tasks:
 
 - Validate desktop layout.
@@ -1181,6 +1183,18 @@ Acceptance criteria:
 Dependencies:
 
 - MVP features complete.
+
+Blocked task log:
+
+```text
+Task: Verify Windows build
+Status: Blocked
+Completed:
+Changed files: TASKS.md
+Verification: Ran `flutter build windows`. Build is blocked by Flutter's plugin symlink requirement.
+Commit: See Git history for `chore: record Windows build blocker`
+Notes: Enable Windows Developer Mode, then rerun `flutter build windows`.
+```
 
 ### Epic 10.2: Android Readiness
 
