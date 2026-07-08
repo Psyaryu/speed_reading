@@ -290,6 +290,16 @@ Notes: Implements local profile, imported passages, reading sessions, quiz resul
 ```
 
 ```text
+Task: Add persistent database connection
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/core/data/database_connection.dart, test/database_connection_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: add persistent database connection`
+Notes: Opens the Drift database from the application documents directory using a stable local SQLite file name.
+```
+
+```text
 Task: Add local progress export formatter
 Status: Done
 Completed: 2026-07-06
