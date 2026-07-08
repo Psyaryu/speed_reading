@@ -1121,6 +1121,8 @@ Notes: Dashboard now consumes the local profile provider, which creates the loca
 
 ### Epic 8.2: Analytics Views
 
+Status: In Progress
+
 Tasks:
 
 - Build WPM over time chart.
@@ -1140,6 +1142,18 @@ Dependencies:
 
 - Local progress history.
 - Charting package.
+
+Completed task log:
+
+```text
+Task: Build basic progress history screen
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/progress/presentation/progress_screen.dart, test/progress_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 97 tests passed.
+Commit: See Git history for `feat: add basic progress history screen`
+Notes: Progress now shows persisted reading sessions with WPM and comprehension context from quiz results, or pending quiz when comprehension is unavailable. Charts and skill breakdowns remain open.
+```
 
 ### Epic 8.3: Shareable Progress Summary
 
