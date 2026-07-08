@@ -1059,6 +1059,16 @@ Commit: See Git history for `feat: add dashboard navigation`
 Notes: Dashboard now links to Library, Import Passage, Reader, Progress, and Settings. Live metrics remain open.
 ```
 
+```text
+Task: Show initialized local profile on dashboard
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/training/presentation/dashboard_screen.dart, test/dashboard_screen_test.dart, test/widget_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: show local profile on dashboard`
+Notes: Dashboard now consumes the local profile provider, which creates the local-only profile on first load.
+```
+
 ### Epic 8.2: Analytics Views
 
 Tasks:

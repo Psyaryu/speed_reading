@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class DashboardScreen extends StatelessWidget {
+import '../../../core/providers/app_providers.dart';
+
+class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(localProfileProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Speed Reading Trainer')),
       body: ListView(
@@ -21,6 +26,18 @@ class DashboardScreen extends StatelessWidget {
           Text(
             'Comprehension-first speed reading practice starts here.',
             style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 16),
+          profile.when(
+            data: (profile) => Text(
+              'Local profile ready • ${profile.goals.length} goal selected',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            error: (error, stackTrace) => Text(
+              'Profile unavailable: $error',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+            loading: () => const LinearProgressIndicator(),
           ),
           const SizedBox(height: 24),
           _DashboardTile(
