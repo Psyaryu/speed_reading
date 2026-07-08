@@ -101,12 +101,16 @@ Notes: Added manual Flutter project metadata, dependency declarations, placehold
 
 Follow-up tasks:
 
-- Status: Blocked
+- Status: Done
   Task: Run `flutter create . --platforms=windows,android,ios` or equivalent to generate full platform scaffolding.
-  Blocker: Flutter SDK is not installed or not on PATH.
+  Completed: 2026-07-07
+  Changed files: .metadata, pubspec.lock, android/**, ios/**, windows/**, TASKS.md
+  Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat create . --platforms=windows,android,ios`. Flutter generated platform scaffolding and resolved dependencies, then exited with a Developer Mode symlink warning for plugin builds.
+  Commit: See Git history for `chore: generate Flutter platform scaffolding`
+  Notes: Flutter SDK is installed locally at `C:\Users\Psyaryu\tools\flutter`. Enable Windows Developer Mode to allow plugin symlink creation for desktop builds.
 - Status: Blocked
   Task: Run `flutter pub get`, `flutter analyze`, and `flutter test`.
-  Blocker: Flutter SDK is not installed or not on PATH.
+  Blocker: Windows Developer Mode is not enabled, so Flutter plugin symlink support is blocked.
 
 ### Epic 0.2: App Architecture Skeleton
 
