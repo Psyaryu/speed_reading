@@ -40,6 +40,9 @@ class ReadingSessionRecords extends Table {
   IntColumn get pauseCount => integer()();
   IntColumn get userConfidenceRating => integer().nullable()();
   IntColumn get selfRatedFocus => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
 }
 
 class QuizResultRecords extends Table {
@@ -109,4 +112,3 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 }
-

@@ -270,6 +270,16 @@ Notes: Defines local tables for profile, passages, reading sessions, quiz result
 ```
 
 ```text
+Task: Add reading session table primary key
+Status: Done
+Completed: 2026-07-07
+Changed files: lib/core/data/app_database.dart, lib/core/data/app_database.g.dart, TASKS.md
+Verification: Ran `flutter pub run build_runner build --delete-conflicting-outputs`, `flutter analyze`, and `flutter test`. Analyze passed with no issues and all tests passed.
+Commit: See Git history for `fix: add reading session primary key`
+Notes: Added a primary key to reading session records so session history can be upserted and referenced reliably.
+```
+
+```text
 Task: Add local progress export formatter
 Status: Done
 Completed: 2026-07-06
