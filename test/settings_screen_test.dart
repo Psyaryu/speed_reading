@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_reading/core/data/app_database.dart';
+import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
+import 'package:speed_reading/reading/domain/reading_session.dart';
 import 'package:speed_reading/settings/presentation/settings_screen.dart';
 
 void main() {
@@ -40,5 +42,54 @@ void main() {
     expect(profile.preferredFontSize, 24);
     expect(profile.preferredLineHeight, 1.8);
     expect(profile.reducedMotion, isTrue);
+  });
+
+  testWidgets('resets progress only after confirmation', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(
+            () => DateTime.utc(2026, 7, 8),
+          ),
+        ],
+        child: const MaterialApp(home: SettingsScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    final store = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsScreen)),
+    ).read(localDataStoreProvider);
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'session-1',
+        passageId: 'passage-1',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8),
+        activeReadingSeconds: 60,
+        wordCount: 800,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+
+    await tester.tap(find.text('Reset Progress'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(await store.loadReadingSessions(), hasLength(1));
+
+    await tester.tap(find.text('Reset Progress'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reset'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Progress reset.'), findsOneWidget);
+    expect(await store.loadReadingSessions(), isEmpty);
   });
 }

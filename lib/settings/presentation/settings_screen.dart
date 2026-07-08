@@ -38,6 +38,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late double _lineHeight;
   late bool _reducedMotion;
   bool _isSaving = false;
+  bool _isResetting = false;
 
   @override
   void initState() {
@@ -117,6 +118,26 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             label: const Text('Save Settings'),
           ),
         ),
+        const SizedBox(height: 32),
+        Text(
+          'Data',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            onPressed: _isResetting ? null : _confirmResetProgress,
+            icon: _isResetting
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.delete_outline),
+            label: const Text('Reset Progress'),
+          ),
+        ),
       ],
     );
   }
@@ -148,6 +169,49 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Settings saved.')),
+    );
+  }
+
+  Future<void> _confirmResetProgress() async {
+    final shouldReset = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset progress?'),
+        content: const Text(
+          'This clears sessions, quiz results, progress snapshots, and certification attempts. Imported passages and settings stay on this device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldReset != true) {
+      return;
+    }
+
+    setState(() {
+      _isResetting = true;
+    });
+
+    await ref.read(localDataStoreProvider).resetProgress();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isResetting = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Progress reset.')),
     );
   }
 }
