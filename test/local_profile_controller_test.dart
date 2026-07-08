@@ -48,4 +48,23 @@ void main() {
 
     expect(profile.id, 'local');
   });
+
+  test('updates reading preferences on local profile', () async {
+    final controller = container.read(localProfileControllerProvider);
+
+    final updated = await controller.updateReadingPreferences(
+      preferredFontSize: 24,
+      preferredLineHeight: 1.8,
+      reducedMotion: true,
+    );
+
+    expect(updated.preferredFontSize, 24);
+    expect(updated.preferredLineHeight, 1.8);
+    expect(updated.reducedMotion, isTrue);
+
+    final stored = await container.read(localDataStoreProvider).loadProfile();
+    expect(stored?.preferredFontSize, 24);
+    expect(stored?.preferredLineHeight, 1.8);
+    expect(stored?.reducedMotion, isTrue);
+  });
 }

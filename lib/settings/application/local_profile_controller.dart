@@ -23,5 +23,19 @@ class LocalProfileController {
     await localDataStore.saveProfile(profile);
     return profile;
   }
-}
 
+  Future<LocalUserProfile> updateReadingPreferences({
+    required double preferredFontSize,
+    required double preferredLineHeight,
+    required bool reducedMotion,
+  }) async {
+    final profile = await loadOrCreate();
+    final updated = profile.copyWith(
+      preferredFontSize: preferredFontSize,
+      preferredLineHeight: preferredLineHeight,
+      reducedMotion: reducedMotion,
+    );
+    await localDataStore.saveProfile(updated);
+    return updated;
+  }
+}

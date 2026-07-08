@@ -33,5 +33,23 @@ void main() {
     expect(roundTrip.baselineComprehension, 0.8);
     expect(roundTrip.reducedMotion, isTrue);
   });
-}
 
+  test('copies reading preferences without changing identity', () {
+    final profile = LocalUserProfile.initial(
+      id: 'local',
+      createdAt: DateTime.utc(2026, 7, 6),
+    );
+
+    final updated = profile.copyWith(
+      preferredFontSize: 22,
+      preferredLineHeight: 1.7,
+      reducedMotion: true,
+    );
+
+    expect(updated.id, 'local');
+    expect(updated.createdAt, DateTime.utc(2026, 7, 6));
+    expect(updated.preferredFontSize, 22);
+    expect(updated.preferredLineHeight, 1.7);
+    expect(updated.reducedMotion, isTrue);
+  });
+}

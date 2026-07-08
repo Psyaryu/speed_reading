@@ -1181,6 +1181,8 @@ Goal: Make the app comfortable, private, and resilient across target platforms.
 
 ### Epic 9.1: Settings
 
+Status: In Progress
+
 Tasks:
 
 - Add font size setting.
@@ -1200,6 +1202,18 @@ Acceptance criteria:
 Dependencies:
 
 - Local persistence.
+
+Completed task log:
+
+```text
+Task: Add local reading preference settings
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/settings/domain/local_user_profile.dart, lib/settings/application/local_profile_controller.dart, lib/settings/presentation/settings_screen.dart, test/local_user_profile_test.dart, test/local_profile_controller_test.dart, test/settings_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 93 tests passed.
+Commit: See Git history for `feat: add local reading preference settings`
+Notes: Settings now persists font size, line height, and reduced motion locally through the profile controller. Theme, column width, export UI, and reset UI remain open.
+```
 
 ### Epic 9.2: Accessibility
 

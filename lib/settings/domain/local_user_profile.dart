@@ -21,6 +21,27 @@ class LocalUserProfile {
   final double? baselineWpm;
   final double? baselineComprehension;
 
+  LocalUserProfile copyWith({
+    List<TrainingGoal>? goals,
+    double? preferredFontSize,
+    double? preferredLineHeight,
+    bool? reducedMotion,
+    double? baselineWpm,
+    double? baselineComprehension,
+  }) {
+    return LocalUserProfile(
+      id: id,
+      createdAt: createdAt,
+      goals: goals ?? this.goals,
+      preferredFontSize: preferredFontSize ?? this.preferredFontSize,
+      preferredLineHeight: preferredLineHeight ?? this.preferredLineHeight,
+      reducedMotion: reducedMotion ?? this.reducedMotion,
+      baselineWpm: baselineWpm ?? this.baselineWpm,
+      baselineComprehension:
+          baselineComprehension ?? this.baselineComprehension,
+    );
+  }
+
   factory LocalUserProfile.initial({
     required String id,
     required DateTime createdAt,
@@ -64,4 +85,3 @@ class LocalUserProfile {
     );
   }
 }
-
