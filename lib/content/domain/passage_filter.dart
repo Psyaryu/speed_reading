@@ -15,6 +15,33 @@ class PassageFilter {
   final String? topic;
   final List<String> tags;
   final PassageSource? source;
+
+  bool get isEmpty =>
+      (query == null || query!.trim().isEmpty) &&
+      difficulty == null &&
+      (topic == null || topic!.trim().isEmpty) &&
+      tags.isEmpty &&
+      source == null;
+
+  PassageFilter copyWith({
+    String? query,
+    bool clearQuery = false,
+    PassageDifficulty? difficulty,
+    bool clearDifficulty = false,
+    String? topic,
+    bool clearTopic = false,
+    List<String>? tags,
+    PassageSource? source,
+    bool clearSource = false,
+  }) {
+    return PassageFilter(
+      query: clearQuery ? null : query ?? this.query,
+      difficulty: clearDifficulty ? null : difficulty ?? this.difficulty,
+      topic: clearTopic ? null : topic ?? this.topic,
+      tags: tags ?? this.tags,
+      source: clearSource ? null : source ?? this.source,
+    );
+  }
 }
 
 class PassageFilterService {
@@ -48,4 +75,3 @@ class PassageFilterService {
     }).toList(growable: false);
   }
 }
-

@@ -14,6 +14,9 @@ void main() {
       ProviderScope(
         overrides: [
           libraryPassagesProvider.overrideWith((ref) async => [_passage()]),
+          libraryAvailablePassagesProvider.overrideWith(
+            (ref) async => [_passage()],
+          ),
         ],
         child: const MaterialApp(home: LibraryScreen()),
       ),
@@ -22,7 +25,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Treasure Island'), findsOneWidget);
-    expect(find.text('pirates'), findsOneWidget);
+    expect(find.widgetWithText(Chip, 'pirates'), findsOneWidget);
   });
 
   testWidgets('renders empty state', (tester) async {
@@ -30,6 +33,7 @@ void main() {
       ProviderScope(
         overrides: [
           libraryPassagesProvider.overrideWith((ref) async => []),
+          libraryAvailablePassagesProvider.overrideWith((ref) async => []),
         ],
         child: const MaterialApp(home: LibraryScreen()),
       ),
@@ -47,6 +51,9 @@ void main() {
       ProviderScope(
         overrides: [
           libraryPassagesProvider.overrideWith(
+            (ref) async => [_passage(), _importedPassage()],
+          ),
+          libraryAvailablePassagesProvider.overrideWith(
             (ref) async => [_passage(), _importedPassage()],
           ),
         ],
@@ -71,6 +78,9 @@ void main() {
           libraryPassagesProvider.overrideWith(
             (ref) async => [_importedPassage()],
           ),
+          libraryAvailablePassagesProvider.overrideWith(
+            (ref) async => [_importedPassage()],
+          ),
           passageRepositoryProvider.overrideWithValue(repository),
         ],
         child: const MaterialApp(home: LibraryScreen()),
@@ -85,6 +95,48 @@ void main() {
 
     expect(repository.deleted, ['import-1']);
     expect(find.text('Passage deleted.'), findsOneWidget);
+  });
+
+  testWidgets('searches and filters by difficulty topic and tag', (
+    tester,
+  ) async {
+    final repository = _FakePassageRepository(
+      passages: [_passage(), _junglePassage()],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          passageRepositoryProvider.overrideWithValue(repository),
+        ],
+        child: const MaterialApp(home: LibraryScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Treasure Island'), findsOneWidget);
+    expect(find.text('Jungle Trail'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'Jungle');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Treasure Island'), findsNothing);
+    expect(find.text('Jungle Trail'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Hard'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Exploration'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilterChip, 'jungle'));
+    await tester.pumpAndSettle();
+
+    final latestFilter = repository.filters.last;
+    expect(latestFilter.query, 'Jungle');
+    expect(latestFilter.difficulty, PassageDifficulty.hard);
+    expect(latestFilter.topic, 'Exploration');
+    expect(latestFilter.tags, ['jungle']);
+    expect(find.text('Jungle Trail'), findsOneWidget);
   });
 }
 
@@ -128,8 +180,33 @@ Passage _importedPassage() {
   );
 }
 
+Passage _junglePassage() {
+  return const Passage(
+    id: 'p2',
+    title: 'Jungle Trail',
+    body: 'Explorers cross the jungle trail.',
+    metadata: PassageMetadata(
+      wordCount: 5,
+      difficulty: PassageDifficulty.hard,
+      topic: 'Exploration',
+      source: PassageSource.official,
+      license: 'Public Domain',
+      type: PassageType.fiction,
+      vocabularyDensity: 0.25,
+      tags: ['jungle', 'adventure'],
+      isCertificationEligible: false,
+      isMasteryEligible: true,
+    ),
+  );
+}
+
 class _FakePassageRepository implements PassageRepository {
+  _FakePassageRepository({List<Passage>? passages})
+      : passages = passages ?? const [];
+
+  final List<Passage> passages;
   final deleted = <String>[];
+  final filters = <PassageFilter>[];
 
   @override
   Future<void> deleteImportedPassage(String passageId) async {
@@ -140,11 +217,16 @@ class _FakePassageRepository implements PassageRepository {
   Future<List<Passage>> loadImportedPassages() async => [];
 
   @override
-  Future<List<Passage>> loadOfficialPassages() async => [];
+  Future<List<Passage>> loadOfficialPassages() async => passages
+      .where((passage) => passage.metadata.source == PassageSource.official)
+      .toList(growable: false);
 
   @override
   Future<void> saveImportedPassage(Passage passage) async {}
 
   @override
-  Future<List<Passage>> search(PassageFilter filter) async => [];
+  Future<List<Passage>> search(PassageFilter filter) async {
+    filters.add(filter);
+    return PassageFilterService.apply(passages, filter);
+  }
 }

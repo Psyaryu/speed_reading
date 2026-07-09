@@ -407,7 +407,7 @@ Goal: Provide official public-domain long-form reading content and local pasted 
 
 ### Epic 2.1: Official Passage Library
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -488,6 +488,16 @@ Changed files: lib/content/presentation/library_screen.dart, test/library_screen
 Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
 Commit: See Git history for `feat: build library passage list`
 Notes: Replaces placeholder with a Riverpod-backed list of official/imported passages and tag chips.
+```
+
+```text
+Task: Add library search and filter controls
+Status: Done
+Completed: 2026-07-09
+Changed files: lib/content/domain/passage_filter.dart, lib/content/presentation/library_screen.dart, test/library_screen_test.dart, TASKS.md
+Verification: Confirmed official bundled passages are adventurous public-domain fiction split into short, medium, and long passages with difficulty, topic, word count, text type, source, license, vocabulary density, tags, grade level, author, source URL, and mastery eligibility metadata. Confirmed official fiction passages remain certification-ineligible under the current non-fiction certification rules and the long hard passage is mastery-eligible. Added Library search plus difficulty, topic, and tag filters backed by the existing repository filtering service. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all 171 tests passed.
+Commit: See Git history for `feat: add library filters`
+Notes: Epic 2.1 acceptance criteria are met. No follow-up tasks remain for the official passage library.
 ```
 
 ### Epic 2.2: Paste-and-Save Imported Text
