@@ -2,8 +2,94 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/providers/app_providers.dart';
+import '../../content/domain/passage.dart';
+import '../../content/domain/passage_filter.dart';
+import '../../core/providers/app_providers.dart';
+import '../../progress/domain/effective_reading_score.dart';
+import '../../progress/domain/progression.dart';
 import '../../progress/presentation/progress_screen.dart';
+
+final dashboardProgressSummaryProvider =
+    FutureProvider<DashboardProgressSummary>((ref) async {
+  final store = ref.watch(localDataStoreProvider);
+  final repository = ref.watch(passageRepositoryProvider);
+  final sessions = await store.loadReadingSessions();
+  final quizResults = await store.loadQuizResults();
+  final passages = await repository.search(const PassageFilter());
+
+  return DashboardProgressSummary.from(
+    history: ProgressHistory(
+      sessions: sessions,
+      quizResults: quizResults,
+    ),
+    passages: passages,
+  );
+});
+
+class DashboardProgressSummary {
+  const DashboardProgressSummary({
+    required this.history,
+    required this.level,
+    required this.levelName,
+    required this.bestQualifiedErs,
+    required this.readinessPercent,
+  });
+
+  final ProgressHistory history;
+  final int level;
+  final String levelName;
+  final double bestQualifiedErs;
+  final double readinessPercent;
+
+  factory DashboardProgressSummary.from({
+    required ProgressHistory history,
+    required List<Passage> passages,
+  }) {
+    final passagesById = {
+      for (final passage in passages) passage.id: passage,
+    };
+    var bestQualifiedErs = 0.0;
+
+    for (final session in history.sessions) {
+      final quiz = history.quizForSession(session.id);
+      final passage = passagesById[session.passageId];
+      if (quiz == null || passage == null) {
+        continue;
+      }
+
+      final input = QualifiedAttemptInput(
+        wpm: session.wpm,
+        comprehensionScore: quiz.comprehensionScore,
+        wordCount: session.wordCount,
+        difficulty: passage.metadata.difficulty,
+        status: session.status,
+        excessivePausing: session.pauseCount > 3,
+      );
+      if (!Progression.isQualifiedAttempt(input)) {
+        continue;
+      }
+
+      final ers = EffectiveReadingScore.calculate(
+        wpm: session.wpm,
+        comprehensionScore: quiz.comprehensionScore,
+        difficulty: passage.metadata.difficulty,
+        mode: session.mode,
+      );
+      if (ers > bestQualifiedErs) {
+        bestQualifiedErs = ers;
+      }
+    }
+
+    final level = Progression.levelForQualifiedErs(bestQualifiedErs);
+    return DashboardProgressSummary(
+      history: history,
+      level: level,
+      levelName: Progression.levelName(level),
+      bestQualifiedErs: bestQualifiedErs,
+      readinessPercent: Progression.readinessPercent(bestQualifiedErs),
+    );
+  }
+}
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -11,7 +97,7 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(localProfileProvider);
-    final history = ref.watch(progressHistoryProvider);
+    final progressSummary = ref.watch(dashboardProgressSummaryProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Speed Reading Trainer')),
@@ -32,7 +118,7 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           profile.when(
             data: (profile) => Text(
-              'Local profile ready • ${profile.goals.length} goal selected',
+              'Local profile ready - ${profile.goals.length} goal selected',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             error: (error, stackTrace) => Text(
@@ -42,8 +128,8 @@ class DashboardScreen extends ConsumerWidget {
             loading: () => const LinearProgressIndicator(),
           ),
           const SizedBox(height: 24),
-          history.when(
-            data: (history) => _ProgressSummary(history: history),
+          progressSummary.when(
+            data: (summary) => _ProgressSummary(summary: summary),
             error: (error, stackTrace) => Text(
               'Progress unavailable: $error',
               style: TextStyle(color: Theme.of(context).colorScheme.error),
@@ -88,12 +174,13 @@ class DashboardScreen extends ConsumerWidget {
 }
 
 class _ProgressSummary extends StatelessWidget {
-  const _ProgressSummary({required this.history});
+  const _ProgressSummary({required this.summary});
 
-  final ProgressHistory history;
+  final DashboardProgressSummary summary;
 
   @override
   Widget build(BuildContext context) {
+    final history = summary.history;
     final sessions = history.newestSessions;
     if (sessions.isEmpty) {
       return const Text('No completed sessions yet.');
@@ -109,10 +196,15 @@ class _ProgressSummary extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Latest Progress',
+          '800 WPM Readiness',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 8),
+        Text('Level ${summary.level}: ${summary.levelName}'),
+        Text(
+          'Readiness: ${summary.readinessPercent.round()}% '
+          '(${summary.bestQualifiedErs.round()} qualified ERS)',
+        ),
         Text('${latest.wpm.round()} WPM - Comprehension: $comprehension'),
       ],
     );
