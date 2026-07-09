@@ -1245,7 +1245,7 @@ Notes: Dashboard now shows a short daily practice plan and a deterministic recom
 
 ### Epic 8.2: Analytics Views
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -1268,6 +1268,16 @@ Dependencies:
 - Charting package.
 
 Completed task log:
+
+```text
+Task: Build WPM/comprehension/ERS over time views
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/progress/domain/progress_trend.dart, lib/progress/presentation/progress_screen.dart, test/progress_trend_test.dart, test/progress_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 131 tests passed.
+Commit: See Git history for `feat: show progress trends`
+Notes: Progress now derives WPM, comprehension, and ERS trend points from local reading sessions, quiz results, and passage metadata, then displays a dated accessible table with official/imported source labels and an empty state when fewer than two paired sessions exist. Imported passage text is not displayed.
+```
 
 ```text
 Task: Build basic progress history screen

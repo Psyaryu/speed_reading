@@ -4,9 +4,11 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../assessment/domain/quiz.dart';
 import '../../content/domain/passage_filter.dart';
+import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
 import '../../progress/domain/best_qualified_attempt.dart';
 import '../../progress/domain/passage_difficulty_distribution.dart';
+import '../../progress/domain/progress_trend.dart';
 import '../../progress/domain/shareable_progress_summary.dart';
 import '../../progress/domain/skill_breakdown.dart';
 import '../../reading/domain/reading_session.dart';
@@ -59,6 +61,18 @@ final passageDifficultyDistributionProvider =
   );
 });
 
+final progressTrendProvider = FutureProvider<ProgressTrend>((ref) async {
+  final history = await ref.watch(progressHistoryProvider.future);
+  final passages = await ref.watch(passageRepositoryProvider).search(
+        const PassageFilter(),
+      );
+  return ProgressTrendBuilder.fromHistory(
+    sessions: history.sessions,
+    quizResults: history.quizResults,
+    passages: passages,
+  );
+});
+
 final skillBreakdownProvider = FutureProvider<SkillBreakdown>((ref) async {
   final history = await ref.watch(progressHistoryProvider.future);
   final questions = await ref.watch(officialQuestionSourceProvider).load();
@@ -107,6 +121,7 @@ class ProgressScreen extends ConsumerWidget {
     final bestQualifiedAttempt = ref.watch(bestQualifiedAttemptProvider);
     final difficultyDistribution =
         ref.watch(passageDifficultyDistributionProvider);
+    final progressTrend = ref.watch(progressTrendProvider);
     final skillBreakdown = ref.watch(skillBreakdownProvider);
 
     return Scaffold(
@@ -117,6 +132,7 @@ class ProgressScreen extends ConsumerWidget {
           shareSummary: shareSummary,
           bestQualifiedAttempt: bestQualifiedAttempt,
           difficultyDistribution: difficultyDistribution,
+          progressTrend: progressTrend,
           skillBreakdown: skillBreakdown,
         ),
         error: (error, stackTrace) => Center(
@@ -134,6 +150,7 @@ class _ProgressBody extends ConsumerWidget {
     required this.shareSummary,
     required this.bestQualifiedAttempt,
     required this.difficultyDistribution,
+    required this.progressTrend,
     required this.skillBreakdown,
   });
 
@@ -141,6 +158,7 @@ class _ProgressBody extends ConsumerWidget {
   final AsyncValue<ShareableProgressSummary?> shareSummary;
   final AsyncValue<BestQualifiedAttempt?> bestQualifiedAttempt;
   final AsyncValue<PassageDifficultyDistribution> difficultyDistribution;
+  final AsyncValue<ProgressTrend> progressTrend;
   final AsyncValue<SkillBreakdown> skillBreakdown;
 
   @override
@@ -168,6 +186,8 @@ class _ProgressBody extends ConsumerWidget {
           label: 'Comprehension',
           value: _comprehensionLabel(latestQuiz),
         ),
+        const SizedBox(height: 16),
+        _ProgressTrendCard(trend: progressTrend),
         const SizedBox(height: 16),
         _ShareableProgressCard(
           summary: shareSummary,
@@ -210,6 +230,134 @@ class _ProgressBody extends ConsumerWidget {
       return 'Pending quiz';
     }
     return '${(quiz.comprehensionScore * 100).round()}%';
+  }
+}
+
+class _ProgressTrendCard extends StatelessWidget {
+  const _ProgressTrendCard({required this.trend});
+
+  final AsyncValue<ProgressTrend> trend;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: trend.when(
+          data: (trend) {
+            if (!trend.hasEnoughData) {
+              return const Text(
+                'Complete at least two sessions with quizzes to see WPM, '
+                'comprehension, and ERS trends.',
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Progress Trends',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'WPM, comprehension, and ERS over time',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 12),
+                _TrendHeader(),
+                const Divider(height: 16),
+                ...trend.points.map((point) => _TrendPointRow(point: point)),
+                if (trend.unmatchedSessionCount > 0) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '${trend.unmatchedSessionCount} completed quiz session '
+                    'could not be matched to a passage.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ],
+            );
+          },
+          error: (error, stackTrace) => Text(
+            'Progress trends unavailable: $error',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+          loading: () => const LinearProgressIndicator(),
+        ),
+      ),
+    );
+  }
+}
+
+class _TrendHeader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.labelMedium;
+    return Row(
+      children: [
+        Expanded(flex: 2, child: Text('Date', style: style)),
+        Expanded(child: Text('WPM', textAlign: TextAlign.end, style: style)),
+        Expanded(child: Text('Comp', textAlign: TextAlign.end, style: style)),
+        Expanded(child: Text('ERS', textAlign: TextAlign.end, style: style)),
+        Expanded(child: Text('Source', textAlign: TextAlign.end, style: style)),
+      ],
+    );
+  }
+}
+
+class _TrendPointRow extends StatelessWidget {
+  const _TrendPointRow({required this.point});
+
+  final ProgressTrendPoint point;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Expanded(flex: 2, child: Text(_dateLabel(point.startedAt))),
+          Expanded(
+            child: Text(
+              point.wpm.round().toString(),
+              textAlign: TextAlign.end,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              '${(point.comprehensionScore * 100).round()}%',
+              textAlign: TextAlign.end,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              point.effectiveReadingScore.round().toString(),
+              textAlign: TextAlign.end,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              _sourceLabel(point.source),
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _dateLabel(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day';
+  }
+
+  String _sourceLabel(PassageSource source) {
+    return switch (source) {
+      PassageSource.official => 'Official',
+      PassageSource.imported => 'Imported',
+    };
   }
 }
 

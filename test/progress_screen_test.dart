@@ -10,6 +10,7 @@ import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
 import 'package:speed_reading/progress/domain/passage_difficulty_distribution.dart';
+import 'package:speed_reading/progress/domain/progress_trend.dart';
 import 'package:speed_reading/progress/domain/skill_breakdown.dart';
 import 'package:speed_reading/progress/presentation/progress_screen.dart';
 import 'package:speed_reading/reading/domain/reading_session.dart';
@@ -28,7 +29,10 @@ void main() {
           passageDifficultyDistributionProvider.overrideWith(
             (ref) async => _emptyDifficultyDistribution,
           ),
-          skillBreakdownProvider.overrideWith((ref) async => _emptySkillBreakdown),
+          progressTrendProvider
+              .overrideWith((ref) async => _emptyProgressTrend),
+          skillBreakdownProvider
+              .overrideWith((ref) async => _emptySkillBreakdown),
         ],
         child: const MaterialApp(home: ProgressScreen()),
       ),
@@ -51,7 +55,9 @@ void main() {
         passageDifficultyDistributionProvider.overrideWith(
           (ref) async => _emptyDifficultyDistribution,
         ),
-        skillBreakdownProvider.overrideWith((ref) async => _emptySkillBreakdown),
+        progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
+        skillBreakdownProvider
+            .overrideWith((ref) async => _emptySkillBreakdown),
       ],
     );
     addTearDown(container.dispose);
@@ -92,6 +98,7 @@ void main() {
     expect(find.text('Latest Session'), findsOneWidget);
     expect(find.text('800'), findsOneWidget);
     expect(find.text('70%'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Session History'), 500);
     expect(find.text('800 WPM'), findsOneWidget);
     expect(find.text('Comprehension: 70%'), findsOneWidget);
   });
@@ -130,7 +137,9 @@ void main() {
         progressShareProvider.overrideWithValue((text) async {
           shared.add(text);
         }),
-        skillBreakdownProvider.overrideWith((ref) async => _emptySkillBreakdown),
+        progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
+        skillBreakdownProvider
+            .overrideWith((ref) async => _emptySkillBreakdown),
       ],
     );
     addTearDown(container.dispose);
@@ -232,7 +241,9 @@ void main() {
           ),
         ),
         progressShareProvider.overrideWithValue((text) async {}),
-        skillBreakdownProvider.overrideWith((ref) async => _emptySkillBreakdown),
+        progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
+        skillBreakdownProvider
+            .overrideWith((ref) async => _emptySkillBreakdown),
       ],
     );
     addTearDown(container.dispose);
@@ -291,6 +302,8 @@ void main() {
     );
 
     await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Best Qualified Attempt'), 500);
 
     expect(find.text('Best Qualified Attempt'), findsOneWidget);
     expect(find.text('The Official Climb'), findsOneWidget);
@@ -367,7 +380,9 @@ void main() {
           ),
         ),
         progressShareProvider.overrideWithValue((text) async {}),
-        skillBreakdownProvider.overrideWith((ref) async => _emptySkillBreakdown),
+        progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
+        skillBreakdownProvider
+            .overrideWith((ref) async => _emptySkillBreakdown),
       ],
     );
     addTearDown(container.dispose);
@@ -442,6 +457,7 @@ void main() {
         passageDifficultyDistributionProvider.overrideWith(
           (ref) async => _emptyDifficultyDistribution,
         ),
+        progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
         skillBreakdownProvider.overrideWith(
           (ref) async => const SkillBreakdown(
             entries: [
@@ -505,6 +521,131 @@ void main() {
     );
     expect(find.text('Private imported passage text.'), findsNothing);
   });
+
+  testWidgets('shows WPM comprehension and ERS trends over time',
+      (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    final container = ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(database),
+        passageRepositoryProvider.overrideWithValue(
+          const _FakePassageRepository(
+            passages: [
+              Passage(
+                id: 'official-hard',
+                title: 'Official Hard',
+                body: 'Official body.',
+                metadata: PassageMetadata(
+                  wordCount: 900,
+                  difficulty: PassageDifficulty.hard,
+                  topic: 'Adventure',
+                  source: PassageSource.official,
+                  license: 'Public domain',
+                  type: PassageType.fiction,
+                  vocabularyDensity: 0.3,
+                  tags: ['official'],
+                  isCertificationEligible: true,
+                  isMasteryEligible: true,
+                ),
+              ),
+              Passage(
+                id: 'imported-standard',
+                title: 'Private Import',
+                body: 'Private imported passage text.',
+                metadata: PassageMetadata(
+                  wordCount: 600,
+                  difficulty: PassageDifficulty.standard,
+                  topic: 'Private',
+                  source: PassageSource.imported,
+                  license: 'User provided',
+                  type: PassageType.workplace,
+                  vocabularyDensity: 0.2,
+                  tags: ['private'],
+                  isCertificationEligible: false,
+                  isMasteryEligible: false,
+                ),
+              ),
+            ],
+          ),
+        ),
+        progressShareableSummaryProvider.overrideWith((ref) async => null),
+        bestQualifiedAttemptProvider.overrideWith((ref) async => null),
+        passageDifficultyDistributionProvider.overrideWith(
+          (ref) async => _emptyDifficultyDistribution,
+        ),
+        skillBreakdownProvider
+            .overrideWith((ref) async => _emptySkillBreakdown),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final store = container.read(localDataStoreProvider);
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'imported-session',
+        passageId: 'imported-standard',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 6, 12),
+        activeReadingSeconds: 60,
+        wordCount: 600,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'official-session',
+        passageId: 'official-hard',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8, 12),
+        activeReadingSeconds: 90,
+        wordCount: 900,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'imported-quiz',
+        sessionId: 'imported-session',
+        passageId: 'imported-standard',
+        correctCount: 7,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 6, 12, 2),
+      ),
+    );
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'official-quiz',
+        sessionId: 'official-session',
+        passageId: 'official-hard',
+        correctCount: 8,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 12, 2),
+      ),
+    );
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: ProgressScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Progress Trends'), findsOneWidget);
+    expect(find.text('WPM, comprehension, and ERS over time'), findsOneWidget);
+    expect(find.text('2026-07-06'), findsOneWidget);
+    expect(find.text('2026-07-08'), findsOneWidget);
+    expect(find.text('Official'), findsOneWidget);
+    expect(find.text('Imported'), findsOneWidget);
+    expect(find.text('420'), findsOneWidget);
+    expect(find.text('552'), findsOneWidget);
+    expect(find.text('Private imported passage text.'), findsNothing);
+  });
 }
 
 const _emptyDifficultyDistribution = PassageDifficultyDistribution(
@@ -515,6 +656,11 @@ const _emptyDifficultyDistribution = PassageDifficultyDistribution(
 const _emptySkillBreakdown = SkillBreakdown(
   entries: [],
   unmatchedAnswerCount: 0,
+);
+
+const _emptyProgressTrend = ProgressTrend(
+  points: [],
+  unmatchedSessionCount: 0,
 );
 
 ReadingSession _session({
