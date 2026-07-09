@@ -1759,7 +1759,7 @@ Goal: Prepare MVP for Windows, Android, and iOS delivery.
 
 ### Epic 10.1: Windows Readiness
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -1799,6 +1799,16 @@ Changed files: TASKS.md
 Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build windows`. Analyze passed with no issues, all 115 tests passed, and the Windows release build succeeded.
 Commit: See Git history for `chore: validate windows readiness`
 Notes: Build output path: `build\windows\x64\runner\Release\speed_reading.exe`. No source fixes were required.
+```
+
+```text
+Task: Revalidate and close Windows readiness after recent feature changes
+Status: Done
+Completed: 2026-07-08
+Changed files: TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build windows`. Analyze passed with no issues, all 182 tests passed, and the Windows release build succeeded. Confirmed packaging output exists at `build\windows\x64\runner\Release\speed_reading.exe`. Existing manual QA coverage is documented in `qa/manual_qa_windows.md`.
+Commit: See Git history for `chore: close windows readiness`
+Notes: Windows readiness acceptance criteria are closed as far as automated validation allows. No source fixes were required and no follow-up tasks were added.
 ```
 
 ### Epic 10.2: Android Readiness
