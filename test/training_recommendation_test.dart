@@ -254,6 +254,55 @@ void main() {
       TrainingDrill.nonRsvpTransfer,
     );
   });
+
+  test('history-derived recommendations change when performance changes', () {
+    final stableInput = TrainingRecommendationInput.fromHistory(
+      sessions: [
+        _session(
+          id: 'stable-1',
+          startedAt: DateTime.utc(2026, 7, 8),
+          activeReadingSeconds: 100,
+          wordCount: 800,
+        ),
+      ],
+      quizResults: [
+        _quiz(sessionId: 'stable-1'),
+      ],
+      questions: const [],
+    );
+    final weakInput = TrainingRecommendationInput.fromHistory(
+      sessions: [
+        _session(
+          id: 'weak-1',
+          startedAt: DateTime.utc(2026, 7, 8),
+          activeReadingSeconds: 120,
+          wordCount: 800,
+          status: AttemptQualificationStatus.unqualified,
+        ),
+      ],
+      quizResults: [
+        _quiz(
+          sessionId: 'weak-1',
+          correctCount: 6,
+          totalQuestions: 10,
+        ),
+      ],
+      questions: const [],
+    );
+
+    expect(
+      TrainingRecommendationEngine.recommend(stableInput),
+      TrainingDrill.pacedReading,
+    );
+    expect(
+      TrainingRecommendationEngine.recommend(weakInput),
+      TrainingDrill.comprehensionReview,
+    );
+    expect(
+      TrainingRecommendationEngine.recommend(stableInput),
+      TrainingRecommendationEngine.recommend(stableInput),
+    );
+  });
 }
 
 ReadingSession _session({

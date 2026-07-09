@@ -116,6 +116,29 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('dashboard daily plan reacts to RSVP-only progress',
+      (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          _profileOverride(),
+          _dashboardSummaryOverride(_rsvpOnlyHistory()),
+        ],
+        child: const SpeedReadingApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Recommended next drill: Non-RSVP Transfer'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Run one non-rsvp transfer drill.'),
+      findsOneWidget,
+    );
+  });
 }
 
 Override _profileOverride() {
@@ -203,6 +226,51 @@ ProgressHistory _weakComprehensionHistory() {
         totalQuestions: 10,
         answersByQuestionId: const {},
         completedAt: DateTime.utc(2026, 7, 8, 0, 2),
+      ),
+    ],
+  );
+}
+
+ProgressHistory _rsvpOnlyHistory() {
+  return ProgressHistory(
+    sessions: [
+      ReadingSession(
+        id: 'rsvp-fast',
+        passageId: 'passage-1',
+        mode: ReadingMode.rsvp,
+        startedAt: DateTime.utc(2026, 7, 8),
+        activeReadingSeconds: 60,
+        wordCount: 800,
+        status: AttemptQualificationStatus.qualified,
+      ),
+      ReadingSession(
+        id: 'manual-slower',
+        passageId: 'passage-1',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 7),
+        activeReadingSeconds: 120,
+        wordCount: 800,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    ],
+    quizResults: [
+      QuizResult(
+        id: 'quiz-rsvp-fast',
+        sessionId: 'rsvp-fast',
+        passageId: 'passage-1',
+        correctCount: 8,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 0, 2),
+      ),
+      QuizResult(
+        id: 'quiz-manual-slower',
+        sessionId: 'manual-slower',
+        passageId: 'passage-1',
+        correctCount: 8,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 7, 0, 2),
       ),
     ],
   );

@@ -1370,6 +1370,16 @@ Commit: `feat: improve training recommendations`
 Notes: Recommendation input derivation now uses local reading sessions, quiz results, official question category metadata, and reading modes to detect below-threshold comprehension, WPM plateau, weak detail recall, weak scan-mode accuracy when scan data exists, and RSVP-only progress without non-RSVP transfer. No follow-up was added because `ReadingMode.scan` exists and provides deterministic local scanning data.
 ```
 
+```text
+Task: Close adaptive recommendation engine acceptance criteria
+Status: Done
+Completed: 2026-07-09
+Changed files: test/training_recommendation_test.dart, test/dashboard_screen_test.dart, TASKS.md
+Verification: Confirmed Epic 7.3 is implemented with deterministic local recommendation inputs from reading sessions, quiz results, official question categories, and reading modes. Added coverage proving history-derived recommendations change when performance changes while remaining deterministic for the same input, and proving the dashboard daily plan surfaces non-RSVP transfer after RSVP-only progress. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\training_recommendation_test.dart test\dashboard_screen_test.dart`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; focused tests passed, analyze passed with no issues, and all 180 tests passed.
+Commit: See Git history for `test: close recommendation criteria`
+Notes: No Epic 7.3 follow-up tasks remain.
+```
+
 ## Milestone 8: Dashboard and Analytics
 
 Goal: Show progress clearly without encouraging speed-only behavior.
