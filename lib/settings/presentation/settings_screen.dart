@@ -37,6 +37,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late double _fontSize;
   late double _lineHeight;
   late double _columnWidth;
+  late LocalThemeMode _themeMode;
   late bool _reducedMotion;
   bool _isSaving = false;
   bool _isResetting = false;
@@ -105,6 +106,36 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
           onChanged: (value) {
             setState(() {
               _columnWidth = value;
+            });
+          },
+        ),
+        const SizedBox(height: 16),
+        DropdownButtonFormField<LocalThemeMode>(
+          initialValue: _themeMode,
+          decoration: const InputDecoration(
+            labelText: 'Theme',
+            border: OutlineInputBorder(),
+          ),
+          items: const [
+            DropdownMenuItem(
+              value: LocalThemeMode.system,
+              child: Text('System'),
+            ),
+            DropdownMenuItem(
+              value: LocalThemeMode.light,
+              child: Text('Light'),
+            ),
+            DropdownMenuItem(
+              value: LocalThemeMode.dark,
+              child: Text('Dark'),
+            ),
+          ],
+          onChanged: (value) {
+            if (value == null) {
+              return;
+            }
+            setState(() {
+              _themeMode = value;
             });
           },
         ),
@@ -208,6 +239,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _fontSize = profile.preferredFontSize;
     _lineHeight = profile.preferredLineHeight;
     _columnWidth = profile.preferredColumnWidth;
+    _themeMode = profile.preferredThemeMode;
     _reducedMotion = profile.reducedMotion;
   }
 
@@ -220,6 +252,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
           preferredFontSize: _fontSize,
           preferredLineHeight: _lineHeight,
           preferredColumnWidth: _columnWidth,
+          preferredThemeMode: _themeMode,
           reducedMotion: _reducedMotion,
         );
     ref.invalidate(localProfileProvider);

@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
+import 'package:speed_reading/settings/domain/local_user_profile.dart';
 
 void main() {
   late AppDatabase database;
@@ -58,18 +59,21 @@ void main() {
       preferredFontSize: 24,
       preferredLineHeight: 1.8,
       preferredColumnWidth: 820,
+      preferredThemeMode: LocalThemeMode.dark,
       reducedMotion: true,
     );
 
     expect(updated.preferredFontSize, 24);
     expect(updated.preferredLineHeight, 1.8);
     expect(updated.preferredColumnWidth, 820);
+    expect(updated.preferredThemeMode, LocalThemeMode.dark);
     expect(updated.reducedMotion, isTrue);
 
     final stored = await container.read(localDataStoreProvider).loadProfile();
     expect(stored?.preferredFontSize, 24);
     expect(stored?.preferredLineHeight, 1.8);
     expect(stored?.preferredColumnWidth, 820);
+    expect(stored?.preferredThemeMode, LocalThemeMode.dark);
     expect(stored?.reducedMotion, isTrue);
   });
 

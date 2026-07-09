@@ -46,6 +46,14 @@ class $LocalProfilesTable extends LocalProfiles
           type: DriftSqlType.double,
           requiredDuringInsert: false,
           defaultValue: const Constant(760.0));
+  static const VerificationMeta _preferredThemeModeMeta =
+      const VerificationMeta('preferredThemeMode');
+  @override
+  late final GeneratedColumn<String> preferredThemeMode =
+      GeneratedColumn<String>('preferred_theme_mode', aliasedName, false,
+          type: DriftSqlType.string,
+          requiredDuringInsert: false,
+          defaultValue: const Constant('system'));
   static const VerificationMeta _reducedMotionMeta =
       const VerificationMeta('reducedMotion');
   @override
@@ -75,6 +83,7 @@ class $LocalProfilesTable extends LocalProfiles
         preferredFontSize,
         preferredLineHeight,
         preferredColumnWidth,
+        preferredThemeMode,
         reducedMotion,
         baselineWpm,
         baselineComprehension
@@ -128,6 +137,12 @@ class $LocalProfilesTable extends LocalProfiles
           preferredColumnWidth.isAcceptableOrUnknown(
               data['preferred_column_width']!, _preferredColumnWidthMeta));
     }
+    if (data.containsKey('preferred_theme_mode')) {
+      context.handle(
+          _preferredThemeModeMeta,
+          preferredThemeMode.isAcceptableOrUnknown(
+              data['preferred_theme_mode']!, _preferredThemeModeMeta));
+    }
     if (data.containsKey('reduced_motion')) {
       context.handle(
           _reducedMotionMeta,
@@ -171,6 +186,8 @@ class $LocalProfilesTable extends LocalProfiles
       preferredColumnWidth: attachedDatabase.typeMapping.read(
           DriftSqlType.double,
           data['${effectivePrefix}preferred_column_width'])!,
+      preferredThemeMode: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}preferred_theme_mode'])!,
       reducedMotion: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}reduced_motion'])!,
       baselineWpm: attachedDatabase.typeMapping
@@ -194,6 +211,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
   final double preferredFontSize;
   final double preferredLineHeight;
   final double preferredColumnWidth;
+  final String preferredThemeMode;
   final bool reducedMotion;
   final double? baselineWpm;
   final double? baselineComprehension;
@@ -204,6 +222,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       required this.preferredFontSize,
       required this.preferredLineHeight,
       required this.preferredColumnWidth,
+      required this.preferredThemeMode,
       required this.reducedMotion,
       this.baselineWpm,
       this.baselineComprehension});
@@ -216,6 +235,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
     map['preferred_font_size'] = Variable<double>(preferredFontSize);
     map['preferred_line_height'] = Variable<double>(preferredLineHeight);
     map['preferred_column_width'] = Variable<double>(preferredColumnWidth);
+    map['preferred_theme_mode'] = Variable<String>(preferredThemeMode);
     map['reduced_motion'] = Variable<bool>(reducedMotion);
     if (!nullToAbsent || baselineWpm != null) {
       map['baseline_wpm'] = Variable<double>(baselineWpm);
@@ -234,6 +254,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       preferredFontSize: Value(preferredFontSize),
       preferredLineHeight: Value(preferredLineHeight),
       preferredColumnWidth: Value(preferredColumnWidth),
+      preferredThemeMode: Value(preferredThemeMode),
       reducedMotion: Value(reducedMotion),
       baselineWpm: baselineWpm == null && nullToAbsent
           ? const Value.absent()
@@ -256,6 +277,8 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
           serializer.fromJson<double>(json['preferredLineHeight']),
       preferredColumnWidth:
           serializer.fromJson<double>(json['preferredColumnWidth']),
+      preferredThemeMode:
+          serializer.fromJson<String>(json['preferredThemeMode']),
       reducedMotion: serializer.fromJson<bool>(json['reducedMotion']),
       baselineWpm: serializer.fromJson<double?>(json['baselineWpm']),
       baselineComprehension:
@@ -272,6 +295,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       'preferredFontSize': serializer.toJson<double>(preferredFontSize),
       'preferredLineHeight': serializer.toJson<double>(preferredLineHeight),
       'preferredColumnWidth': serializer.toJson<double>(preferredColumnWidth),
+      'preferredThemeMode': serializer.toJson<String>(preferredThemeMode),
       'reducedMotion': serializer.toJson<bool>(reducedMotion),
       'baselineWpm': serializer.toJson<double?>(baselineWpm),
       'baselineComprehension':
@@ -286,6 +310,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
           double? preferredFontSize,
           double? preferredLineHeight,
           double? preferredColumnWidth,
+          String? preferredThemeMode,
           bool? reducedMotion,
           Value<double?> baselineWpm = const Value.absent(),
           Value<double?> baselineComprehension = const Value.absent()}) =>
@@ -296,6 +321,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
         preferredFontSize: preferredFontSize ?? this.preferredFontSize,
         preferredLineHeight: preferredLineHeight ?? this.preferredLineHeight,
         preferredColumnWidth: preferredColumnWidth ?? this.preferredColumnWidth,
+        preferredThemeMode: preferredThemeMode ?? this.preferredThemeMode,
         reducedMotion: reducedMotion ?? this.reducedMotion,
         baselineWpm: baselineWpm.present ? baselineWpm.value : this.baselineWpm,
         baselineComprehension: baselineComprehension.present
@@ -316,6 +342,9 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       preferredColumnWidth: data.preferredColumnWidth.present
           ? data.preferredColumnWidth.value
           : this.preferredColumnWidth,
+      preferredThemeMode: data.preferredThemeMode.present
+          ? data.preferredThemeMode.value
+          : this.preferredThemeMode,
       reducedMotion: data.reducedMotion.present
           ? data.reducedMotion.value
           : this.reducedMotion,
@@ -336,6 +365,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
           ..write('preferredFontSize: $preferredFontSize, ')
           ..write('preferredLineHeight: $preferredLineHeight, ')
           ..write('preferredColumnWidth: $preferredColumnWidth, ')
+          ..write('preferredThemeMode: $preferredThemeMode, ')
           ..write('reducedMotion: $reducedMotion, ')
           ..write('baselineWpm: $baselineWpm, ')
           ..write('baselineComprehension: $baselineComprehension')
@@ -351,6 +381,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       preferredFontSize,
       preferredLineHeight,
       preferredColumnWidth,
+      preferredThemeMode,
       reducedMotion,
       baselineWpm,
       baselineComprehension);
@@ -364,6 +395,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
           other.preferredFontSize == this.preferredFontSize &&
           other.preferredLineHeight == this.preferredLineHeight &&
           other.preferredColumnWidth == this.preferredColumnWidth &&
+          other.preferredThemeMode == this.preferredThemeMode &&
           other.reducedMotion == this.reducedMotion &&
           other.baselineWpm == this.baselineWpm &&
           other.baselineComprehension == this.baselineComprehension);
@@ -376,6 +408,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
   final Value<double> preferredFontSize;
   final Value<double> preferredLineHeight;
   final Value<double> preferredColumnWidth;
+  final Value<String> preferredThemeMode;
   final Value<bool> reducedMotion;
   final Value<double?> baselineWpm;
   final Value<double?> baselineComprehension;
@@ -387,6 +420,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
     this.preferredFontSize = const Value.absent(),
     this.preferredLineHeight = const Value.absent(),
     this.preferredColumnWidth = const Value.absent(),
+    this.preferredThemeMode = const Value.absent(),
     this.reducedMotion = const Value.absent(),
     this.baselineWpm = const Value.absent(),
     this.baselineComprehension = const Value.absent(),
@@ -399,6 +433,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
     required double preferredFontSize,
     required double preferredLineHeight,
     this.preferredColumnWidth = const Value.absent(),
+    this.preferredThemeMode = const Value.absent(),
     required bool reducedMotion,
     this.baselineWpm = const Value.absent(),
     this.baselineComprehension = const Value.absent(),
@@ -416,6 +451,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
     Expression<double>? preferredFontSize,
     Expression<double>? preferredLineHeight,
     Expression<double>? preferredColumnWidth,
+    Expression<String>? preferredThemeMode,
     Expression<bool>? reducedMotion,
     Expression<double>? baselineWpm,
     Expression<double>? baselineComprehension,
@@ -430,6 +466,8 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
         'preferred_line_height': preferredLineHeight,
       if (preferredColumnWidth != null)
         'preferred_column_width': preferredColumnWidth,
+      if (preferredThemeMode != null)
+        'preferred_theme_mode': preferredThemeMode,
       if (reducedMotion != null) 'reduced_motion': reducedMotion,
       if (baselineWpm != null) 'baseline_wpm': baselineWpm,
       if (baselineComprehension != null)
@@ -445,6 +483,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       Value<double>? preferredFontSize,
       Value<double>? preferredLineHeight,
       Value<double>? preferredColumnWidth,
+      Value<String>? preferredThemeMode,
       Value<bool>? reducedMotion,
       Value<double?>? baselineWpm,
       Value<double?>? baselineComprehension,
@@ -456,6 +495,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       preferredFontSize: preferredFontSize ?? this.preferredFontSize,
       preferredLineHeight: preferredLineHeight ?? this.preferredLineHeight,
       preferredColumnWidth: preferredColumnWidth ?? this.preferredColumnWidth,
+      preferredThemeMode: preferredThemeMode ?? this.preferredThemeMode,
       reducedMotion: reducedMotion ?? this.reducedMotion,
       baselineWpm: baselineWpm ?? this.baselineWpm,
       baselineComprehension:
@@ -487,6 +527,9 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       map['preferred_column_width'] =
           Variable<double>(preferredColumnWidth.value);
     }
+    if (preferredThemeMode.present) {
+      map['preferred_theme_mode'] = Variable<String>(preferredThemeMode.value);
+    }
     if (reducedMotion.present) {
       map['reduced_motion'] = Variable<bool>(reducedMotion.value);
     }
@@ -512,6 +555,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
           ..write('preferredFontSize: $preferredFontSize, ')
           ..write('preferredLineHeight: $preferredLineHeight, ')
           ..write('preferredColumnWidth: $preferredColumnWidth, ')
+          ..write('preferredThemeMode: $preferredThemeMode, ')
           ..write('reducedMotion: $reducedMotion, ')
           ..write('baselineWpm: $baselineWpm, ')
           ..write('baselineComprehension: $baselineComprehension, ')
@@ -3080,6 +3124,7 @@ typedef $$LocalProfilesTableCreateCompanionBuilder = LocalProfilesCompanion
   required double preferredFontSize,
   required double preferredLineHeight,
   Value<double> preferredColumnWidth,
+  Value<String> preferredThemeMode,
   required bool reducedMotion,
   Value<double?> baselineWpm,
   Value<double?> baselineComprehension,
@@ -3093,6 +3138,7 @@ typedef $$LocalProfilesTableUpdateCompanionBuilder = LocalProfilesCompanion
   Value<double> preferredFontSize,
   Value<double> preferredLineHeight,
   Value<double> preferredColumnWidth,
+  Value<String> preferredThemeMode,
   Value<bool> reducedMotion,
   Value<double?> baselineWpm,
   Value<double?> baselineComprehension,
@@ -3127,6 +3173,10 @@ class $$LocalProfilesTableFilterComposer
 
   ColumnFilters<double> get preferredColumnWidth => $composableBuilder(
       column: $table.preferredColumnWidth,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get preferredThemeMode => $composableBuilder(
+      column: $table.preferredThemeMode,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get reducedMotion => $composableBuilder(
@@ -3170,6 +3220,10 @@ class $$LocalProfilesTableOrderingComposer
       column: $table.preferredColumnWidth,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get preferredThemeMode => $composableBuilder(
+      column: $table.preferredThemeMode,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<bool> get reducedMotion => $composableBuilder(
       column: $table.reducedMotion,
       builder: (column) => ColumnOrderings(column));
@@ -3208,6 +3262,9 @@ class $$LocalProfilesTableAnnotationComposer
 
   GeneratedColumn<double> get preferredColumnWidth => $composableBuilder(
       column: $table.preferredColumnWidth, builder: (column) => column);
+
+  GeneratedColumn<String> get preferredThemeMode => $composableBuilder(
+      column: $table.preferredThemeMode, builder: (column) => column);
 
   GeneratedColumn<bool> get reducedMotion => $composableBuilder(
       column: $table.reducedMotion, builder: (column) => column);
@@ -3251,6 +3308,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             Value<double> preferredFontSize = const Value.absent(),
             Value<double> preferredLineHeight = const Value.absent(),
             Value<double> preferredColumnWidth = const Value.absent(),
+            Value<String> preferredThemeMode = const Value.absent(),
             Value<bool> reducedMotion = const Value.absent(),
             Value<double?> baselineWpm = const Value.absent(),
             Value<double?> baselineComprehension = const Value.absent(),
@@ -3263,6 +3321,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             preferredFontSize: preferredFontSize,
             preferredLineHeight: preferredLineHeight,
             preferredColumnWidth: preferredColumnWidth,
+            preferredThemeMode: preferredThemeMode,
             reducedMotion: reducedMotion,
             baselineWpm: baselineWpm,
             baselineComprehension: baselineComprehension,
@@ -3275,6 +3334,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             required double preferredFontSize,
             required double preferredLineHeight,
             Value<double> preferredColumnWidth = const Value.absent(),
+            Value<String> preferredThemeMode = const Value.absent(),
             required bool reducedMotion,
             Value<double?> baselineWpm = const Value.absent(),
             Value<double?> baselineComprehension = const Value.absent(),
@@ -3287,6 +3347,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             preferredFontSize: preferredFontSize,
             preferredLineHeight: preferredLineHeight,
             preferredColumnWidth: preferredColumnWidth,
+            preferredThemeMode: preferredThemeMode,
             reducedMotion: reducedMotion,
             baselineWpm: baselineWpm,
             baselineComprehension: baselineComprehension,

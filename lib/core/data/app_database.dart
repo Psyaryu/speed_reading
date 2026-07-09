@@ -10,6 +10,8 @@ class LocalProfiles extends Table {
   RealColumn get preferredLineHeight => real()();
   RealColumn get preferredColumnWidth =>
       real().withDefault(const Constant(760.0))();
+  TextColumn get preferredThemeMode =>
+      text().withDefault(const Constant('system'))();
   BoolColumn get reducedMotion => boolean()();
   RealColumn get baselineWpm => real().nullable()();
   RealColumn get baselineComprehension => real().nullable()();
@@ -112,7 +114,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -121,6 +123,12 @@ class AppDatabase extends _$AppDatabase {
             await migrator.addColumn(
               localProfiles,
               localProfiles.preferredColumnWidth,
+            );
+          }
+          if (from < 3) {
+            await migrator.addColumn(
+              localProfiles,
+              localProfiles.preferredThemeMode,
             );
           }
         },

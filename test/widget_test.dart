@@ -1,14 +1,21 @@
+import 'package:drift/native.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
 import 'package:speed_reading/main.dart';
 import 'package:speed_reading/settings/domain/local_user_profile.dart';
 
 void main() {
   testWidgets('renders dashboard placeholder', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(database),
           localProfileProvider.overrideWith((ref) async {
             return LocalUserProfile.initial(
               id: 'local',
@@ -25,5 +32,30 @@ void main() {
       find.text('Comprehension-first speed reading practice starts here.'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('applies persisted theme mode to MaterialApp', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          localProfileProvider.overrideWith((ref) async {
+            return LocalUserProfile.initial(
+              id: 'local',
+              createdAt: DateTime.utc(2026, 7, 7),
+            ).copyWith(preferredThemeMode: LocalThemeMode.dark);
+          }),
+        ],
+        child: const SpeedReadingApp(),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+    expect(app.themeMode, ThemeMode.dark);
   });
 }

@@ -1364,6 +1364,16 @@ Notes: Settings now persists reader column width locally, migrates existing prof
 ```
 
 ```text
+Task: Add persisted theme setting
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/core/data/app_database.dart, lib/core/data/app_database.g.dart, lib/core/data/drift_local_data_store.dart, lib/main.dart, lib/settings/domain/local_user_profile.dart, lib/settings/application/local_profile_controller.dart, lib/settings/presentation/settings_screen.dart, test/local_user_profile_test.dart, test/local_profile_controller_test.dart, test/settings_screen_test.dart, test/reader_screen_test.dart, test/widget_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 115 tests passed.
+Commit: See Git history for `feat: add theme setting`
+Notes: Settings now persists system, light, or dark theme preference locally, migrates existing profile rows with a system default, and applies it through MaterialApp themeMode.
+```
+
+```text
 Task: Add reset progress settings flow
 Status: Done
 Completed: 2026-07-08

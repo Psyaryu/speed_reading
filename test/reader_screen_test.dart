@@ -351,6 +351,7 @@ LocalUserProfile _profile({
     preferredFontSize: fontSize,
     preferredLineHeight: lineHeight,
     preferredColumnWidth: columnWidth,
+    preferredThemeMode: LocalThemeMode.system,
     reducedMotion: false,
   );
 }

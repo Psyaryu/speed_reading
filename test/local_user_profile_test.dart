@@ -12,6 +12,7 @@ void main() {
     expect(profile.goals, contains(TrainingGoal.generalImprovement));
     expect(profile.preferredFontSize, 18);
     expect(profile.preferredColumnWidth, 760);
+    expect(profile.preferredThemeMode, LocalThemeMode.system);
     expect(profile.reducedMotion, isFalse);
   });
 
@@ -23,6 +24,7 @@ void main() {
       preferredFontSize: 20,
       preferredLineHeight: 1.6,
       preferredColumnWidth: 820,
+      preferredThemeMode: LocalThemeMode.dark,
       reducedMotion: true,
       baselineWpm: 260,
       baselineComprehension: 0.8,
@@ -34,10 +36,11 @@ void main() {
     expect(roundTrip.baselineWpm, 260);
     expect(roundTrip.baselineComprehension, 0.8);
     expect(roundTrip.preferredColumnWidth, 820);
+    expect(roundTrip.preferredThemeMode, LocalThemeMode.dark);
     expect(roundTrip.reducedMotion, isTrue);
   });
 
-  test('deserializes older profile JSON with default column width', () {
+  test('deserializes older profile JSON with default column width and theme', () {
     final profile = LocalUserProfile.fromJson({
       'id': 'local',
       'createdAt': DateTime.utc(2026, 7, 6).toIso8601String(),
@@ -50,6 +53,7 @@ void main() {
     });
 
     expect(profile.preferredColumnWidth, 760);
+    expect(profile.preferredThemeMode, LocalThemeMode.system);
   });
 
   test('copies reading preferences without changing identity', () {
@@ -62,6 +66,7 @@ void main() {
       preferredFontSize: 22,
       preferredLineHeight: 1.7,
       preferredColumnWidth: 640,
+      preferredThemeMode: LocalThemeMode.light,
       reducedMotion: true,
     );
 
@@ -70,6 +75,7 @@ void main() {
     expect(updated.preferredFontSize, 22);
     expect(updated.preferredLineHeight, 1.7);
     expect(updated.preferredColumnWidth, 640);
+    expect(updated.preferredThemeMode, LocalThemeMode.light);
     expect(updated.reducedMotion, isTrue);
   });
 }

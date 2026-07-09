@@ -1,5 +1,7 @@
 import '../../core/domain/reading_enums.dart';
 
+enum LocalThemeMode { system, light, dark }
+
 class LocalUserProfile {
   const LocalUserProfile({
     required this.id,
@@ -8,6 +10,7 @@ class LocalUserProfile {
     required this.preferredFontSize,
     required this.preferredLineHeight,
     required this.preferredColumnWidth,
+    required this.preferredThemeMode,
     required this.reducedMotion,
     this.baselineWpm,
     this.baselineComprehension,
@@ -19,6 +22,7 @@ class LocalUserProfile {
   final double preferredFontSize;
   final double preferredLineHeight;
   final double preferredColumnWidth;
+  final LocalThemeMode preferredThemeMode;
   final bool reducedMotion;
   final double? baselineWpm;
   final double? baselineComprehension;
@@ -28,6 +32,7 @@ class LocalUserProfile {
     double? preferredFontSize,
     double? preferredLineHeight,
     double? preferredColumnWidth,
+    LocalThemeMode? preferredThemeMode,
     bool? reducedMotion,
     double? baselineWpm,
     double? baselineComprehension,
@@ -39,6 +44,7 @@ class LocalUserProfile {
       preferredFontSize: preferredFontSize ?? this.preferredFontSize,
       preferredLineHeight: preferredLineHeight ?? this.preferredLineHeight,
       preferredColumnWidth: preferredColumnWidth ?? this.preferredColumnWidth,
+      preferredThemeMode: preferredThemeMode ?? this.preferredThemeMode,
       reducedMotion: reducedMotion ?? this.reducedMotion,
       baselineWpm: baselineWpm ?? this.baselineWpm,
       baselineComprehension:
@@ -57,6 +63,7 @@ class LocalUserProfile {
       preferredFontSize: 18,
       preferredLineHeight: 1.5,
       preferredColumnWidth: 760,
+      preferredThemeMode: LocalThemeMode.system,
       reducedMotion: false,
     );
   }
@@ -69,6 +76,7 @@ class LocalUserProfile {
       'preferredFontSize': preferredFontSize,
       'preferredLineHeight': preferredLineHeight,
       'preferredColumnWidth': preferredColumnWidth,
+      'preferredThemeMode': preferredThemeMode.name,
       'reducedMotion': reducedMotion,
       'baselineWpm': baselineWpm,
       'baselineComprehension': baselineComprehension,
@@ -86,6 +94,9 @@ class LocalUserProfile {
       preferredLineHeight: (json['preferredLineHeight'] as num).toDouble(),
       preferredColumnWidth:
           (json['preferredColumnWidth'] as num?)?.toDouble() ?? 760,
+      preferredThemeMode: LocalThemeMode.values.byName(
+        json['preferredThemeMode'] as String? ?? LocalThemeMode.system.name,
+      ),
       reducedMotion: json['reducedMotion'] as bool,
       baselineWpm: (json['baselineWpm'] as num?)?.toDouble(),
       baselineComprehension:

@@ -6,6 +6,7 @@ import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
 import 'package:speed_reading/reading/domain/reading_session.dart';
+import 'package:speed_reading/settings/domain/local_user_profile.dart';
 import 'package:speed_reading/settings/presentation/settings_screen.dart';
 
 void main() {
@@ -31,6 +32,10 @@ void main() {
     sliders[0].onChanged?.call(24);
     sliders[1].onChanged?.call(1.8);
     sliders[2].onChanged?.call(820);
+    await tester.tap(find.text('System'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dark').last);
+    await tester.pumpAndSettle();
     await tester.tap(find.byType(SwitchListTile));
     await tester.pump();
 
@@ -43,6 +48,7 @@ void main() {
     expect(profile.preferredFontSize, 24);
     expect(profile.preferredLineHeight, 1.8);
     expect(profile.preferredColumnWidth, 820);
+    expect(profile.preferredThemeMode, LocalThemeMode.dark.name);
     expect(profile.reducedMotion, isTrue);
   });
 

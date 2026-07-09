@@ -29,6 +29,7 @@ class LocalProfileController {
     required double preferredFontSize,
     required double preferredLineHeight,
     required double preferredColumnWidth,
+    required LocalThemeMode preferredThemeMode,
     required bool reducedMotion,
   }) async {
     final profile = await loadOrCreate();
@@ -36,6 +37,7 @@ class LocalProfileController {
       preferredFontSize: preferredFontSize,
       preferredLineHeight: preferredLineHeight,
       preferredColumnWidth: preferredColumnWidth,
+      preferredThemeMode: preferredThemeMode,
       reducedMotion: reducedMotion,
     );
     await localDataStore.saveProfile(updated);
