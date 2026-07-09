@@ -884,6 +884,16 @@ Commit: See Git history for `feat: add official question asset loader`
 Notes: Added official JSON-backed questions for the starter Treasure Island passage, a loader/provider, and production quiz filtering by passage id. More official passages and full length-scaled certification question coverage remain open.
 ```
 
+```text
+Task: Expand official question sets for bundled MVP passages
+Status: Done
+Completed: 2026-07-08
+Changed files: assets/passages/official_questions.json, test/official_question_loader_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 112 tests passed.
+Commit: See Git history for `feat: expand official question sets`
+Notes: Added provider-loadable main idea, detail, inference, and vocabulary questions for every current official bundled MVP passage, with bundled asset tests enforcing length-scaled minimum question counts.
+```
+
 ## Milestone 6: Scoring, Progression, Certification, and Mastery
 
 Goal: Implement the product's core measurement system.

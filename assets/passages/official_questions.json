@@ -68,5 +68,215 @@
     ],
     "correctOptionIndex": 1,
     "explanation": "The seaman is described as having a sabre cut."
+  },
+  {
+    "id": "treasure-island-002-main-idea",
+    "passageId": "treasure-island-002",
+    "type": "mainIdea",
+    "prompt": "What is the main focus of this passage?",
+    "options": [
+      "The first description of the sea-captain arriving at the inn",
+      "Jim's discovery of the treasure map",
+      "A battle between sailors on the beach",
+      "Dr. Livesey's warning about pirates"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "The passage centers on the captain's arrival, appearance, manner, and decision to stay at the inn."
+  },
+  {
+    "id": "treasure-island-002-detail-song",
+    "passageId": "treasure-island-002",
+    "type": "detailRecall",
+    "prompt": "What song does the captain sing after looking around the cove?",
+    "options": [
+      "Rule, Britannia!",
+      "Fifteen men on the dead man's chest",
+      "Spanish Ladies",
+      "Auld Lang Syne"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "The captain breaks into the old sea-song beginning with \"Fifteen men on the dead man's chest.\""
+  },
+  {
+    "id": "treasure-island-002-detail-food",
+    "passageId": "treasure-island-002",
+    "type": "detailRecall",
+    "prompt": "What does the captain say he wants?",
+    "options": [
+      "Tea, bread, and cheese",
+      "Rum and bacon and eggs",
+      "Wine and roast beef",
+      "Water and a quiet room"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "He calls himself a plain man and says rum, bacon, and eggs are what he wants."
+  },
+  {
+    "id": "treasure-island-002-inference-berth",
+    "passageId": "treasure-island-002",
+    "type": "inference",
+    "prompt": "Why does the captain decide the inn is a suitable place for him?",
+    "options": [
+      "It is crowded with merchants who will buy his cargo",
+      "It has little company and a useful view for watching ships",
+      "It belongs to an old friend from his crew",
+      "It is the only inn that serves tea"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "He asks about company, approves the quiet berth, and wants the headland for watching ships offshore."
+  },
+  {
+    "id": "treasure-island-002-vocabulary-connoisseur",
+    "passageId": "treasure-island-002",
+    "type": "vocabularyInContext",
+    "prompt": "In this passage, what does \"connoisseur\" most nearly mean?",
+    "options": [
+      "A person who savors and judges something carefully",
+      "A sailor who repairs broken rigging",
+      "A stranger who pays in advance",
+      "A worker who pushes a hand-barrow"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "The captain drinks slowly, lingering on the taste, as someone carefully appreciating the rum."
+  },
+  {
+    "id": "treasure-island-003-main-idea",
+    "passageId": "treasure-island-003",
+    "type": "mainIdea",
+    "prompt": "What is the main event in this passage?",
+    "options": [
+      "A mysterious seafaring stranger waits at the inn to confront the captain",
+      "Jim and his mother sell the Admiral Benbow and leave the coast",
+      "Dr. Livesey arrests the captain for smuggling",
+      "The captain reveals the island's location to Jim"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "Black Dog arrives, questions Jim about Bill, and waits to surprise the captain on his return."
+  },
+  {
+    "id": "treasure-island-003-detail-season",
+    "passageId": "treasure-island-003",
+    "type": "detailRecall",
+    "prompt": "What kind of morning is described when the stranger arrives?",
+    "options": [
+      "A hot, stormy summer morning",
+      "A pinching, frosty January morning",
+      "A foggy autumn evening",
+      "A calm spring afternoon"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Jim describes it as one January morning, very early, and pinching and frosty."
+  },
+  {
+    "id": "treasure-island-003-detail-stranger-hand",
+    "passageId": "treasure-island-003",
+    "type": "detailRecall",
+    "prompt": "What physical detail makes the stranger stand out?",
+    "options": [
+      "He is missing two fingers on his left hand",
+      "He wears a gold crown",
+      "He has a wooden leg",
+      "He has a patch over both eyes"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "The stranger is described as wanting two fingers of the left hand."
+  },
+  {
+    "id": "treasure-island-003-detail-captain-items",
+    "passageId": "treasure-island-003",
+    "type": "detailRecall",
+    "prompt": "What does the captain carry when he sets out down the beach?",
+    "options": [
+      "A map and a lantern",
+      "A cutlass and a brass telescope",
+      "A pistol and a purse",
+      "A shovel and a compass"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "The captain leaves with his cutlass swinging and his brass telescope under his arm."
+  },
+  {
+    "id": "treasure-island-003-detail-bill",
+    "passageId": "treasure-island-003",
+    "type": "detailRecall",
+    "prompt": "By what name does the stranger seem to know the captain?",
+    "options": [
+      "Long John",
+      "Squire Trelawney",
+      "Bill",
+      "Dr. Livesey"
+    ],
+    "correctOptionIndex": 2,
+    "explanation": "The stranger repeatedly calls the captain his mate Bill."
+  },
+  {
+    "id": "treasure-island-003-inference-danger",
+    "passageId": "treasure-island-003",
+    "type": "inference",
+    "prompt": "What can the reader infer about the stranger's intentions?",
+    "options": [
+      "He is harmlessly lost and wants directions",
+      "He likely has business with the captain that may be threatening",
+      "He has come to nurse Jim's father",
+      "He wants to rent the inn for the winter"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "His sneering questions, control of Jim, and plan to hide behind the door suggest dangerous business with Bill."
+  },
+  {
+    "id": "treasure-island-003-inference-jim-caution",
+    "passageId": "treasure-island-003",
+    "type": "inference",
+    "prompt": "Why does Jim think the stranger may be mistaken even if he means what he says?",
+    "options": [
+      "Jim knows the captain has already left the country",
+      "Jim does not fully understand the stranger's connection to the captain",
+      "Jim has been told the captain's real name is not Bill",
+      "Jim believes the stranger cannot see well enough to recognize anyone"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Jim has doubts about the stranger's claims and does not yet know what trouble links him to the captain."
+  },
+  {
+    "id": "treasure-island-003-vocabulary-tallowy",
+    "passageId": "treasure-island-003",
+    "type": "vocabularyInContext",
+    "prompt": "In context, what does \"tallowy\" suggest about the stranger's appearance?",
+    "options": [
+      "Pale and waxy",
+      "Brightly dressed",
+      "Tall and muscular",
+      "Cheerful and smiling"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "The passage pairs \"tallowy\" with pale, giving the stranger a waxy, unhealthy look."
+  },
+  {
+    "id": "treasure-island-003-vocabulary-fawning",
+    "passageId": "treasure-island-003",
+    "type": "vocabularyInContext",
+    "prompt": "What does \"fawning\" most nearly mean in the stranger's \"half fawning, half sneering\" manner?",
+    "options": [
+      "Overly flattering or servile",
+      "Openly asleep",
+      "Violently angry",
+      "Completely silent"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "The stranger shifts into a falsely friendly, ingratiating manner after ordering Jim back inside."
+  },
+  {
+    "id": "treasure-island-003-detail-hiding-place",
+    "passageId": "treasure-island-003",
+    "type": "detailRecall",
+    "prompt": "Where does the stranger plan to wait with Jim for the captain?",
+    "options": [
+      "Behind the parlour door",
+      "Under the kitchen table",
+      "Beside the signboard outside",
+      "On the road near the big rock"
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "He tells Jim they will go back into the parlour and get behind the door."
   }
 ]
