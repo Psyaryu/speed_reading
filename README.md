@@ -36,9 +36,12 @@ flutter analyze
 flutter test
 ```
 
+Unit, widget, and integration-style flow coverage currently lives under `test/`.
+Widget and screen tests cover app flows until a platform-driven
+`integration_test/` harness is needed for release validation.
+
 ## Project Docs
 
 - [PRD.md](./PRD.md)
 - [TASKS.md](./TASKS.md)
 - [AGENTS.md](./AGENTS.md)
-

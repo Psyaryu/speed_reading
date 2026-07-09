@@ -61,7 +61,7 @@ Goal: Create the Flutter project, baseline architecture, local tooling, and init
 
 ### Epic 0.1: Flutter Project Setup
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -115,6 +115,13 @@ Follow-up tasks:
   Verification: Ran `flutter pub get`, `flutter analyze`, and `flutter test` with local SDK at `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat`. Analyze passed with no issues. Test suite passed after changing one floating-point ERS assertion to use a tolerance.
   Commit: See Git history for `test: verify Flutter analysis and tests`
   Notes: `flutter create` previously reported a Windows Developer Mode symlink warning. Current `pub get`, `analyze`, and `test` all pass.
+- Status: Done
+  Task: Close Flutter project setup acceptance criteria.
+  Completed: 2026-07-09
+  Changed files: README.md, TASKS.md
+  Verification: Confirmed Flutter scaffold and full Windows, Android, and iOS target folders are present; README documents setup, run, test, and current test-layout conventions; `analysis_options.yaml` includes Flutter lints; `pubspec.yaml` includes Riverpod, Drift/SQLite, and `fl_chart`; existing task logs record passing `flutter analyze`, passing `flutter test`, and a successful Windows build. Reran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all tests passed.
+  Commit: See Git history for `docs: close project setup task`
+  Notes: Unit, widget, and integration-style flow coverage currently lives under `test/`; a separate `integration_test/` harness can be added later if platform-driven release automation needs it. No setup follow-up tasks remain.
 
 ### Epic 0.2: App Architecture Skeleton
 
