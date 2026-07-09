@@ -54,11 +54,18 @@ void main() {
       totalQuestions: 10,
       answersByQuestionId: const {'question-1': 0},
       completedAt: DateTime.utc(2026, 7, 6),
+      questionTypesByQuestionId: const {
+        'question-1': QuestionType.vocabularyInContext,
+      },
       writtenSummary: 'A short recall summary.',
     );
 
     expect(result.comprehensionScore, 0.7);
     expect(QuizResult.fromJson(result.toJson()).writtenSummary,
         result.writtenSummary);
+    expect(
+      QuizResult.fromJson(result.toJson()).questionTypesByQuestionId,
+      {'question-1': QuestionType.vocabularyInContext},
+    );
   });
 }

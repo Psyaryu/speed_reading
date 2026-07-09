@@ -124,6 +124,11 @@ class DriftLocalDataStore implements LocalDataStore {
             correctCount: result.correctCount,
             totalQuestions: result.totalQuestions,
             answersByQuestionIdJson: jsonEncode(result.answersByQuestionId),
+            questionTypesByQuestionIdJson: Value(jsonEncode(
+              result.questionTypesByQuestionId.map(
+                (questionId, type) => MapEntry(questionId, type.name),
+              ),
+            )),
             completedAt: result.completedAt,
             writtenSummary: Value(result.writtenSummary),
           ),
@@ -298,6 +303,9 @@ class DriftLocalDataStore implements LocalDataStore {
       totalQuestions: row.totalQuestions,
       answersByQuestionId: _intMapFromJson(row.answersByQuestionIdJson),
       completedAt: row.completedAt,
+      questionTypesByQuestionId: _questionTypeMapFromJson(
+        row.questionTypesByQuestionIdJson,
+      ),
       writtenSummary: row.writtenSummary,
     );
   }
@@ -334,6 +342,16 @@ class DriftLocalDataStore implements LocalDataStore {
     final decoded = jsonDecode(rawJson) as Map<String, Object?>;
     return decoded.map(
       (key, value) => MapEntry(key, (value as num).toInt()),
+    );
+  }
+
+  Map<String, QuestionType> _questionTypeMapFromJson(String rawJson) {
+    final decoded = jsonDecode(rawJson) as Map<String, Object?>;
+    return decoded.map(
+      (key, value) => MapEntry(
+        key,
+        QuestionType.values.byName(value as String),
+      ),
     );
   }
 }

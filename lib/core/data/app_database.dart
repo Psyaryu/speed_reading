@@ -57,6 +57,8 @@ class QuizResultRecords extends Table {
   IntColumn get correctCount => integer()();
   IntColumn get totalQuestions => integer()();
   TextColumn get answersByQuestionIdJson => text()();
+  TextColumn get questionTypesByQuestionIdJson =>
+      text().withDefault(const Constant('{}'))();
   DateTimeColumn get completedAt => dateTime()();
   TextColumn get writtenSummary => text().nullable()();
 
@@ -131,7 +133,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -162,6 +164,12 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 6) {
             await migrator.createTable(delayedRecallAttemptRecords);
+          }
+          if (from < 7) {
+            await migrator.addColumn(
+              quizResultRecords,
+              quizResultRecords.questionTypesByQuestionIdJson,
+            );
           }
         },
       );

@@ -852,7 +852,7 @@ Goal: Measure comprehension reliably enough to gate progression and certificatio
 
 ### Epic 5.1: Quiz Engine
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -935,6 +935,16 @@ Changed files: lib/assessment/presentation/results_screen.dart, test/results_scr
 Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 107 tests passed.
 Commit: See Git history for `feat: show ERS on results screen`
 Notes: Results now loads passage metadata, computes Effective Reading Score from WPM, comprehension, difficulty, and mode, and displays it alongside the 70% comprehension gate.
+```
+
+```text
+Task: Persist quiz question category snapshots
+Status: Done
+Completed: 2026-07-09
+Changed files: lib/assessment/domain/quiz.dart, lib/assessment/domain/quiz_scorer.dart, lib/core/data/app_database.dart, lib/core/data/app_database.g.dart, lib/core/data/drift_local_data_store.dart, test/domain_models_test.dart, test/drift_local_data_store_test.dart, test/quiz_scorer_test.dart, TASKS.md
+Verification: Confirmed quiz engine supports multiple-choice questions; main idea, detail recall, inference, and vocabulary-in-context categories; optional written summary prompt; scoring; immediate comprehension score; 70% pass/fail result display; reading-session-linked persisted results. Added stored question category snapshots to quiz results and Drift persistence. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\quiz_scorer_test.dart test\domain_models_test.dart test\drift_local_data_store_test.dart`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all tests passed.
+Commit:
+Notes: Epic 5.1 acceptance criteria are closed. Official question-set breadth remains tracked separately under Epic 5.2.
 ```
 
 ### Epic 5.2: Official Passage Question Sets

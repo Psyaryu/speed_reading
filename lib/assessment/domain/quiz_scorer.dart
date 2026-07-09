@@ -24,6 +24,9 @@ class QuizScorer {
       totalQuestions: questions.length,
       answersByQuestionId: answersByQuestionId,
       completedAt: completedAt,
+      questionTypesByQuestionId: {
+        for (final question in questions) question.id: question.type,
+      },
       writtenSummary: writtenSummary,
     );
   }

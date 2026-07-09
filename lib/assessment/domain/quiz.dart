@@ -53,6 +53,7 @@ class QuizResult {
     required this.totalQuestions,
     required this.answersByQuestionId,
     required this.completedAt,
+    this.questionTypesByQuestionId = const {},
     this.writtenSummary,
   });
 
@@ -63,6 +64,7 @@ class QuizResult {
   final int totalQuestions;
   final Map<String, int> answersByQuestionId;
   final DateTime completedAt;
+  final Map<String, QuestionType> questionTypesByQuestionId;
   final String? writtenSummary;
 
   double get comprehensionScore {
@@ -80,12 +82,17 @@ class QuizResult {
       'correctCount': correctCount,
       'totalQuestions': totalQuestions,
       'answersByQuestionId': answersByQuestionId,
+      'questionTypesByQuestionId': questionTypesByQuestionId.map(
+        (questionId, type) => MapEntry(questionId, type.name),
+      ),
       'completedAt': completedAt.toIso8601String(),
       'writtenSummary': writtenSummary,
     };
   }
 
   factory QuizResult.fromJson(Map<String, Object?> json) {
+    final questionTypesJson =
+        json['questionTypesByQuestionId'] as Map<String, Object?>?;
     return QuizResult(
       id: json['id'] as String,
       sessionId: json['sessionId'] as String,
@@ -95,6 +102,14 @@ class QuizResult {
       answersByQuestionId: (json['answersByQuestionId'] as Map<String, Object?>)
           .cast<String, int>(),
       completedAt: DateTime.parse(json['completedAt'] as String),
+      questionTypesByQuestionId: questionTypesJson == null
+          ? const {}
+          : questionTypesJson.map(
+              (questionId, type) => MapEntry(
+                questionId,
+                QuestionType.values.byName(type as String),
+              ),
+            ),
       writtenSummary: json['writtenSummary'] as String?,
     );
   }

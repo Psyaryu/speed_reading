@@ -116,6 +116,9 @@ void main() {
         totalQuestions: 2,
         answersByQuestionId: const {'question-1': 0},
         completedAt: DateTime.utc(2026, 7, 8),
+        questionTypesByQuestionId: const {
+          'question-1': QuestionType.mainIdea,
+        },
         writtenSummary: 'The passage is about a signal fire.',
       ),
     );
@@ -126,6 +129,9 @@ void main() {
       results.single.writtenSummary,
       'The passage is about a signal fire.',
     );
+    expect(results.single.questionTypesByQuestionId, {
+      'question-1': QuestionType.mainIdea,
+    });
     expect(results.single.comprehensionScore, 0.5);
   });
 
