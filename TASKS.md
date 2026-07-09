@@ -1354,6 +1354,16 @@ Notes: Settings now persists font size, line height, and reduced motion locally 
 ```
 
 ```text
+Task: Add reduced motion setting
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/main.dart, test/widget_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 116 tests passed.
+Commit: See Git history for `feat: add reduced motion setting`
+Notes: Reduced motion was already stored in the local profile and Settings UI; this task wires the persisted value into app-level `MediaQuery.disableAnimations` and adds widget coverage for the behavior.
+```
+
+```text
 Task: Add reader column width setting
 Status: Done
 Completed: 2026-07-08

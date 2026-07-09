@@ -58,4 +58,29 @@ void main() {
     final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
     expect(app.themeMode, ThemeMode.dark);
   });
+
+  testWidgets('applies reduced motion preference to MediaQuery', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          localProfileProvider.overrideWith((ref) async {
+            return LocalUserProfile.initial(
+              id: 'local',
+              createdAt: DateTime.utc(2026, 7, 8),
+            ).copyWith(reducedMotion: true);
+          }),
+        ],
+        child: const SpeedReadingApp(),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    final context = tester.element(find.text('Dashboard'));
+    expect(MediaQuery.of(context).disableAnimations, isTrue);
+  });
 }

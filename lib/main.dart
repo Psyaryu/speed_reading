@@ -25,6 +25,18 @@ class SpeedReadingApp extends ConsumerWidget {
         data: (profile) => profile.preferredThemeMode.toMaterialThemeMode(),
         orElse: () => ThemeMode.system,
       ),
+      builder: (context, child) {
+        final reduceMotion = profile.maybeWhen(
+          data: (profile) => profile.reducedMotion,
+          orElse: () => false,
+        );
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            disableAnimations: reduceMotion,
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       routerConfig: appRouter,
     );
   }
