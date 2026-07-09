@@ -5,12 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../assessment/domain/quiz.dart';
 import '../../content/domain/passage.dart';
 import '../../content/domain/passage_filter.dart';
-import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
 import '../../progress/domain/effective_reading_score.dart';
 import '../../progress/domain/progression.dart';
 import '../../progress/presentation/progress_screen.dart';
-import '../../reading/domain/reading_session.dart';
 import '../domain/training_recommendation.dart';
 
 final dashboardProgressSummaryProvider =
@@ -20,6 +18,7 @@ final dashboardProgressSummaryProvider =
   final sessions = await store.loadReadingSessions();
   final quizResults = await store.loadQuizResults();
   final passages = await repository.search(const PassageFilter());
+  final questions = await ref.watch(officialQuestionSourceProvider).load();
 
   return DashboardProgressSummary.from(
     history: ProgressHistory(
@@ -27,6 +26,7 @@ final dashboardProgressSummaryProvider =
       quizResults: quizResults,
     ),
     passages: passages,
+    questions: questions,
   );
 });
 
@@ -52,13 +52,12 @@ class DashboardProgressSummary {
   factory DashboardProgressSummary.from({
     required ProgressHistory history,
     required List<Passage> passages,
+    List<QuizQuestion> questions = const [],
   }) {
     final passagesById = {
       for (final passage in passages) passage.id: passage,
     };
     var bestQualifiedErs = 0.0;
-
-    final qualifiedAttempts = <_DashboardQualifiedAttempt>[];
 
     for (final session in history.sessions) {
       final quiz = history.quizForSession(session.id);
@@ -85,20 +84,16 @@ class DashboardProgressSummary {
         difficulty: passage.metadata.difficulty,
         mode: session.mode,
       );
-      qualifiedAttempts.add(
-        _DashboardQualifiedAttempt(
-          session: session,
-          comprehensionScore: quiz.comprehensionScore,
-          effectiveReadingScore: ers,
-        ),
-      );
       if (ers > bestQualifiedErs) {
         bestQualifiedErs = ers;
       }
     }
 
     final level = Progression.levelForQualifiedErs(bestQualifiedErs);
-    final recommendedDrill = _recommendedDrillFor(history, qualifiedAttempts);
+    final recommendedDrill = _recommendedDrillFor(
+      history,
+      questions,
+    );
     return DashboardProgressSummary(
       history: history,
       level: level,
@@ -112,70 +107,13 @@ class DashboardProgressSummary {
 
   static TrainingDrill _recommendedDrillFor(
     ProgressHistory history,
-    List<_DashboardQualifiedAttempt> qualifiedAttempts,
+    List<QuizQuestion> questions,
   ) {
-    if (history.sessions.isEmpty) {
-      return TrainingDrill.pacedReading;
-    }
-
-    final newestQuizScores = history.newestSessions
-        .map((session) => history.quizForSession(session.id))
-        .whereType<QuizResult>()
-        .map((quiz) => quiz.comprehensionScore)
-        .take(3)
-        .toList(growable: false);
-    final recentComprehension = newestQuizScores.isEmpty
-        ? 1.0
-        : newestQuizScores.fold(0.0, (sum, score) => sum + score) /
-            newestQuizScores.length;
-
-    final scanningScores = history.newestSessions
-        .where((session) => session.mode == ReadingMode.scan)
-        .map((session) => history.quizForSession(session.id))
-        .whereType<QuizResult>()
-        .map((quiz) => quiz.comprehensionScore)
-        .take(3)
-        .toList(growable: false);
-    final scanningAccuracy = scanningScores.isEmpty
-        ? 1.0
-        : scanningScores.fold(0.0, (sum, score) => sum + score) /
-            scanningScores.length;
-
-    final newestQualifiedAttempts = [...qualifiedAttempts]
-      ..sort((a, b) => b.session.startedAt.compareTo(a.session.startedAt));
-    final recentAttempts =
-        newestQualifiedAttempts.take(3).toList(growable: false);
-
-    final recentWpms =
-        recentAttempts.map((attempt) => attempt.session.wpm).toList();
-    final wpmPlateaued = recentWpms.length >= 3 &&
-        (recentWpms.reduce((a, b) => a > b ? a : b) -
-                recentWpms.reduce((a, b) => a < b ? a : b)) <=
-            25;
-
-    final bestRsvpErs = qualifiedAttempts
-        .where((attempt) => attempt.session.mode == ReadingMode.rsvp)
-        .fold(0.0, (best, attempt) {
-      return attempt.effectiveReadingScore > best
-          ? attempt.effectiveReadingScore
-          : best;
-    });
-    final bestNonRsvpErs = qualifiedAttempts
-        .where((attempt) => attempt.session.mode != ReadingMode.rsvp)
-        .fold(0.0, (best, attempt) {
-      return attempt.effectiveReadingScore > best
-          ? attempt.effectiveReadingScore
-          : best;
-    });
-    final rsvpOnlyProgress = bestRsvpErs >= 1 && bestRsvpErs > bestNonRsvpErs;
-
     return TrainingRecommendationEngine.recommend(
-      TrainingRecommendationInput(
-        recentComprehension: recentComprehension,
-        wpmPlateaued: wpmPlateaued,
-        detailRecallWeak: false,
-        scanningAccuracy: scanningAccuracy,
-        rsvpOnlyProgress: rsvpOnlyProgress,
+      TrainingRecommendationInput.fromHistory(
+        sessions: history.sessions,
+        quizResults: history.quizResults,
+        questions: questions,
       ),
     );
   }
@@ -187,18 +125,6 @@ class DashboardProgressSummary {
       'Finish with a comprehension quiz and review misses.',
     ];
   }
-}
-
-class _DashboardQualifiedAttempt {
-  const _DashboardQualifiedAttempt({
-    required this.session,
-    required this.comprehensionScore,
-    required this.effectiveReadingScore,
-  });
-
-  final ReadingSession session;
-  final double comprehensionScore;
-  final double effectiveReadingScore;
 }
 
 class DashboardScreen extends ConsumerWidget {

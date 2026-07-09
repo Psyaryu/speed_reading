@@ -1221,7 +1221,7 @@ Dependencies:
 
 ### Epic 7.3: Adaptive Recommendation Engine
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -1253,6 +1253,16 @@ Changed files: lib/training/domain/training_recommendation.dart, test/training_r
 Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for comprehension-first behavior, RSVP transfer, scanning weakness, and WPM plateau recommendations.
 Commit: See Git history for `feat: add training recommendation rules`
 Notes: Recommendation inputs are domain-level for now. Wiring to persisted progress history remains open.
+```
+
+```text
+Task: Complete deterministic adaptive recommendation signals
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/training/domain/training_recommendation.dart, lib/training/presentation/dashboard_screen.dart, test/training_recommendation_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\training_recommendation_test.dart`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 164 tests passed.
+Commit: `feat: improve training recommendations`
+Notes: Recommendation input derivation now uses local reading sessions, quiz results, official question category metadata, and reading modes to detect below-threshold comprehension, WPM plateau, weak detail recall, weak scan-mode accuracy when scan data exists, and RSVP-only progress without non-RSVP transfer. No follow-up was added because `ReadingMode.scan` exists and provides deterministic local scanning data.
 ```
 
 ## Milestone 8: Dashboard and Analytics
