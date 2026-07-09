@@ -1509,9 +1509,9 @@ Task: Validate current Android release readiness
 Status: Blocked
 Completed: 2026-07-08
 Changed files: TASKS.md
-Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build apk`. Analyze passed with no issues. Test suite passed with all 115 tests passing. Android APK build exited before Gradle because Flutter reported: `[!] No Android SDK found. Try setting the ANDROID_HOME environment variable.`
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build apk`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat doctor -v`. Analyze passed with no issues. Test suite passed with all 115 tests passing. Android APK build exited before Gradle because Flutter reported: `[!] No Android SDK found. Try setting the ANDROID_HOME environment variable.` Flutter doctor confirmed `Android toolchain - develop for Android devices` failed with `Unable to locate Android SDK` and advised installing Android Studio/SDK or configuring `flutter config --android-sdk`.
 Commit: See Git history for `docs: record android readiness blocker`
-Notes: No source fixes were required. Install/configure the Android SDK and set `ANDROID_HOME`, then rerun `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build apk` to complete Android build validation.
+Notes: No source fixes were required. Android readiness remains blocked until an Android SDK is installed or configured for the local Flutter SDK, then `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build apk` can be rerun to complete Android build validation.
 ```
 
 ### Epic 10.3: iOS Readiness
