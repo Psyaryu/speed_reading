@@ -949,7 +949,7 @@ Notes: Epic 5.1 acceptance criteria are closed. Official question-set breadth re
 
 ### Epic 5.2: Official Passage Question Sets
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -1003,6 +1003,16 @@ Changed files: assets/passages/official_questions.json, test/official_question_l
 Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 112 tests passed.
 Commit: See Git history for `feat: expand official question sets`
 Notes: Added provider-loadable main idea, detail, inference, and vocabulary questions for every current official bundled MVP passage, with bundled asset tests enforcing length-scaled minimum question counts.
+```
+
+```text
+Task: Close official passage question-set acceptance criteria
+Status: Done
+Completed: 2026-07-09
+Changed files: TASKS.md
+Verification: Confirmed every bundled official MVP passage in `assets/passages/official_passages.json` has a quiz in `assets/passages/official_questions.json`; questions include category tags, answer keys, and explanations; length-scaled minimum counts are enforced by `test/official_question_loader_test.dart`; and no current certification-eligible official passages lack question coverage. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all 173 tests passed.
+Commit:
+Notes: Epic 5.2 acceptance criteria are closed. No follow-up tasks were added.
 ```
 
 ## Milestone 6: Scoring, Progression, Certification, and Mastery
