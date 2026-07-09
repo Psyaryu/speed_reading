@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../content/domain/passage.dart';
 import '../../content/domain/passage_filter.dart';
 import '../../core/providers/app_providers.dart';
 import '../../progress/domain/effective_reading_score.dart';
+import '../../progress/domain/progression.dart';
+import '../../progress/domain/shareable_progress_summary.dart';
 import '../../progress/presentation/progress_screen.dart';
 
 final resultPassagesProvider = FutureProvider<List<Passage>>((ref) {
   return ref.watch(passageRepositoryProvider).search(const PassageFilter());
+});
+
+final resultShareProvider = Provider<Future<void> Function(String)>((ref) {
+  return (text) async {
+    await Share.share(text, subject: 'Speed Reading Progress');
+  };
 });
 
 class ResultsScreen extends ConsumerWidget {
@@ -36,7 +45,7 @@ class ResultsScreen extends ConsumerWidget {
   }
 }
 
-class _ResultsBody extends StatelessWidget {
+class _ResultsBody extends ConsumerWidget {
   const _ResultsBody({
     required this.history,
     required this.passages,
@@ -46,7 +55,7 @@ class _ResultsBody extends StatelessWidget {
   final List<Passage> passages;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final sessions = history.newestSessions;
     if (sessions.isEmpty) {
       return const Center(child: Text('No results yet.'));
@@ -100,6 +109,29 @@ class _ResultsBody extends StatelessWidget {
                   ? 'Qualified'
                   : 'Below 70%',
         ),
+        if (effectiveReadingScore != null && comprehensionScore != null) ...[
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilledButton.icon(
+              onPressed: () {
+                final summary = ShareableProgressSummary(
+                  levelName: Progression.levelName(
+                    Progression.levelForQualifiedErs(effectiveReadingScore),
+                  ),
+                  effectiveReadingScore: effectiveReadingScore,
+                  qualifiedWpm: session.wpm,
+                  comprehensionScore: comprehensionScore,
+                  streakDays: 0,
+                  certificationStatus: 'Not certified yet',
+                );
+                ref.read(resultShareProvider).call(summary.toShareText());
+              },
+              icon: const Icon(Icons.share),
+              label: const Text('Share Progress'),
+            ),
+          ),
+        ],
       ],
     );
   }

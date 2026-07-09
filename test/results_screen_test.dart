@@ -76,6 +76,58 @@ void main() {
     expect(find.text('560'), findsOneWidget);
     expect(find.text('Qualified'), findsOneWidget);
   });
+
+  testWidgets('shares public progress summary', (tester) async {
+    final shared = <String>[];
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          progressHistoryProvider.overrideWith(
+            (ref) async => ProgressHistory(
+              sessions: [
+                ReadingSession(
+                  id: 'session-1',
+                  passageId: 'passage-1',
+                  mode: ReadingMode.manual,
+                  startedAt: DateTime.utc(2026, 7, 8),
+                  activeReadingSeconds: 60,
+                  wordCount: 800,
+                  status: AttemptQualificationStatus.qualified,
+                ),
+              ],
+              quizResults: [
+                QuizResult(
+                  id: 'quiz-1',
+                  sessionId: 'session-1',
+                  passageId: 'passage-1',
+                  correctCount: 7,
+                  totalQuestions: 10,
+                  answersByQuestionId: const {},
+                  completedAt: DateTime.utc(2026, 7, 8, 0, 2),
+                ),
+              ],
+            ),
+          ),
+          resultPassagesProvider.overrideWith((ref) async => [
+                _passage(),
+              ]),
+          resultShareProvider.overrideWithValue((text) async {
+            shared.add(text);
+          }),
+        ],
+        child: const MaterialApp(home: ResultsScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Share Progress'));
+    await tester.pumpAndSettle();
+
+    expect(shared.single, contains('800 WPM'));
+    expect(shared.single, contains('70% comprehension'));
+    expect(shared.single, isNot(contains('A public domain passage.')));
+  });
 }
 
 Passage _passage() {

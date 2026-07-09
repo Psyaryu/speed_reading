@@ -1273,6 +1273,16 @@ Commit: See Git history for `feat: add shareable progress summary`
 Notes: UI card and platform share sheet integration remain open.
 ```
 
+```text
+Task: Add results progress share action
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/assessment/presentation/results_screen.dart, test/results_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 110 tests passed.
+Commit: See Git history for `feat: add results progress sharing`
+Notes: Results now builds a public share summary from WPM, comprehension, ERS, and level, then invokes the platform share sheet through `share_plus`. Tests verify private passage text is excluded.
+```
+
 ## Milestone 9: Settings, Accessibility, Privacy, and Reliability
 
 Goal: Make the app comfortable, private, and resilient across target platforms.
