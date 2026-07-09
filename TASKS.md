@@ -1097,9 +1097,7 @@ Dependencies:
 
 Follow-up tasks:
 
-- Status: Todo
-  Task: Schedule delayed recall reminders when persisted mastery candidates are created.
-  Notes: Use `delayedRecallReminderSchedulerProvider` and `DelayedRecallReminderFactory` from the mastery candidate creation flow once immediate 800 WPM mastery attempts are persisted.
+- None.
 
 Completed task log:
 
@@ -1161,7 +1159,18 @@ Changed files: lib/progress/domain/delayed_recall_attempt.dart, lib/core/data/ap
 Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat pub run build_runner build --delete-conflicting-outputs`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 167 tests passed.
 Commit: See Git history for `feat: persist delayed recall attempts`
 Notes: Added loadable local delayed recall attempt storage with passage/session/quiz linkage, recall timestamp, due/original timestamps, score, and mastery qualification. Mastery progress now uses stored delayed recall attempts to satisfy the 24-hour and 90% requirements while remaining pending when no attempts are stored.
-Follow-up: Keep `Schedule delayed recall reminders when persisted mastery candidates are created` open; this task did not implement the candidate creation scheduling hook.
+Follow-up: Scheduling persisted mastery candidate reminders was completed by `feat: schedule mastery candidate reminders`.
+```
+
+```text
+Task: Schedule delayed recall reminders when persisted mastery candidates are created
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/assessment/presentation/quiz_screen.dart, test/quiz_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\quiz_screen_test.dart`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 169 tests passed.
+Commit: See Git history for `feat: schedule mastery candidate reminders`
+Notes: Quiz completion now schedules a delayed recall reminder through `delayedRecallReminderSchedulerProvider` and `DelayedRecallReminderFactory` after a persisted official standard/hard 800+ WPM result with 100% immediate comprehension qualifies as a mastery candidate. The reminder ID is deterministic for the persisted quiz and passage, so repeated scheduling updates the same reminder slot instead of creating duplicate in-memory or platform notifications.
+Follow-up: None.
 ```
 
 ## Milestone 7: Training Curriculum and Adaptive Plan

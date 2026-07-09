@@ -6,9 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:speed_reading/assessment/data/official_question_loader.dart';
 import 'package:speed_reading/assessment/domain/quiz.dart';
 import 'package:speed_reading/assessment/presentation/quiz_screen.dart';
+import 'package:speed_reading/content/data/passage_repository.dart';
+import 'package:speed_reading/content/domain/passage.dart';
+import 'package:speed_reading/content/domain/passage_filter.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
+import 'package:speed_reading/progress/domain/delayed_recall_reminder.dart';
 import 'package:speed_reading/reading/domain/reading_session.dart';
 
 void main() {
@@ -89,6 +93,107 @@ void main() {
     );
   });
 
+  testWidgets('schedules delayed recall reminder for mastery candidate',
+      (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    final scheduler = _FakeDelayedRecallReminderScheduler();
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(
+            () => DateTime.utc(2026, 7, 8, 12, 2),
+          ),
+          latestQuizSessionProvider.overrideWith(
+            (ref) async => _session(
+              completedAt: DateTime.utc(2026, 7, 8, 12, 1),
+            ),
+          ),
+          officialQuestionSourceProvider.overrideWithValue(
+            const _FakeOfficialQuestionSource(),
+          ),
+          passageRepositoryProvider.overrideWithValue(
+            _FakePassageRepository([
+              _passage(),
+            ]),
+          ),
+          quizResultIdProvider.overrideWithValue(() => 'quiz-1'),
+          delayedRecallReminderSchedulerProvider.overrideWithValue(scheduler),
+        ],
+        child: const MaterialApp(home: QuizScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('The signal fire'));
+    await tester.pump();
+    await tester.tap(find.text('A compass'));
+    await tester.pump();
+    await tester.scrollUntilVisible(
+      find.text('Submit Quiz'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Submit Quiz'));
+    await tester.pumpAndSettle();
+
+    expect(scheduler.scheduledReminders, hasLength(1));
+    final reminder = scheduler.scheduledReminders.single;
+    expect(reminder.id, 'delayed-recall-quiz-1-passage-1');
+    expect(reminder.masteryAttemptId, 'quiz-1');
+    expect(reminder.passageId, 'passage-1');
+    expect(reminder.dueAt, DateTime.utc(2026, 7, 9, 12, 1));
+  });
+
+  testWidgets('does not schedule delayed recall for non-perfect quiz',
+      (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    final scheduler = _FakeDelayedRecallReminderScheduler();
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(
+            () => DateTime.utc(2026, 7, 8, 12, 2),
+          ),
+          latestQuizSessionProvider.overrideWith((ref) async => _session()),
+          officialQuestionSourceProvider.overrideWithValue(
+            const _FakeOfficialQuestionSource(),
+          ),
+          passageRepositoryProvider.overrideWithValue(
+            _FakePassageRepository([
+              _passage(),
+            ]),
+          ),
+          quizResultIdProvider.overrideWithValue(() => 'quiz-1'),
+          delayedRecallReminderSchedulerProvider.overrideWithValue(scheduler),
+        ],
+        child: const MaterialApp(home: QuizScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('The signal fire'));
+    await tester.pump();
+    await tester.tap(find.text('A hidden map'));
+    await tester.pump();
+    await tester.scrollUntilVisible(
+      find.text('Submit Quiz'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Submit Quiz'));
+    await tester.pumpAndSettle();
+
+    expect(scheduler.scheduledReminders, isEmpty);
+  });
+
   testWidgets('navigates to results after submitting quiz', (tester) async {
     final database = AppDatabase(NativeDatabase.memory());
     addTearDown(database.close);
@@ -150,15 +255,39 @@ void main() {
   });
 }
 
-ReadingSession _session() {
+ReadingSession _session({DateTime? completedAt}) {
   return ReadingSession(
     id: 'session-1',
     passageId: 'passage-1',
     mode: ReadingMode.manual,
     startedAt: DateTime.utc(2026, 7, 8, 12),
+    completedAt: completedAt,
     activeReadingSeconds: 60,
     wordCount: 800,
     status: AttemptQualificationStatus.qualified,
+  );
+}
+
+Passage _passage({
+  PassageSource source = PassageSource.official,
+  PassageDifficulty difficulty = PassageDifficulty.standard,
+}) {
+  return Passage(
+    id: 'passage-1',
+    title: 'Passage',
+    body: 'A public domain passage.',
+    metadata: PassageMetadata(
+      wordCount: 800,
+      difficulty: difficulty,
+      topic: 'Adventure',
+      source: source,
+      license: 'Public Domain',
+      type: PassageType.fiction,
+      vocabularyDensity: 0.2,
+      tags: const ['mastery'],
+      isCertificationEligible: true,
+      isMasteryEligible: true,
+    ),
   );
 }
 
@@ -188,4 +317,54 @@ class _FakeOfficialQuestionSource implements OfficialQuestionSource {
 
   @override
   Future<List<QuizQuestion>> load() async => _questions();
+}
+
+class _FakePassageRepository implements PassageRepository {
+  const _FakePassageRepository(this.passages);
+
+  final List<Passage> passages;
+
+  @override
+  Future<List<Passage>> loadOfficialPassages() async {
+    return passages
+        .where((passage) => passage.metadata.source == PassageSource.official)
+        .toList(growable: false);
+  }
+
+  @override
+  Future<List<Passage>> loadImportedPassages() async {
+    return passages
+        .where((passage) => passage.metadata.source == PassageSource.imported)
+        .toList(growable: false);
+  }
+
+  @override
+  Future<void> saveImportedPassage(Passage passage) async {}
+
+  @override
+  Future<void> deleteImportedPassage(String passageId) async {}
+
+  @override
+  Future<List<Passage>> search(PassageFilter filter) async {
+    return PassageFilterService.apply(passages, filter);
+  }
+}
+
+class _FakeDelayedRecallReminderScheduler
+    implements DelayedRecallReminderScheduler {
+  final Map<String, DelayedRecallReminder> _scheduledReminders = {};
+
+  List<DelayedRecallReminder> get scheduledReminders {
+    return List.unmodifiable(_scheduledReminders.values);
+  }
+
+  @override
+  Future<void> schedule(DelayedRecallReminder reminder) async {
+    _scheduledReminders[reminder.id] = reminder;
+  }
+
+  @override
+  Future<void> cancel(String reminderId) async {
+    _scheduledReminders.remove(reminderId);
+  }
 }

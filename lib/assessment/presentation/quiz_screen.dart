@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../content/domain/passage_filter.dart';
 import '../../core/providers/app_providers.dart';
+import '../../progress/domain/delayed_recall_reminder.dart';
+import '../../progress/domain/mastery_rules.dart';
 import '../../reading/domain/reading_session.dart';
 import '../domain/quiz.dart';
 import '../domain/quiz_scorer.dart';
@@ -185,6 +188,7 @@ class _QuizFormState extends ConsumerState<_QuizForm> {
       writtenSummary: _normalizedSummary(),
     );
     await ref.read(localDataStoreProvider).saveQuizResult(result);
+    await _scheduleDelayedRecallReminderIfMasteryCandidate(ref, result);
 
     if (!mounted) {
       return;
@@ -199,6 +203,48 @@ class _QuizFormState extends ConsumerState<_QuizForm> {
   String? _normalizedSummary() {
     final summary = _summaryController.text.trim();
     return summary.isEmpty ? null : summary;
+  }
+
+  Future<void> _scheduleDelayedRecallReminderIfMasteryCandidate(
+    WidgetRef ref,
+    QuizResult result,
+  ) async {
+    if (result.comprehensionScore != 1.0) {
+      return;
+    }
+
+    final passages = await ref.read(passageRepositoryProvider).search(
+          const PassageFilter(),
+        );
+    final passage = passages.where((candidate) {
+      return candidate.id == widget.session.passageId;
+    }).firstOrNull;
+    if (passage == null) {
+      return;
+    }
+
+    final masteryResult = MasterySessionResult(
+      passageId: widget.session.passageId,
+      wpm: widget.session.wpm,
+      immediateComprehensionScore: result.comprehensionScore,
+      delayedRecallScore: 0,
+      mode: widget.session.mode,
+      difficulty: passage.metadata.difficulty,
+      source: passage.metadata.source,
+      status: widget.session.status,
+      excessivePausing: widget.session.pauseCount > 3,
+    );
+    if (!MasteryRules.isImmediateCandidate(masteryResult)) {
+      return;
+    }
+
+    final completedAt = widget.session.completedAt ?? result.completedAt;
+    final reminder = const DelayedRecallReminderFactory().create(
+      masteryAttemptId: result.id,
+      passageId: widget.session.passageId,
+      immediateAttemptCompletedAt: completedAt,
+    );
+    await ref.read(delayedRecallReminderSchedulerProvider).schedule(reminder);
   }
 }
 
