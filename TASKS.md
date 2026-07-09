@@ -1299,6 +1299,16 @@ Commit: See Git history for `feat: show difficulty distribution`
 Notes: Progress now summarizes completed practice sessions by passage difficulty with official/imported counts, unmatched-session context, and an empty-data state without exposing imported passage text.
 ```
 
+```text
+Task: Build skill breakdown view
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/progress/domain/skill_breakdown.dart, lib/progress/presentation/progress_screen.dart, test/skill_breakdown_test.dart, test/progress_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 128 tests passed.
+Commit: See Git history for `feat: show skill breakdown`
+Notes: Progress now summarizes quiz answer accuracy by matched local question skills, including main idea, detail recall, inference, and vocabulary categories, with unmatched-answer context and an empty-data state without exposing imported passage text.
+```
+
 ### Epic 8.3: Shareable Progress Summary
 
 Status: Done

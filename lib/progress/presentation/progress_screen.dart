@@ -8,6 +8,7 @@ import '../../core/providers/app_providers.dart';
 import '../../progress/domain/best_qualified_attempt.dart';
 import '../../progress/domain/passage_difficulty_distribution.dart';
 import '../../progress/domain/shareable_progress_summary.dart';
+import '../../progress/domain/skill_breakdown.dart';
 import '../../reading/domain/reading_session.dart';
 
 final progressHistoryProvider = FutureProvider<ProgressHistory>((ref) async {
@@ -58,6 +59,15 @@ final passageDifficultyDistributionProvider =
   );
 });
 
+final skillBreakdownProvider = FutureProvider<SkillBreakdown>((ref) async {
+  final history = await ref.watch(progressHistoryProvider.future);
+  final questions = await ref.watch(officialQuestionSourceProvider).load();
+  return SkillBreakdownBuilder.fromQuizHistory(
+    quizResults: history.quizResults,
+    questions: questions,
+  );
+});
+
 final progressShareProvider = Provider<Future<void> Function(String)>((ref) {
   return (text) async {
     await Share.share(text, subject: 'Speed Reading Progress');
@@ -97,6 +107,7 @@ class ProgressScreen extends ConsumerWidget {
     final bestQualifiedAttempt = ref.watch(bestQualifiedAttemptProvider);
     final difficultyDistribution =
         ref.watch(passageDifficultyDistributionProvider);
+    final skillBreakdown = ref.watch(skillBreakdownProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Progress')),
@@ -106,6 +117,7 @@ class ProgressScreen extends ConsumerWidget {
           shareSummary: shareSummary,
           bestQualifiedAttempt: bestQualifiedAttempt,
           difficultyDistribution: difficultyDistribution,
+          skillBreakdown: skillBreakdown,
         ),
         error: (error, stackTrace) => Center(
           child: Text('Unable to load progress: $error'),
@@ -122,12 +134,14 @@ class _ProgressBody extends ConsumerWidget {
     required this.shareSummary,
     required this.bestQualifiedAttempt,
     required this.difficultyDistribution,
+    required this.skillBreakdown,
   });
 
   final ProgressHistory history;
   final AsyncValue<ShareableProgressSummary?> shareSummary;
   final AsyncValue<BestQualifiedAttempt?> bestQualifiedAttempt;
   final AsyncValue<PassageDifficultyDistribution> difficultyDistribution;
+  final AsyncValue<SkillBreakdown> skillBreakdown;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -164,6 +178,8 @@ class _ProgressBody extends ConsumerWidget {
         const SizedBox(height: 16),
         _BestQualifiedAttemptCard(attempt: bestQualifiedAttempt),
         const SizedBox(height: 16),
+        _SkillBreakdownCard(breakdown: skillBreakdown),
+        const SizedBox(height: 16),
         _DifficultyDistributionCard(distribution: difficultyDistribution),
         const SizedBox(height: 24),
         Text(
@@ -194,6 +210,90 @@ class _ProgressBody extends ConsumerWidget {
       return 'Pending quiz';
     }
     return '${(quiz.comprehensionScore * 100).round()}%';
+  }
+}
+
+class _SkillBreakdownCard extends StatelessWidget {
+  const _SkillBreakdownCard({required this.breakdown});
+
+  final AsyncValue<SkillBreakdown> breakdown;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: breakdown.when(
+          data: (breakdown) {
+            if (!breakdown.hasAnsweredQuestions) {
+              return const Text('Not enough skill data yet.');
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Skill Breakdown',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                ...breakdown.entries
+                    .where((entry) => entry.answeredCount > 0)
+                    .map((entry) => _SkillBreakdownRow(entry: entry)),
+                if (breakdown.unmatchedAnswerCount > 0) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '${breakdown.unmatchedAnswerCount} answer could not be '
+                    'matched to a skill.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ],
+            );
+          },
+          error: (error, stackTrace) => Text(
+            'Skill breakdown unavailable: $error',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+          loading: () => const LinearProgressIndicator(),
+        ),
+      ),
+    );
+  }
+}
+
+class _SkillBreakdownRow extends StatelessWidget {
+  const _SkillBreakdownRow({required this.entry});
+
+  final SkillBreakdownEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final accuracyPercent = (entry.accuracy * 100).round();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(entry.label)),
+              Text(
+                '$accuracyPercent%',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          LinearProgressIndicator(value: entry.accuracy),
+          const SizedBox(height: 4),
+          Text(
+            '${entry.correctCount}/${entry.answeredCount} correct',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ),
+    );
   }
 }
 

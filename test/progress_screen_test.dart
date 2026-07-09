@@ -10,6 +10,7 @@ import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
 import 'package:speed_reading/progress/domain/passage_difficulty_distribution.dart';
+import 'package:speed_reading/progress/domain/skill_breakdown.dart';
 import 'package:speed_reading/progress/presentation/progress_screen.dart';
 import 'package:speed_reading/reading/domain/reading_session.dart';
 
@@ -27,6 +28,7 @@ void main() {
           passageDifficultyDistributionProvider.overrideWith(
             (ref) async => _emptyDifficultyDistribution,
           ),
+          skillBreakdownProvider.overrideWith((ref) async => _emptySkillBreakdown),
         ],
         child: const MaterialApp(home: ProgressScreen()),
       ),
@@ -49,6 +51,7 @@ void main() {
         passageDifficultyDistributionProvider.overrideWith(
           (ref) async => _emptyDifficultyDistribution,
         ),
+        skillBreakdownProvider.overrideWith((ref) async => _emptySkillBreakdown),
       ],
     );
     addTearDown(container.dispose);
@@ -127,6 +130,7 @@ void main() {
         progressShareProvider.overrideWithValue((text) async {
           shared.add(text);
         }),
+        skillBreakdownProvider.overrideWith((ref) async => _emptySkillBreakdown),
       ],
     );
     addTearDown(container.dispose);
@@ -228,6 +232,7 @@ void main() {
           ),
         ),
         progressShareProvider.overrideWithValue((text) async {}),
+        skillBreakdownProvider.overrideWith((ref) async => _emptySkillBreakdown),
       ],
     );
     addTearDown(container.dispose);
@@ -362,6 +367,7 @@ void main() {
           ),
         ),
         progressShareProvider.overrideWithValue((text) async {}),
+        skillBreakdownProvider.overrideWith((ref) async => _emptySkillBreakdown),
       ],
     );
     addTearDown(container.dispose);
@@ -400,11 +406,115 @@ void main() {
     );
     expect(find.text('Private imported passage text.'), findsNothing);
   });
+
+  testWidgets('shows skill breakdown by question category', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    final container = ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(database),
+        passageRepositoryProvider.overrideWithValue(
+          const _FakePassageRepository(
+            passages: [
+              Passage(
+                id: 'imported-passage',
+                title: 'Private Import',
+                body: 'Private imported passage text.',
+                metadata: PassageMetadata(
+                  wordCount: 700,
+                  difficulty: PassageDifficulty.standard,
+                  topic: 'Private',
+                  source: PassageSource.imported,
+                  license: 'User provided',
+                  type: PassageType.workplace,
+                  vocabularyDensity: 0.2,
+                  tags: ['private'],
+                  isCertificationEligible: false,
+                  isMasteryEligible: false,
+                ),
+              ),
+            ],
+          ),
+        ),
+        progressShareableSummaryProvider.overrideWith((ref) async => null),
+        bestQualifiedAttemptProvider.overrideWith((ref) async => null),
+        passageDifficultyDistributionProvider.overrideWith(
+          (ref) async => _emptyDifficultyDistribution,
+        ),
+        skillBreakdownProvider.overrideWith(
+          (ref) async => const SkillBreakdown(
+            entries: [
+              SkillBreakdownEntry(
+                type: QuestionType.mainIdea,
+                correctCount: 1,
+                answeredCount: 1,
+              ),
+              SkillBreakdownEntry(
+                type: QuestionType.detailRecall,
+                correctCount: 1,
+                answeredCount: 2,
+              ),
+            ],
+            unmatchedAnswerCount: 1,
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final store = container.read(localDataStoreProvider);
+    await store.saveReadingSession(
+      _session(id: 'imported-session', passageId: 'imported-passage'),
+    );
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'quiz-1',
+        sessionId: 'imported-session',
+        passageId: 'imported-passage',
+        correctCount: 2,
+        totalQuestions: 3,
+        answersByQuestionId: const {
+          'main-idea-1': 1,
+          'detail-1': 0,
+          'detail-2': 3,
+        },
+        completedAt: DateTime.utc(2026, 7, 8, 12, 2),
+      ),
+    );
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: ProgressScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Skill Breakdown'), findsOneWidget);
+    expect(find.text('Main Idea'), findsOneWidget);
+    expect(find.text('Detail Recall'), findsOneWidget);
+    expect(find.text('100%'), findsOneWidget);
+    expect(find.text('50%'), findsOneWidget);
+    expect(find.text('1/1 correct'), findsOneWidget);
+    expect(find.text('1/2 correct'), findsOneWidget);
+    expect(
+      find.text('1 answer could not be matched to a skill.'),
+      findsOneWidget,
+    );
+    expect(find.text('Private imported passage text.'), findsNothing);
+  });
 }
 
 const _emptyDifficultyDistribution = PassageDifficultyDistribution(
   entries: [],
   unmatchedSessionCount: 0,
+);
+
+const _emptySkillBreakdown = SkillBreakdown(
+  entries: [],
+  unmatchedAnswerCount: 0,
 );
 
 ReadingSession _session({
