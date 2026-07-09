@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../assessment/domain/quiz.dart';
 import '../../content/domain/passage_filter.dart';
 import '../../core/providers/app_providers.dart';
+import '../../progress/domain/best_qualified_attempt.dart';
 import '../../progress/domain/shareable_progress_summary.dart';
 import '../../reading/domain/reading_session.dart';
 
@@ -25,6 +26,19 @@ final progressShareableSummaryProvider =
         const PassageFilter(),
       );
   return ShareableProgressSummaryBuilder.fromHistory(
+    sessions: history.sessions,
+    quizResults: history.quizResults,
+    passages: passages,
+  );
+});
+
+final bestQualifiedAttemptProvider =
+    FutureProvider<BestQualifiedAttempt?>((ref) async {
+  final history = await ref.watch(progressHistoryProvider.future);
+  final passages = await ref.watch(passageRepositoryProvider).search(
+        const PassageFilter(),
+      );
+  return BestQualifiedAttemptSelector.fromHistory(
     sessions: history.sessions,
     quizResults: history.quizResults,
     passages: passages,
@@ -67,6 +81,7 @@ class ProgressScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final history = ref.watch(progressHistoryProvider);
     final shareSummary = ref.watch(progressShareableSummaryProvider);
+    final bestQualifiedAttempt = ref.watch(bestQualifiedAttemptProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Progress')),
@@ -74,6 +89,7 @@ class ProgressScreen extends ConsumerWidget {
         data: (history) => _ProgressBody(
           history: history,
           shareSummary: shareSummary,
+          bestQualifiedAttempt: bestQualifiedAttempt,
         ),
         error: (error, stackTrace) => Center(
           child: Text('Unable to load progress: $error'),
@@ -88,10 +104,12 @@ class _ProgressBody extends ConsumerWidget {
   const _ProgressBody({
     required this.history,
     required this.shareSummary,
+    required this.bestQualifiedAttempt,
   });
 
   final ProgressHistory history;
   final AsyncValue<ShareableProgressSummary?> shareSummary;
+  final AsyncValue<BestQualifiedAttempt?> bestQualifiedAttempt;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -125,6 +143,8 @@ class _ProgressBody extends ConsumerWidget {
             ref.read(progressShareProvider).call(summary.toShareText());
           },
         ),
+        const SizedBox(height: 16),
+        _BestQualifiedAttemptCard(attempt: bestQualifiedAttempt),
         const SizedBox(height: 24),
         Text(
           'Session History',
@@ -154,6 +174,72 @@ class _ProgressBody extends ConsumerWidget {
       return 'Pending quiz';
     }
     return '${(quiz.comprehensionScore * 100).round()}%';
+  }
+}
+
+class _BestQualifiedAttemptCard extends StatelessWidget {
+  const _BestQualifiedAttemptCard({required this.attempt});
+
+  final AsyncValue<BestQualifiedAttempt?> attempt;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: attempt.when(
+          data: (attempt) {
+            if (attempt == null) {
+              return const Text('No official qualified attempt yet.');
+            }
+
+            final comprehensionPercent =
+                (attempt.comprehensionScore * 100).round();
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Best Qualified Attempt',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                _MetricRow(
+                  label: 'Passage',
+                  value: attempt.passageTitle,
+                ),
+                _MetricRow(
+                  label: 'WPM',
+                  value: attempt.wpm.round().toString(),
+                ),
+                _MetricRow(
+                  label: 'Comprehension',
+                  value: '$comprehensionPercent%',
+                ),
+                _MetricRow(
+                  label: 'ERS',
+                  value: attempt.effectiveReadingScore.round().toString(),
+                ),
+                _MetricRow(
+                  label: 'Date',
+                  value: _dateLabel(attempt.startedAt),
+                ),
+              ],
+            );
+          },
+          error: (error, stackTrace) => Text(
+            'Best qualified attempt unavailable: $error',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+          loading: () => const LinearProgressIndicator(),
+        ),
+      ),
+    );
+  }
+
+  String _dateLabel(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day';
   }
 }
 
@@ -248,9 +334,12 @@ class _MetricRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: Text(label)),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.titleMedium,
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
           ),
         ],
       ),

@@ -1279,6 +1279,16 @@ Commit: See Git history for `feat: add basic progress history screen`
 Notes: Progress now shows persisted reading sessions with WPM and comprehension context from quiz results, or pending quiz when comprehension is unavailable. Charts and skill breakdowns remain open.
 ```
 
+```text
+Task: Build best qualified attempt view
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/progress/domain/best_qualified_attempt.dart, lib/progress/presentation/progress_screen.dart, test/best_qualified_attempt_test.dart, test/progress_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 122 tests passed.
+Commit: See Git history for `feat: show best qualified attempt`
+Notes: Progress now selects the highest-ERS official qualified attempt with paired quiz comprehension at or above 70%, then displays WPM, comprehension, ERS, passage title, and date without exposing imported passage text.
+```
+
 ### Epic 8.3: Shareable Progress Summary
 
 Status: Done

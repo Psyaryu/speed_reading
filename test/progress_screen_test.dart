@@ -22,6 +22,7 @@ void main() {
         overrides: [
           appDatabaseProvider.overrideWithValue(database),
           progressShareableSummaryProvider.overrideWith((ref) async => null),
+          bestQualifiedAttemptProvider.overrideWith((ref) async => null),
         ],
         child: const MaterialApp(home: ProgressScreen()),
       ),
@@ -40,6 +41,7 @@ void main() {
       overrides: [
         appDatabaseProvider.overrideWithValue(database),
         progressShareableSummaryProvider.overrideWith((ref) async => null),
+        bestQualifiedAttemptProvider.overrideWith((ref) async => null),
       ],
     );
     addTearDown(container.dispose);
@@ -169,6 +171,122 @@ void main() {
     expect(shared.single, contains('Certification not earned yet'));
     expect(shared.single, contains('Mastery not earned yet'));
     expect(shared.single, isNot(contains('Private imported passage text.')));
+  });
+
+  testWidgets('shows best official qualified attempt details', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    final container = ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(database),
+        passageRepositoryProvider.overrideWithValue(
+          const _FakePassageRepository(
+            passages: [
+              Passage(
+                id: 'official-passage',
+                title: 'The Official Climb',
+                body: 'Official bundled passage body.',
+                metadata: PassageMetadata(
+                  wordCount: 900,
+                  difficulty: PassageDifficulty.hard,
+                  topic: 'Adventure',
+                  source: PassageSource.official,
+                  license: 'Public domain',
+                  type: PassageType.fiction,
+                  vocabularyDensity: 0.3,
+                  tags: ['official'],
+                  isCertificationEligible: true,
+                  isMasteryEligible: true,
+                ),
+              ),
+              Passage(
+                id: 'imported-passage',
+                title: 'Private Import',
+                body: 'Private imported passage text.',
+                metadata: PassageMetadata(
+                  wordCount: 1200,
+                  difficulty: PassageDifficulty.technical,
+                  topic: 'Private',
+                  source: PassageSource.imported,
+                  license: 'User provided',
+                  type: PassageType.workplace,
+                  vocabularyDensity: 0.4,
+                  tags: ['private'],
+                  isCertificationEligible: false,
+                  isMasteryEligible: false,
+                ),
+              ),
+            ],
+          ),
+        ),
+        progressShareProvider.overrideWithValue((text) async {}),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final store = container.read(localDataStoreProvider);
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'official-session',
+        passageId: 'official-passage',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8, 12),
+        activeReadingSeconds: 90,
+        wordCount: 900,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'imported-session',
+        passageId: 'imported-passage',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8, 13),
+        activeReadingSeconds: 60,
+        wordCount: 1200,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'official-quiz',
+        sessionId: 'official-session',
+        passageId: 'official-passage',
+        correctCount: 8,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 12, 2),
+      ),
+    );
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'imported-quiz',
+        sessionId: 'imported-session',
+        passageId: 'imported-passage',
+        correctCount: 10,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 13, 2),
+      ),
+    );
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: ProgressScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Best Qualified Attempt'), findsOneWidget);
+    expect(find.text('The Official Climb'), findsOneWidget);
+    expect(find.text('600'), findsWidgets);
+    expect(find.text('80%'), findsOneWidget);
+    expect(find.text('552'), findsOneWidget);
+    expect(find.text('2026-07-08'), findsOneWidget);
+    expect(find.text('Private imported passage text.'), findsNothing);
   });
 }
 
