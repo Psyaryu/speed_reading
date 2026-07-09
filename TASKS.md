@@ -1562,6 +1562,8 @@ Dependencies:
 
 ### Epic 11.3: Manual QA Checklist
 
+Status: Done
+
 Tasks:
 
 - Create Windows QA checklist.
@@ -1581,6 +1583,18 @@ Acceptance criteria:
 Dependencies:
 
 - Platform builds.
+
+Completed task log:
+
+```text
+Task: Create platform manual QA checklists
+Status: Done
+Completed: 2026-07-08
+Changed files: qa/manual_qa_windows.md, qa/manual_qa_android.md, qa/manual_qa_ios.md, TASKS.md
+Verification: Added Windows, Android, and iOS manual QA checklists covering offline launch, layout and text overlap, reader flow, quiz/results, reset/export/share, local storage, reduced motion/theme, and platform-specific build/readiness checks. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` with no issues and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test` with all 115 tests passing.
+Commit: docs: add platform QA checklists
+Notes: Documentation-only QA artifact task. iOS build execution still requires a macOS/Xcode environment during release validation.
+```
 
 ## Post-MVP Backlog
 
