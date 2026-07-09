@@ -1233,6 +1233,16 @@ Commit: See Git history for `feat: show dashboard readiness level`
 Notes: Dashboard now derives current level, qualified ERS, and 800 WPM readiness from persisted reading sessions, quiz results, passage metadata, EffectiveReadingScore, and Progression rules while keeping WPM paired with comprehension context.
 ```
 
+```text
+Task: Show daily practice plan and recommended next drill
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/training/presentation/dashboard_screen.dart, test/dashboard_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 119 tests passed.
+Commit: See Git history for `feat: show dashboard practice plan`
+Notes: Dashboard now shows a short daily practice plan and a deterministic recommended next drill derived from local sessions, quiz results, qualified ERS history, scan accuracy, WPM plateau checks, and RSVP transfer state.
+```
+
 ### Epic 8.2: Analytics Views
 
 Status: In Progress

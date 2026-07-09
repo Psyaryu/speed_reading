@@ -30,7 +30,9 @@ void main() {
 
     expect(find.text('Library'), findsOneWidget);
     expect(find.text('Import Passage'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Reader'), 300);
     expect(find.text('Reader'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Progress'), 300);
     expect(find.text('Progress'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Settings'), 300);
     expect(find.text('Settings'), findsOneWidget);
@@ -55,6 +57,8 @@ void main() {
 
     expect(find.textContaining('Local profile ready'), findsOneWidget);
     expect(find.text('No completed sessions yet.'), findsOneWidget);
+    expect(find.text('Daily Practice Plan'), findsOneWidget);
+    expect(find.text('Recommended next drill: Paced Reading'), findsOneWidget);
   });
 
   testWidgets('dashboard shows latest WPM with comprehension', (tester) async {
@@ -88,6 +92,29 @@ void main() {
 
     expect(find.text('Level 4: Fast Reader'), findsOneWidget);
     expect(find.text('Readiness: 70% (560 qualified ERS)'), findsOneWidget);
+  });
+
+  testWidgets('dashboard recommends comprehension review for weak quizzes',
+      (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          _profileOverride(),
+          _dashboardSummaryOverride(_weakComprehensionHistory()),
+        ],
+        child: const SpeedReadingApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Recommended next drill: Comprehension Review'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Run one comprehension review drill.'),
+      findsOneWidget,
+    );
   });
 }
 
@@ -146,6 +173,33 @@ ProgressHistory _qualifiedHistory() {
         sessionId: 'session-1',
         passageId: 'passage-1',
         correctCount: 7,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 0, 2),
+      ),
+    ],
+  );
+}
+
+ProgressHistory _weakComprehensionHistory() {
+  return ProgressHistory(
+    sessions: [
+      ReadingSession(
+        id: 'session-weak',
+        passageId: 'passage-1',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8),
+        activeReadingSeconds: 120,
+        wordCount: 800,
+        status: AttemptQualificationStatus.unqualified,
+      ),
+    ],
+    quizResults: [
+      QuizResult(
+        id: 'quiz-weak',
+        sessionId: 'session-weak',
+        passageId: 'passage-1',
+        correctCount: 6,
         totalQuestions: 10,
         answersByQuestionId: const {},
         completedAt: DateTime.utc(2026, 7, 8, 0, 2),

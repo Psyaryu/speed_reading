@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../assessment/domain/quiz.dart';
 import '../../content/domain/passage.dart';
 import '../../content/domain/passage_filter.dart';
+import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
 import '../../progress/domain/effective_reading_score.dart';
 import '../../progress/domain/progression.dart';
 import '../../progress/presentation/progress_screen.dart';
+import '../../reading/domain/reading_session.dart';
+import '../domain/training_recommendation.dart';
 
 final dashboardProgressSummaryProvider =
     FutureProvider<DashboardProgressSummary>((ref) async {
@@ -33,6 +37,8 @@ class DashboardProgressSummary {
     required this.levelName,
     required this.bestQualifiedErs,
     required this.readinessPercent,
+    required this.recommendedDrill,
+    required this.practicePlanItems,
   });
 
   final ProgressHistory history;
@@ -40,6 +46,8 @@ class DashboardProgressSummary {
   final String levelName;
   final double bestQualifiedErs;
   final double readinessPercent;
+  final TrainingDrill recommendedDrill;
+  final List<String> practicePlanItems;
 
   factory DashboardProgressSummary.from({
     required ProgressHistory history,
@@ -49,6 +57,8 @@ class DashboardProgressSummary {
       for (final passage in passages) passage.id: passage,
     };
     var bestQualifiedErs = 0.0;
+
+    final qualifiedAttempts = <_DashboardQualifiedAttempt>[];
 
     for (final session in history.sessions) {
       final quiz = history.quizForSession(session.id);
@@ -75,20 +85,120 @@ class DashboardProgressSummary {
         difficulty: passage.metadata.difficulty,
         mode: session.mode,
       );
+      qualifiedAttempts.add(
+        _DashboardQualifiedAttempt(
+          session: session,
+          comprehensionScore: quiz.comprehensionScore,
+          effectiveReadingScore: ers,
+        ),
+      );
       if (ers > bestQualifiedErs) {
         bestQualifiedErs = ers;
       }
     }
 
     final level = Progression.levelForQualifiedErs(bestQualifiedErs);
+    final recommendedDrill = _recommendedDrillFor(history, qualifiedAttempts);
     return DashboardProgressSummary(
       history: history,
       level: level,
       levelName: Progression.levelName(level),
       bestQualifiedErs: bestQualifiedErs,
       readinessPercent: Progression.readinessPercent(bestQualifiedErs),
+      recommendedDrill: recommendedDrill,
+      practicePlanItems: _practicePlanFor(recommendedDrill),
     );
   }
+
+  static TrainingDrill _recommendedDrillFor(
+    ProgressHistory history,
+    List<_DashboardQualifiedAttempt> qualifiedAttempts,
+  ) {
+    if (history.sessions.isEmpty) {
+      return TrainingDrill.pacedReading;
+    }
+
+    final newestQuizScores = history.newestSessions
+        .map((session) => history.quizForSession(session.id))
+        .whereType<QuizResult>()
+        .map((quiz) => quiz.comprehensionScore)
+        .take(3)
+        .toList(growable: false);
+    final recentComprehension = newestQuizScores.isEmpty
+        ? 1.0
+        : newestQuizScores.fold(0.0, (sum, score) => sum + score) /
+            newestQuizScores.length;
+
+    final scanningScores = history.newestSessions
+        .where((session) => session.mode == ReadingMode.scan)
+        .map((session) => history.quizForSession(session.id))
+        .whereType<QuizResult>()
+        .map((quiz) => quiz.comprehensionScore)
+        .take(3)
+        .toList(growable: false);
+    final scanningAccuracy = scanningScores.isEmpty
+        ? 1.0
+        : scanningScores.fold(0.0, (sum, score) => sum + score) /
+            scanningScores.length;
+
+    final newestQualifiedAttempts = [...qualifiedAttempts]
+      ..sort((a, b) => b.session.startedAt.compareTo(a.session.startedAt));
+    final recentAttempts =
+        newestQualifiedAttempts.take(3).toList(growable: false);
+
+    final recentWpms =
+        recentAttempts.map((attempt) => attempt.session.wpm).toList();
+    final wpmPlateaued = recentWpms.length >= 3 &&
+        (recentWpms.reduce((a, b) => a > b ? a : b) -
+                recentWpms.reduce((a, b) => a < b ? a : b)) <=
+            25;
+
+    final bestRsvpErs = qualifiedAttempts
+        .where((attempt) => attempt.session.mode == ReadingMode.rsvp)
+        .fold(0.0, (best, attempt) {
+      return attempt.effectiveReadingScore > best
+          ? attempt.effectiveReadingScore
+          : best;
+    });
+    final bestNonRsvpErs = qualifiedAttempts
+        .where((attempt) => attempt.session.mode != ReadingMode.rsvp)
+        .fold(0.0, (best, attempt) {
+      return attempt.effectiveReadingScore > best
+          ? attempt.effectiveReadingScore
+          : best;
+    });
+    final rsvpOnlyProgress = bestRsvpErs >= 1 && bestRsvpErs > bestNonRsvpErs;
+
+    return TrainingRecommendationEngine.recommend(
+      TrainingRecommendationInput(
+        recentComprehension: recentComprehension,
+        wpmPlateaued: wpmPlateaued,
+        detailRecallWeak: false,
+        scanningAccuracy: scanningAccuracy,
+        rsvpOnlyProgress: rsvpOnlyProgress,
+      ),
+    );
+  }
+
+  static List<String> _practicePlanFor(TrainingDrill drill) {
+    return [
+      'Warm up with 5 minutes of paced reading.',
+      'Run one ${drill.displayName.toLowerCase()} drill.',
+      'Finish with a comprehension quiz and review misses.',
+    ];
+  }
+}
+
+class _DashboardQualifiedAttempt {
+  const _DashboardQualifiedAttempt({
+    required this.session,
+    required this.comprehensionScore,
+    required this.effectiveReadingScore,
+  });
+
+  final ReadingSession session;
+  final double comprehensionScore;
+  final double effectiveReadingScore;
 }
 
 class DashboardScreen extends ConsumerWidget {
@@ -183,7 +293,14 @@ class _ProgressSummary extends StatelessWidget {
     final history = summary.history;
     final sessions = history.newestSessions;
     if (sessions.isEmpty) {
-      return const Text('No completed sessions yet.');
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('No completed sessions yet.'),
+          const SizedBox(height: 16),
+          _PracticePlan(summary: summary),
+        ],
+      );
     }
 
     final latest = sessions.first;
@@ -206,8 +323,54 @@ class _ProgressSummary extends StatelessWidget {
           '(${summary.bestQualifiedErs.round()} qualified ERS)',
         ),
         Text('${latest.wpm.round()} WPM - Comprehension: $comprehension'),
+        const SizedBox(height: 16),
+        _PracticePlan(summary: summary),
       ],
     );
+  }
+}
+
+class _PracticePlan extends StatelessWidget {
+  const _PracticePlan({required this.summary});
+
+  final DashboardProgressSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Daily Practice Plan',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 8),
+        ...summary.practicePlanItems.map(
+          (item) => Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(item),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text('Recommended next drill: ${summary.recommendedDrill.displayName}'),
+      ],
+    );
+  }
+}
+
+extension on TrainingDrill {
+  String get displayName {
+    return switch (this) {
+      TrainingDrill.pacedReading => 'Paced Reading',
+      TrainingDrill.chunking => 'Chunking',
+      TrainingDrill.regressionControl => 'Regression Control',
+      TrainingDrill.subvocalizationAwareness => 'Subvocalization Awareness',
+      TrainingDrill.skimming => 'Skimming',
+      TrainingDrill.scanning => 'Scanning',
+      TrainingDrill.rsvp => 'RSVP Practice',
+      TrainingDrill.comprehensionReview => 'Comprehension Review',
+      TrainingDrill.nonRsvpTransfer => 'Non-RSVP Transfer',
+    };
   }
 }
 
