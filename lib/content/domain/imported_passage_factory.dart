@@ -24,7 +24,7 @@ class ImportedPassageFactory {
       body: trimmedBody,
       metadata: PassageMetadata(
         wordCount: WordCounter.count(trimmedBody),
-        difficulty: PassageDifficulty.standard,
+        difficulty: _estimateDifficulty(trimmedBody),
         topic: 'Imported',
         source: PassageSource.imported,
         license: sourceLabel == null || sourceLabel.trim().isEmpty
@@ -38,5 +38,15 @@ class ImportedPassageFactory {
       ),
     );
   }
-}
 
+  static PassageDifficulty _estimateDifficulty(String body) {
+    final wordCount = WordCounter.count(body);
+    if (wordCount < 100) {
+      return PassageDifficulty.easy;
+    }
+    if (wordCount >= 1200) {
+      return PassageDifficulty.hard;
+    }
+    return PassageDifficulty.standard;
+  }
+}

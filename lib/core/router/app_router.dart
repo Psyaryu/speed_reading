@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../assessment/presentation/quiz_screen.dart';
 import '../../assessment/presentation/results_screen.dart';
+import '../../content/domain/passage.dart';
 import '../../content/presentation/import_passage_screen.dart';
 import '../../content/presentation/library_screen.dart';
 import '../../progress/presentation/progress_screen.dart';
@@ -30,7 +31,12 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/import',
       name: 'import',
-      builder: (context, state) => const ImportPassageScreen(),
+      builder: (context, state) {
+        final initialPassage = state.extra is Passage
+            ? state.extra! as Passage
+            : null;
+        return ImportPassageScreen(initialPassage: initialPassage);
+      },
     ),
     GoRoute(
       path: '/reader',

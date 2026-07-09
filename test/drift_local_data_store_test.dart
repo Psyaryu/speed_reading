@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_reading/content/domain/imported_passage_factory.dart';
+import 'package:speed_reading/content/domain/passage.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/data/drift_local_data_store.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
@@ -44,6 +45,39 @@ void main() {
     expect(await store.loadPassages(), hasLength(1));
 
     await store.deleteImportedPassage('import-1');
+    expect(await store.loadPassages(), isEmpty);
+  });
+
+  test('updates imported passage and keeps recalculated metadata', () async {
+    await store.saveImportedPassage(
+      ImportedPassageFactory.create(
+        id: 'import-1',
+        title: 'Draft',
+        body: 'Short draft.',
+      ),
+    );
+
+    await store.saveImportedPassage(
+      ImportedPassageFactory.create(
+        id: 'import-1',
+        title: 'Updated Draft',
+        body: List.filled(120, 'word').join(' '),
+      ),
+    );
+
+    final passages = await store.loadPassages();
+    expect(passages, hasLength(1));
+    expect(passages.single.title, 'Updated Draft');
+    expect(passages.single.metadata.wordCount, 120);
+    expect(passages.single.metadata.difficulty, PassageDifficulty.standard);
+    expect(passages.single.metadata.isCertificationEligible, isFalse);
+  });
+
+  test('rejects official passage saves through imported passage method', () async {
+    expect(
+      () => store.saveImportedPassage(_officialPassage()),
+      throwsArgumentError,
+    );
     expect(await store.loadPassages(), isEmpty);
   });
 
@@ -94,3 +128,22 @@ void main() {
   });
 }
 
+Passage _officialPassage() {
+  return const Passage(
+    id: 'official-1',
+    title: 'Official',
+    body: 'Official bundled body.',
+    metadata: PassageMetadata(
+      wordCount: 3,
+      difficulty: PassageDifficulty.standard,
+      topic: 'Adventure',
+      source: PassageSource.official,
+      license: 'Public Domain',
+      type: PassageType.fiction,
+      vocabularyDensity: 0.1,
+      tags: ['official'],
+      isCertificationEligible: true,
+      isMasteryEligible: true,
+    ),
+  );
+}

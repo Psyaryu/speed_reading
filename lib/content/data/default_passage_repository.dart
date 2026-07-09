@@ -29,6 +29,13 @@ class DefaultPassageRepository implements PassageRepository {
 
   @override
   Future<void> saveImportedPassage(Passage passage) {
+    if (passage.metadata.source != PassageSource.imported) {
+      throw ArgumentError.value(
+        passage.metadata.source,
+        'passage.metadata.source',
+        'Only imported passages can be saved through this repository.',
+      );
+    }
     return localDataStore.saveImportedPassage(passage);
   }
 
@@ -46,4 +53,3 @@ class DefaultPassageRepository implements PassageRepository {
     return PassageFilterService.apply(passages, filter);
   }
 }
-

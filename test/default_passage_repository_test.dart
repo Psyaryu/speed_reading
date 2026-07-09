@@ -60,6 +60,15 @@ void main() {
     expect(officialResults.single.id, 'official-1');
     expect(importedResults.single.id, 'import-1');
   });
+
+  test('rejects official passage saves through imported repository method', () async {
+    expect(
+      () => repository.saveImportedPassage(_officialPassage()),
+      throwsArgumentError,
+    );
+
+    expect(await repository.loadImportedPassages(), isEmpty);
+  });
 }
 
 class _FakeOfficialPassageSource implements OfficialPassageSource {
@@ -90,4 +99,3 @@ Passage _officialPassage() {
     ),
   );
 }
-

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/imported_passage_factory.dart';
+import '../domain/passage.dart';
+import '../../../core/domain/reading_enums.dart';
 import '../../../core/providers/app_providers.dart';
 
 final importedPassageIdProvider = Provider<String Function()>((ref) {
@@ -9,7 +11,9 @@ final importedPassageIdProvider = Provider<String Function()>((ref) {
 });
 
 class ImportPassageScreen extends ConsumerStatefulWidget {
-  const ImportPassageScreen({super.key});
+  const ImportPassageScreen({super.key, this.initialPassage});
+
+  final Passage? initialPassage;
 
   @override
   ConsumerState<ImportPassageScreen> createState() => _ImportPassageScreenState();
@@ -21,6 +25,33 @@ class _ImportPassageScreenState extends ConsumerState<ImportPassageScreen> {
   final _tagsController = TextEditingController();
   final _bodyController = TextEditingController();
   bool _saving = false;
+
+  Passage? get _initialImportedPassage {
+    final passage = widget.initialPassage;
+    if (passage?.metadata.source != PassageSource.imported) {
+      return null;
+    }
+    return passage;
+  }
+
+  bool get _isEditing => _initialImportedPassage != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final passage = _initialImportedPassage;
+    if (passage == null) {
+      return;
+    }
+    _titleController.text = passage.title;
+    _sourceController.text = passage.metadata.license == 'User Provided'
+        ? ''
+        : passage.metadata.license;
+    _tagsController.text = passage.metadata.tags
+        .where((tag) => tag != 'imported')
+        .join(', ');
+    _bodyController.text = passage.body;
+  }
 
   @override
   void dispose() {
@@ -34,7 +65,9 @@ class _ImportPassageScreenState extends ConsumerState<ImportPassageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Import Passage')),
+      appBar: AppBar(
+        title: Text(_isEditing ? 'Edit Passage' : 'Import Passage'),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -68,7 +101,13 @@ class _ImportPassageScreenState extends ConsumerState<ImportPassageScreen> {
           const SizedBox(height: 20),
           FilledButton(
             onPressed: _saving ? null : _save,
-            child: Text(_saving ? 'Saving' : 'Save Passage'),
+            child: Text(
+              _saving
+                  ? 'Saving'
+                  : _isEditing
+                      ? 'Update Passage'
+                      : 'Save Passage',
+            ),
           ),
         ],
       ),
@@ -91,7 +130,7 @@ class _ImportPassageScreenState extends ConsumerState<ImportPassageScreen> {
         .where((tag) => tag.isNotEmpty)
         .toList(growable: false);
     final passage = ImportedPassageFactory.create(
-      id: ref.read(importedPassageIdProvider)(),
+      id: _initialImportedPassage?.id ?? ref.read(importedPassageIdProvider)(),
       title: _titleController.text,
       body: body,
       sourceLabel: _sourceController.text,
@@ -103,8 +142,13 @@ class _ImportPassageScreenState extends ConsumerState<ImportPassageScreen> {
       return;
     }
     setState(() => _saving = false);
+    final message = _isEditing ? 'Passage updated.' : 'Passage saved.';
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop(true);
+      return;
+    }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Passage saved.')),
+      SnackBar(content: Text(message)),
     );
   }
 }

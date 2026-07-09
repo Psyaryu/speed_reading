@@ -55,6 +55,13 @@ class DriftLocalDataStore implements LocalDataStore {
 
   @override
   Future<void> saveImportedPassage(Passage passage) {
+    if (passage.metadata.source != PassageSource.imported) {
+      throw ArgumentError.value(
+        passage.metadata.source,
+        'passage.metadata.source',
+        'Only imported passages can be saved through this method.',
+      );
+    }
     return database.into(database.passageRecords).insertOnConflictUpdate(
           PassageRecordsCompanion.insert(
             id: passage.id,

@@ -464,7 +464,7 @@ Notes: Replaces placeholder with a Riverpod-backed list of official/imported pas
 
 ### Epic 2.2: Paste-and-Save Imported Text
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -509,6 +509,16 @@ Changed files: lib/content/presentation/import_passage_screen.dart, lib/core/rou
 Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
 Commit: See Git history for `feat: build import passage screen`
 Notes: Adds paste form with title, source, tags, body validation, and repository save wiring.
+```
+
+```text
+Task: Allow edit/delete of imported passages
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/content/domain/imported_passage_factory.dart, lib/content/data/default_passage_repository.dart, lib/core/data/drift_local_data_store.dart, lib/content/presentation/import_passage_screen.dart, lib/content/presentation/library_screen.dart, lib/core/router/app_router.dart, test/imported_passage_factory_test.dart, test/default_passage_repository_test.dart, test/drift_local_data_store_test.dart, test/import_passage_screen_test.dart, test/library_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 139 tests passed.
+Commit: See Git history for `feat: edit imported passages`
+Notes: Imported library rows now expose edit and confirmed delete actions, official rows stay read-only in this path, edits preserve the passage id while recalculating word count and estimated difficulty, and imported passages remain practice-only by default.
 ```
 
 ## Milestone 3: Onboarding and Baseline Assessment
