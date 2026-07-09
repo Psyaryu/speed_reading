@@ -58,5 +58,29 @@ void main() {
     expect(result.correctCount, 0);
     expect(result.comprehensionScore, 0);
   });
-}
 
+  test('stores written summary without changing comprehension score', () {
+    final result = QuizScorer.score(
+      id: 'result-1',
+      sessionId: 'session-1',
+      passageId: 'passage-1',
+      questions: const [
+        QuizQuestion(
+          id: 'q1',
+          passageId: 'passage-1',
+          type: QuestionType.mainIdea,
+          prompt: 'What is the main idea?',
+          options: ['A', 'B'],
+          correctOptionIndex: 0,
+        ),
+      ],
+      answersByQuestionId: const {'q1': 1},
+      completedAt: DateTime.utc(2026, 7, 6),
+      writtenSummary: 'The passage follows a risky search.',
+    );
+
+    expect(result.correctCount, 0);
+    expect(result.comprehensionScore, 0);
+    expect(result.writtenSummary, 'The passage follows a risky search.');
+  });
+}

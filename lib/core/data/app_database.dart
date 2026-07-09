@@ -57,6 +57,7 @@ class QuizResultRecords extends Table {
   IntColumn get totalQuestions => integer()();
   TextColumn get answersByQuestionIdJson => text()();
   DateTimeColumn get completedAt => dateTime()();
+  TextColumn get writtenSummary => text().nullable()();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -114,7 +115,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -129,6 +130,12 @@ class AppDatabase extends _$AppDatabase {
             await migrator.addColumn(
               localProfiles,
               localProfiles.preferredThemeMode,
+            );
+          }
+          if (from < 4) {
+            await migrator.addColumn(
+              quizResultRecords,
+              quizResultRecords.writtenSummary,
             );
           }
         },

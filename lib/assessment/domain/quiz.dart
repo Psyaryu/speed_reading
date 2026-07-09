@@ -53,6 +53,7 @@ class QuizResult {
     required this.totalQuestions,
     required this.answersByQuestionId,
     required this.completedAt,
+    this.writtenSummary,
   });
 
   final String id;
@@ -62,6 +63,7 @@ class QuizResult {
   final int totalQuestions;
   final Map<String, int> answersByQuestionId;
   final DateTime completedAt;
+  final String? writtenSummary;
 
   double get comprehensionScore {
     if (totalQuestions == 0) {
@@ -79,6 +81,7 @@ class QuizResult {
       'totalQuestions': totalQuestions,
       'answersByQuestionId': answersByQuestionId,
       'completedAt': completedAt.toIso8601String(),
+      'writtenSummary': writtenSummary,
     };
   }
 
@@ -89,10 +92,10 @@ class QuizResult {
       passageId: json['passageId'] as String,
       correctCount: json['correctCount'] as int,
       totalQuestions: json['totalQuestions'] as int,
-      answersByQuestionId:
-          (json['answersByQuestionId'] as Map<String, Object?>).cast<String, int>(),
+      answersByQuestionId: (json['answersByQuestionId'] as Map<String, Object?>)
+          .cast<String, int>(),
       completedAt: DateTime.parse(json['completedAt'] as String),
+      writtenSummary: json['writtenSummary'] as String?,
     );
   }
 }
-

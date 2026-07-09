@@ -121,6 +121,7 @@ class DriftLocalDataStore implements LocalDataStore {
             totalQuestions: result.totalQuestions,
             answersByQuestionIdJson: jsonEncode(result.answersByQuestionId),
             completedAt: result.completedAt,
+            writtenSummary: Value(result.writtenSummary),
           ),
         );
   }
@@ -264,6 +265,7 @@ class DriftLocalDataStore implements LocalDataStore {
       totalQuestions: row.totalQuestions,
       answersByQuestionId: _intMapFromJson(row.answersByQuestionIdJson),
       completedAt: row.completedAt,
+      writtenSummary: row.writtenSummary,
     );
   }
 

@@ -10,6 +10,7 @@ class QuizScorer {
     required List<QuizQuestion> questions,
     required Map<String, int> answersByQuestionId,
     required DateTime completedAt,
+    String? writtenSummary,
   }) {
     final correctCount = questions.where((question) {
       return answersByQuestionId[question.id] == question.correctOptionIndex;
@@ -23,7 +24,7 @@ class QuizScorer {
       totalQuestions: questions.length,
       answersByQuestionId: answersByQuestionId,
       completedAt: completedAt,
+      writtenSummary: writtenSummary,
     );
   }
 }
-

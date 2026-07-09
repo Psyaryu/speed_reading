@@ -837,6 +837,16 @@ Notes: After a quiz is scored and saved, the quiz screen now shows a View Result
 ```
 
 ```text
+Task: Support optional written summary prompt
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/assessment/domain/quiz.dart, lib/assessment/domain/quiz_scorer.dart, lib/assessment/presentation/quiz_screen.dart, lib/assessment/presentation/results_screen.dart, lib/core/data/app_database.dart, lib/core/data/app_database.g.dart, lib/core/data/drift_local_data_store.dart, test/domain_models_test.dart, test/drift_local_data_store_test.dart, test/quiz_scorer_test.dart, test/quiz_screen_test.dart, test/results_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 142 tests passed.
+Commit: See Git history for `feat: add quiz summary prompt`
+Notes: Quiz results now optionally store a written summary locally without changing immediate comprehension scoring, and the latest results screen shows the summary when provided.
+```
+
+```text
 Task: Connect results screen to ERS scoring
 Status: Done
 Completed: 2026-07-08

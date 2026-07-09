@@ -1543,6 +1543,12 @@ class $QuizResultRecordsTable extends QuizResultRecords
   late final GeneratedColumn<DateTime> completedAt = GeneratedColumn<DateTime>(
       'completed_at', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _writtenSummaryMeta =
+      const VerificationMeta('writtenSummary');
+  @override
+  late final GeneratedColumn<String> writtenSummary = GeneratedColumn<String>(
+      'written_summary', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1551,7 +1557,8 @@ class $QuizResultRecordsTable extends QuizResultRecords
         correctCount,
         totalQuestions,
         answersByQuestionIdJson,
-        completedAt
+        completedAt,
+        writtenSummary
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1613,6 +1620,12 @@ class $QuizResultRecordsTable extends QuizResultRecords
     } else if (isInserting) {
       context.missing(_completedAtMeta);
     }
+    if (data.containsKey('written_summary')) {
+      context.handle(
+          _writtenSummaryMeta,
+          writtenSummary.isAcceptableOrUnknown(
+              data['written_summary']!, _writtenSummaryMeta));
+    }
     return context;
   }
 
@@ -1637,6 +1650,8 @@ class $QuizResultRecordsTable extends QuizResultRecords
           data['${effectivePrefix}answers_by_question_id_json'])!,
       completedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}completed_at'])!,
+      writtenSummary: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}written_summary']),
     );
   }
 
@@ -1655,6 +1670,7 @@ class QuizResultRecord extends DataClass
   final int totalQuestions;
   final String answersByQuestionIdJson;
   final DateTime completedAt;
+  final String? writtenSummary;
   const QuizResultRecord(
       {required this.id,
       required this.sessionId,
@@ -1662,7 +1678,8 @@ class QuizResultRecord extends DataClass
       required this.correctCount,
       required this.totalQuestions,
       required this.answersByQuestionIdJson,
-      required this.completedAt});
+      required this.completedAt,
+      this.writtenSummary});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1674,6 +1691,9 @@ class QuizResultRecord extends DataClass
     map['answers_by_question_id_json'] =
         Variable<String>(answersByQuestionIdJson);
     map['completed_at'] = Variable<DateTime>(completedAt);
+    if (!nullToAbsent || writtenSummary != null) {
+      map['written_summary'] = Variable<String>(writtenSummary);
+    }
     return map;
   }
 
@@ -1686,6 +1706,9 @@ class QuizResultRecord extends DataClass
       totalQuestions: Value(totalQuestions),
       answersByQuestionIdJson: Value(answersByQuestionIdJson),
       completedAt: Value(completedAt),
+      writtenSummary: writtenSummary == null && nullToAbsent
+          ? const Value.absent()
+          : Value(writtenSummary),
     );
   }
 
@@ -1701,6 +1724,7 @@ class QuizResultRecord extends DataClass
       answersByQuestionIdJson:
           serializer.fromJson<String>(json['answersByQuestionIdJson']),
       completedAt: serializer.fromJson<DateTime>(json['completedAt']),
+      writtenSummary: serializer.fromJson<String?>(json['writtenSummary']),
     );
   }
   @override
@@ -1715,6 +1739,7 @@ class QuizResultRecord extends DataClass
       'answersByQuestionIdJson':
           serializer.toJson<String>(answersByQuestionIdJson),
       'completedAt': serializer.toJson<DateTime>(completedAt),
+      'writtenSummary': serializer.toJson<String?>(writtenSummary),
     };
   }
 
@@ -1725,7 +1750,8 @@ class QuizResultRecord extends DataClass
           int? correctCount,
           int? totalQuestions,
           String? answersByQuestionIdJson,
-          DateTime? completedAt}) =>
+          DateTime? completedAt,
+          Value<String?> writtenSummary = const Value.absent()}) =>
       QuizResultRecord(
         id: id ?? this.id,
         sessionId: sessionId ?? this.sessionId,
@@ -1735,6 +1761,8 @@ class QuizResultRecord extends DataClass
         answersByQuestionIdJson:
             answersByQuestionIdJson ?? this.answersByQuestionIdJson,
         completedAt: completedAt ?? this.completedAt,
+        writtenSummary:
+            writtenSummary.present ? writtenSummary.value : this.writtenSummary,
       );
   QuizResultRecord copyWithCompanion(QuizResultRecordsCompanion data) {
     return QuizResultRecord(
@@ -1752,6 +1780,9 @@ class QuizResultRecord extends DataClass
           : this.answersByQuestionIdJson,
       completedAt:
           data.completedAt.present ? data.completedAt.value : this.completedAt,
+      writtenSummary: data.writtenSummary.present
+          ? data.writtenSummary.value
+          : this.writtenSummary,
     );
   }
 
@@ -1764,14 +1795,15 @@ class QuizResultRecord extends DataClass
           ..write('correctCount: $correctCount, ')
           ..write('totalQuestions: $totalQuestions, ')
           ..write('answersByQuestionIdJson: $answersByQuestionIdJson, ')
-          ..write('completedAt: $completedAt')
+          ..write('completedAt: $completedAt, ')
+          ..write('writtenSummary: $writtenSummary')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(id, sessionId, passageId, correctCount,
-      totalQuestions, answersByQuestionIdJson, completedAt);
+      totalQuestions, answersByQuestionIdJson, completedAt, writtenSummary);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1782,7 +1814,8 @@ class QuizResultRecord extends DataClass
           other.correctCount == this.correctCount &&
           other.totalQuestions == this.totalQuestions &&
           other.answersByQuestionIdJson == this.answersByQuestionIdJson &&
-          other.completedAt == this.completedAt);
+          other.completedAt == this.completedAt &&
+          other.writtenSummary == this.writtenSummary);
 }
 
 class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
@@ -1793,6 +1826,7 @@ class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
   final Value<int> totalQuestions;
   final Value<String> answersByQuestionIdJson;
   final Value<DateTime> completedAt;
+  final Value<String?> writtenSummary;
   final Value<int> rowid;
   const QuizResultRecordsCompanion({
     this.id = const Value.absent(),
@@ -1802,6 +1836,7 @@ class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
     this.totalQuestions = const Value.absent(),
     this.answersByQuestionIdJson = const Value.absent(),
     this.completedAt = const Value.absent(),
+    this.writtenSummary = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   QuizResultRecordsCompanion.insert({
@@ -1812,6 +1847,7 @@ class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
     required int totalQuestions,
     required String answersByQuestionIdJson,
     required DateTime completedAt,
+    this.writtenSummary = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         sessionId = Value(sessionId),
@@ -1828,6 +1864,7 @@ class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
     Expression<int>? totalQuestions,
     Expression<String>? answersByQuestionIdJson,
     Expression<DateTime>? completedAt,
+    Expression<String>? writtenSummary,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1839,6 +1876,7 @@ class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
       if (answersByQuestionIdJson != null)
         'answers_by_question_id_json': answersByQuestionIdJson,
       if (completedAt != null) 'completed_at': completedAt,
+      if (writtenSummary != null) 'written_summary': writtenSummary,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1851,6 +1889,7 @@ class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
       Value<int>? totalQuestions,
       Value<String>? answersByQuestionIdJson,
       Value<DateTime>? completedAt,
+      Value<String?>? writtenSummary,
       Value<int>? rowid}) {
     return QuizResultRecordsCompanion(
       id: id ?? this.id,
@@ -1861,6 +1900,7 @@ class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
       answersByQuestionIdJson:
           answersByQuestionIdJson ?? this.answersByQuestionIdJson,
       completedAt: completedAt ?? this.completedAt,
+      writtenSummary: writtenSummary ?? this.writtenSummary,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1890,6 +1930,9 @@ class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
     if (completedAt.present) {
       map['completed_at'] = Variable<DateTime>(completedAt.value);
     }
+    if (writtenSummary.present) {
+      map['written_summary'] = Variable<String>(writtenSummary.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1906,6 +1949,7 @@ class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
           ..write('totalQuestions: $totalQuestions, ')
           ..write('answersByQuestionIdJson: $answersByQuestionIdJson, ')
           ..write('completedAt: $completedAt, ')
+          ..write('writtenSummary: $writtenSummary, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3850,6 +3894,7 @@ typedef $$QuizResultRecordsTableCreateCompanionBuilder
   required int totalQuestions,
   required String answersByQuestionIdJson,
   required DateTime completedAt,
+  Value<String?> writtenSummary,
   Value<int> rowid,
 });
 typedef $$QuizResultRecordsTableUpdateCompanionBuilder
@@ -3861,6 +3906,7 @@ typedef $$QuizResultRecordsTableUpdateCompanionBuilder
   Value<int> totalQuestions,
   Value<String> answersByQuestionIdJson,
   Value<DateTime> completedAt,
+  Value<String?> writtenSummary,
   Value<int> rowid,
 });
 
@@ -3895,6 +3941,10 @@ class $$QuizResultRecordsTableFilterComposer
 
   ColumnFilters<DateTime> get completedAt => $composableBuilder(
       column: $table.completedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get writtenSummary => $composableBuilder(
+      column: $table.writtenSummary,
+      builder: (column) => ColumnFilters(column));
 }
 
 class $$QuizResultRecordsTableOrderingComposer
@@ -3929,6 +3979,10 @@ class $$QuizResultRecordsTableOrderingComposer
 
   ColumnOrderings<DateTime> get completedAt => $composableBuilder(
       column: $table.completedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get writtenSummary => $composableBuilder(
+      column: $table.writtenSummary,
+      builder: (column) => ColumnOrderings(column));
 }
 
 class $$QuizResultRecordsTableAnnotationComposer
@@ -3960,6 +4014,9 @@ class $$QuizResultRecordsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get completedAt => $composableBuilder(
       column: $table.completedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get writtenSummary => $composableBuilder(
+      column: $table.writtenSummary, builder: (column) => column);
 }
 
 class $$QuizResultRecordsTableTableManager extends RootTableManager<
@@ -3997,6 +4054,7 @@ class $$QuizResultRecordsTableTableManager extends RootTableManager<
             Value<int> totalQuestions = const Value.absent(),
             Value<String> answersByQuestionIdJson = const Value.absent(),
             Value<DateTime> completedAt = const Value.absent(),
+            Value<String?> writtenSummary = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               QuizResultRecordsCompanion(
@@ -4007,6 +4065,7 @@ class $$QuizResultRecordsTableTableManager extends RootTableManager<
             totalQuestions: totalQuestions,
             answersByQuestionIdJson: answersByQuestionIdJson,
             completedAt: completedAt,
+            writtenSummary: writtenSummary,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -4017,6 +4076,7 @@ class $$QuizResultRecordsTableTableManager extends RootTableManager<
             required int totalQuestions,
             required String answersByQuestionIdJson,
             required DateTime completedAt,
+            Value<String?> writtenSummary = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               QuizResultRecordsCompanion.insert(
@@ -4027,6 +4087,7 @@ class $$QuizResultRecordsTableTableManager extends RootTableManager<
             totalQuestions: totalQuestions,
             answersByQuestionIdJson: answersByQuestionIdJson,
             completedAt: completedAt,
+            writtenSummary: writtenSummary,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

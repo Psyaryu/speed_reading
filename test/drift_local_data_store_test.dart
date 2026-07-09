@@ -1,5 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:speed_reading/assessment/domain/quiz.dart';
 import 'package:speed_reading/content/domain/imported_passage_factory.dart';
 import 'package:speed_reading/content/domain/passage.dart';
 import 'package:speed_reading/core/data/app_database.dart';
@@ -73,7 +74,8 @@ void main() {
     expect(passages.single.metadata.isCertificationEligible, isFalse);
   });
 
-  test('rejects official passage saves through imported passage method', () async {
+  test('rejects official passage saves through imported passage method',
+      () async {
     expect(
       () => store.saveImportedPassage(_officialPassage()),
       throwsArgumentError,
@@ -99,6 +101,27 @@ void main() {
 
     expect(sessions.single.wpm, 800);
     expect(csv, contains('s1,p1,manual'));
+  });
+
+  test('saves and loads quiz written summary', () async {
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'q1',
+        sessionId: 's1',
+        passageId: 'p1',
+        correctCount: 1,
+        totalQuestions: 2,
+        answersByQuestionId: const {'question-1': 0},
+        completedAt: DateTime.utc(2026, 7, 8),
+        writtenSummary: 'The passage is about a signal fire.',
+      ),
+    );
+
+    final results = await store.loadQuizResults();
+
+    expect(
+        results.single.writtenSummary, 'The passage is about a signal fire.');
+    expect(results.single.comprehensionScore, 0.5);
   });
 
   test('reset progress keeps imported passages', () async {

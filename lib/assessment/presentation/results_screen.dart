@@ -63,6 +63,7 @@ class _ResultsBody extends ConsumerWidget {
 
     final session = sessions.first;
     final quiz = history.quizForSession(session.id);
+    final writtenSummary = quiz?.writtenSummary;
     final passage = _passageFor(session.passageId);
     final comprehensionScore = quiz?.comprehensionScore;
     final comprehensionLabel = comprehensionScore == null
@@ -109,6 +110,25 @@ class _ResultsBody extends ConsumerWidget {
                   ? 'Qualified'
                   : 'Below 70%',
         ),
+        if (writtenSummary != null) ...[
+          const SizedBox(height: 4),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Written Summary',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(writtenSummary),
+                ],
+              ),
+            ),
+          ),
+        ],
         if (effectiveReadingScore != null && comprehensionScore != null) ...[
           const SizedBox(height: 8),
           Align(

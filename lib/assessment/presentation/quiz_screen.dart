@@ -8,7 +8,8 @@ import '../domain/quiz.dart';
 import '../domain/quiz_scorer.dart';
 
 final latestQuizSessionProvider = FutureProvider<ReadingSession?>((ref) async {
-  final sessions = await ref.watch(localDataStoreProvider).loadReadingSessions();
+  final sessions =
+      await ref.watch(localDataStoreProvider).loadReadingSessions();
   if (sessions.isEmpty) {
     return null;
   }
@@ -41,7 +42,9 @@ class QuizScreen extends ConsumerWidget {
       body: session.when(
         data: (session) {
           if (session == null) {
-            return const Center(child: Text('Complete a reading session first.'));
+            return const Center(
+              child: Text('Complete a reading session first.'),
+            );
           }
           final questions = ref.watch(quizQuestionsProvider(session.passageId));
           return questions.when(
@@ -84,8 +87,15 @@ class _QuizForm extends ConsumerStatefulWidget {
 
 class _QuizFormState extends ConsumerState<_QuizForm> {
   final _answersByQuestionId = <String, int>{};
+  final _summaryController = TextEditingController();
   QuizResult? _result;
   bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _summaryController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +126,17 @@ class _QuizFormState extends ConsumerState<_QuizForm> {
           ),
           const SizedBox(height: 12),
         ],
+        TextField(
+          controller: _summaryController,
+          enabled: result == null,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            labelText: 'Optional written summary',
+            hintText: 'Write the main idea in your own words.',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 12),
         FilledButton.icon(
           onPressed: result == null && !_isSaving ? _submit : null,
           icon: _isSaving
@@ -131,6 +152,10 @@ class _QuizFormState extends ConsumerState<_QuizForm> {
           const SizedBox(height: 16),
           Text('Comprehension: ${(result.comprehensionScore * 100).round()}%'),
           Text('${result.correctCount}/${result.totalQuestions} correct'),
+          if (result.writtenSummary != null) ...[
+            const SizedBox(height: 8),
+            const Text('Summary saved'),
+          ],
           const SizedBox(height: 12),
           Align(
             alignment: Alignment.centerLeft,
@@ -157,6 +182,7 @@ class _QuizFormState extends ConsumerState<_QuizForm> {
       questions: widget.questions,
       answersByQuestionId: Map.unmodifiable(_answersByQuestionId),
       completedAt: ref.read(currentDateTimeProvider).call(),
+      writtenSummary: _normalizedSummary(),
     );
     await ref.read(localDataStoreProvider).saveQuizResult(result);
 
@@ -168,6 +194,11 @@ class _QuizFormState extends ConsumerState<_QuizForm> {
       _result = result;
       _isSaving = false;
     });
+  }
+
+  String? _normalizedSummary() {
+    final summary = _summaryController.text.trim();
+    return summary.isEmpty ? null : summary;
   }
 }
 

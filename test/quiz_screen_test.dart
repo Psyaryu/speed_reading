@@ -57,17 +57,36 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('A hidden map'));
     await tester.pump();
+    await tester.enterText(
+      find.byType(TextField),
+      'The runner follows the fire but misses the hidden map.',
+    );
+    await tester.scrollUntilVisible(
+      find.text('Submit Quiz'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('Submit Quiz'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('1/2 correct'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
 
     expect(find.text('Comprehension: 50%'), findsOneWidget);
     expect(find.text('1/2 correct'), findsOneWidget);
+    expect(find.text('Summary saved'), findsOneWidget);
 
     final rows = await database.select(database.quizResultRecords).get();
     expect(rows.single.id, 'quiz-1');
     expect(rows.single.sessionId, 'session-1');
     expect(rows.single.correctCount, 1);
     expect(rows.single.totalQuestions, 2);
+    expect(
+      rows.single.writtenSummary,
+      'The runner follows the fire but misses the hidden map.',
+    );
   });
 
   testWidgets('navigates to results after submitting quiz', (tester) async {
@@ -114,7 +133,11 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('A compass'));
     await tester.pump();
-    await tester.ensureVisible(find.text('Submit Quiz'));
+    await tester.scrollUntilVisible(
+      find.text('Submit Quiz'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('Submit Quiz'));
     await tester.pumpAndSettle();
     expect(find.text('Comprehension: 100%'), findsOneWidget);

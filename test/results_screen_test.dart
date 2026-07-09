@@ -128,6 +128,51 @@ void main() {
     expect(shared.single, contains('70% comprehension'));
     expect(shared.single, isNot(contains('A public domain passage.')));
   });
+
+  testWidgets('shows written summary when provided', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          progressHistoryProvider.overrideWith(
+            (ref) async => ProgressHistory(
+              sessions: [
+                ReadingSession(
+                  id: 'session-1',
+                  passageId: 'passage-1',
+                  mode: ReadingMode.manual,
+                  startedAt: DateTime.utc(2026, 7, 8),
+                  activeReadingSeconds: 60,
+                  wordCount: 800,
+                  status: AttemptQualificationStatus.qualified,
+                ),
+              ],
+              quizResults: [
+                QuizResult(
+                  id: 'quiz-1',
+                  sessionId: 'session-1',
+                  passageId: 'passage-1',
+                  correctCount: 7,
+                  totalQuestions: 10,
+                  answersByQuestionId: const {},
+                  completedAt: DateTime.utc(2026, 7, 8, 0, 2),
+                  writtenSummary: 'A runner follows the signal fire.',
+                ),
+              ],
+            ),
+          ),
+          resultPassagesProvider.overrideWith((ref) async => [
+                _passage(),
+              ]),
+        ],
+        child: const MaterialApp(home: ResultsScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Written Summary'), findsOneWidget);
+    expect(find.text('A runner follows the signal fire.'), findsOneWidget);
+  });
 }
 
 Passage _passage() {
