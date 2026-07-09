@@ -1051,6 +1051,12 @@ Dependencies:
 - Certification attempt infrastructure.
 - Local scheduling/reminder strategy.
 
+Follow-up tasks:
+
+- Status: Todo
+  Task: Schedule delayed recall reminders when persisted mastery candidates are created.
+  Notes: Use `delayedRecallReminderSchedulerProvider` and `DelayedRecallReminderFactory` from the mastery candidate creation flow once immediate 800 WPM mastery attempts are persisted.
+
 Completed task log:
 
 ```text
@@ -1081,6 +1087,16 @@ Changed files: lib/progress/domain/delayed_recall_reminder.dart, test/delayed_re
 Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added test for 24-hour delayed recall due-time calculation.
 Commit: See Git history for `feat: add delayed recall reminder contract`
 Notes: Platform implementation using local notifications remains open.
+```
+
+```text
+Task: Trigger local notification reminders for delayed recall checks
+Status: Done
+Completed: 2026-07-08
+Changed files: pubspec.yaml, pubspec.lock, android/app/src/main/AndroidManifest.xml, lib/core/providers/app_providers.dart, lib/progress/domain/delayed_recall_reminder.dart, lib/progress/data/delayed_recall_notification_scheduler.dart, test/app_providers_test.dart, test/delayed_recall_reminder_test.dart, test/delayed_recall_notification_scheduler_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 147 tests passed.
+Commit: See Git history for `feat: schedule delayed recall reminders`
+Notes: Added a reminder factory, in-memory scheduler, Android/iOS `flutter_local_notifications` scheduler, Riverpod provider wiring, stable notification IDs, delayed recall payloads, and focused tests. Unsupported platforms such as Windows use the in-memory scheduler instead of calling unsupported plugin APIs.
 ```
 
 ## Milestone 7: Training Curriculum and Adaptive Plan

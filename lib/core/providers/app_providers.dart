@@ -4,6 +4,8 @@ import '../../assessment/data/official_question_loader.dart';
 import '../../content/data/default_passage_repository.dart';
 import '../../content/data/official_passage_loader.dart';
 import '../../content/data/passage_repository.dart';
+import '../../progress/data/delayed_recall_notification_scheduler.dart';
+import '../../progress/domain/delayed_recall_reminder.dart';
 import '../../settings/application/local_profile_controller.dart';
 import '../../settings/domain/local_user_profile.dart';
 import '../data/app_database.dart';
@@ -38,6 +40,11 @@ final officialQuestionSourceProvider = Provider<OfficialQuestionSource>((ref) {
 
 final currentDateTimeProvider = Provider<DateTime Function()>((ref) {
   return DateTime.now;
+});
+
+final delayedRecallReminderSchedulerProvider =
+    Provider<DelayedRecallReminderScheduler>((ref) {
+  return createDefaultDelayedRecallReminderScheduler();
 });
 
 final localProfileControllerProvider = Provider<LocalProfileController>((ref) {

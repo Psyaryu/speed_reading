@@ -66,6 +66,15 @@ void main() {
 
     expect(questions.single.passageId, 'official');
   });
+
+  test('delayed recall reminder scheduler provider is available', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    final scheduler = container.read(delayedRecallReminderSchedulerProvider);
+
+    expect(scheduler, isNotNull);
+  });
 }
 
 class _FakeOfficialPassageSource implements OfficialPassageSource {

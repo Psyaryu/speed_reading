@@ -16,6 +16,7 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.24
   path: ^1.9.0
   path_provider: ^2.1.4
+  timezone: ^0.9.4
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
   fl_chart: ^0.69.0
@@ -34,4 +35,3 @@ flutter:
   uses-material-design: true
   assets:
     - assets/passages/
-
