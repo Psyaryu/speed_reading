@@ -1535,6 +1535,18 @@ Dependencies:
 - MVP features complete.
 - macOS/iOS build environment for final validation.
 
+Blocked task log:
+
+```text
+Task: Validate current iOS release readiness
+Status: Blocked
+Completed: 2026-07-08
+Changed files: TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build ios --no-codesign`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build ios`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat doctor -v`. Analyze passed with no issues. Test suite passed with all 115 tests passing. iOS build validation could not proceed on this Windows host: `flutter build ios --no-codesign` reported `Could not find an option named "--no-codesign"`, and `flutter build ios` reported `Could not find a subcommand named "ios" for "flutter build"`. Flutter doctor confirmed the host is Microsoft Windows with connected Windows, Chrome, and Edge devices only; no macOS/Xcode/iOS simulator toolchain is available for final iOS compilation.
+Commit: See Git history for `docs: record ios readiness blocker`
+Notes: No source fixes were required and no iOS build output was produced. iOS readiness remains blocked until the project is validated on macOS with Xcode/iOS tooling, then the iOS build/configuration command should be rerun there.
+```
+
 ## Milestone 11: Verification and Quality
 
 Goal: Prove the app behaves correctly before release.
