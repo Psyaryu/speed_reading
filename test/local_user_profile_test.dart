@@ -28,6 +28,7 @@ void main() {
       reducedMotion: true,
       baselineWpm: 260,
       baselineComprehension: 0.8,
+      baselineEffectiveReadingScore: 208,
     );
 
     final roundTrip = LocalUserProfile.fromJson(profile.toJson());
@@ -35,6 +36,7 @@ void main() {
     expect(roundTrip.goals, [TrainingGoal.school, TrainingGoal.work]);
     expect(roundTrip.baselineWpm, 260);
     expect(roundTrip.baselineComprehension, 0.8);
+    expect(roundTrip.baselineEffectiveReadingScore, 208);
     expect(roundTrip.preferredColumnWidth, 820);
     expect(roundTrip.preferredThemeMode, LocalThemeMode.dark);
     expect(roundTrip.reducedMotion, isTrue);
@@ -54,6 +56,7 @@ void main() {
 
     expect(profile.preferredColumnWidth, 760);
     expect(profile.preferredThemeMode, LocalThemeMode.system);
+    expect(profile.baselineEffectiveReadingScore, isNull);
   });
 
   test('copies reading preferences without changing identity', () {

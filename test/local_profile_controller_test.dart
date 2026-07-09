@@ -1,9 +1,12 @@
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:speed_reading/assessment/domain/quiz.dart';
+import 'package:speed_reading/content/domain/passage.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
+import 'package:speed_reading/reading/domain/reading_session.dart';
 import 'package:speed_reading/settings/domain/local_user_profile.dart';
 
 void main() {
@@ -89,5 +92,60 @@ void main() {
     expect(updated.goals, [TrainingGoal.school, TrainingGoal.exam]);
     expect(updated.preferredFontSize, 22);
     expect(updated.reducedMotion, isTrue);
+  });
+
+  test('stores derived baseline values from a reading result', () async {
+    final controller = container.read(localProfileControllerProvider);
+    final session = ReadingSession(
+      id: 'session-1',
+      passageId: 'passage-1',
+      mode: ReadingMode.manual,
+      startedAt: DateTime.utc(2026, 7, 7, 12),
+      completedAt: DateTime.utc(2026, 7, 7, 12, 2),
+      activeReadingSeconds: 120,
+      wordCount: 500,
+      status: AttemptQualificationStatus.qualified,
+    );
+    final quiz = QuizResult(
+      id: 'quiz-1',
+      sessionId: 'session-1',
+      passageId: 'passage-1',
+      correctCount: 4,
+      totalQuestions: 5,
+      answersByQuestionId: const {},
+      completedAt: DateTime.utc(2026, 7, 7, 12, 3),
+    );
+    const passage = Passage(
+      id: 'passage-1',
+      title: 'Baseline',
+      body: 'Practice text',
+      metadata: PassageMetadata(
+        wordCount: 500,
+        difficulty: PassageDifficulty.standard,
+        topic: 'Baseline',
+        source: PassageSource.official,
+        license: 'Public domain',
+        type: PassageType.fiction,
+        vocabularyDensity: 0.2,
+        tags: ['baseline'],
+        isCertificationEligible: false,
+        isMasteryEligible: false,
+      ),
+    );
+
+    final updated = await controller.updateBaselineFromResult(
+      session: session,
+      quizResult: quiz,
+      passage: passage,
+    );
+
+    expect(updated.baselineWpm, 250);
+    expect(updated.baselineComprehension, 0.8);
+    expect(updated.baselineEffectiveReadingScore, 200);
+
+    final stored = await container.read(localDataStoreProvider).loadProfile();
+    expect(stored?.baselineWpm, 250);
+    expect(stored?.baselineComprehension, 0.8);
+    expect(stored?.baselineEffectiveReadingScore, 200);
   });
 }

@@ -14,6 +14,7 @@ class LocalUserProfile {
     required this.reducedMotion,
     this.baselineWpm,
     this.baselineComprehension,
+    this.baselineEffectiveReadingScore,
   });
 
   final String id;
@@ -26,6 +27,7 @@ class LocalUserProfile {
   final bool reducedMotion;
   final double? baselineWpm;
   final double? baselineComprehension;
+  final double? baselineEffectiveReadingScore;
 
   LocalUserProfile copyWith({
     List<TrainingGoal>? goals,
@@ -36,6 +38,7 @@ class LocalUserProfile {
     bool? reducedMotion,
     double? baselineWpm,
     double? baselineComprehension,
+    double? baselineEffectiveReadingScore,
   }) {
     return LocalUserProfile(
       id: id,
@@ -49,6 +52,8 @@ class LocalUserProfile {
       baselineWpm: baselineWpm ?? this.baselineWpm,
       baselineComprehension:
           baselineComprehension ?? this.baselineComprehension,
+      baselineEffectiveReadingScore:
+          baselineEffectiveReadingScore ?? this.baselineEffectiveReadingScore,
     );
   }
 
@@ -80,6 +85,7 @@ class LocalUserProfile {
       'reducedMotion': reducedMotion,
       'baselineWpm': baselineWpm,
       'baselineComprehension': baselineComprehension,
+      'baselineEffectiveReadingScore': baselineEffectiveReadingScore,
     };
   }
 
@@ -101,6 +107,8 @@ class LocalUserProfile {
       baselineWpm: (json['baselineWpm'] as num?)?.toDouble(),
       baselineComprehension:
           (json['baselineComprehension'] as num?)?.toDouble(),
+      baselineEffectiveReadingScore:
+          (json['baselineEffectiveReadingScore'] as num?)?.toDouble(),
     );
   }
 }

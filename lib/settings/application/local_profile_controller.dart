@@ -1,6 +1,10 @@
 import '../domain/local_user_profile.dart';
+import '../../assessment/domain/quiz.dart';
+import '../../content/domain/passage.dart';
 import '../../core/domain/reading_enums.dart';
 import '../../core/services/local_data_store.dart';
+import '../../progress/domain/effective_reading_score.dart';
+import '../../reading/domain/reading_session.dart';
 
 class LocalProfileController {
   const LocalProfileController({
@@ -54,6 +58,27 @@ class LocalProfileController {
       goals: goals.isEmpty ? const [TrainingGoal.generalImprovement] : goals,
       preferredFontSize: preferredFontSize,
       reducedMotion: reducedMotion,
+    );
+    await localDataStore.saveProfile(updated);
+    return updated;
+  }
+
+  Future<LocalUserProfile> updateBaselineFromResult({
+    required ReadingSession session,
+    required QuizResult quizResult,
+    required Passage passage,
+  }) async {
+    final profile = await loadOrCreate();
+    final comprehensionScore = quizResult.comprehensionScore;
+    final updated = profile.copyWith(
+      baselineWpm: session.wpm,
+      baselineComprehension: comprehensionScore,
+      baselineEffectiveReadingScore: EffectiveReadingScore.calculate(
+        wpm: session.wpm,
+        comprehensionScore: comprehensionScore,
+        difficulty: passage.metadata.difficulty,
+        mode: session.mode,
+      ),
     );
     await localDataStore.saveProfile(updated);
     return updated;

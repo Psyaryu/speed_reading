@@ -15,6 +15,7 @@ class LocalProfiles extends Table {
   BoolColumn get reducedMotion => boolean()();
   RealColumn get baselineWpm => real().nullable()();
   RealColumn get baselineComprehension => real().nullable()();
+  RealColumn get baselineEffectiveReadingScore => real().nullable()();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -115,7 +116,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -136,6 +137,12 @@ class AppDatabase extends _$AppDatabase {
             await migrator.addColumn(
               quizResultRecords,
               quizResultRecords.writtenSummary,
+            );
+          }
+          if (from < 5) {
+            await migrator.addColumn(
+              localProfiles,
+              localProfiles.baselineEffectiveReadingScore,
             );
           }
         },

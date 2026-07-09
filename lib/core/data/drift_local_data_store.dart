@@ -43,6 +43,9 @@ class DriftLocalDataStore implements LocalDataStore {
             reducedMotion: profile.reducedMotion,
             baselineWpm: Value(profile.baselineWpm),
             baselineComprehension: Value(profile.baselineComprehension),
+            baselineEffectiveReadingScore: Value(
+              profile.baselineEffectiveReadingScore,
+            ),
           ),
         );
   }
@@ -225,6 +228,7 @@ class DriftLocalDataStore implements LocalDataStore {
       reducedMotion: row.reducedMotion,
       baselineWpm: row.baselineWpm,
       baselineComprehension: row.baselineComprehension,
+      baselineEffectiveReadingScore: row.baselineEffectiveReadingScore,
     );
   }
 

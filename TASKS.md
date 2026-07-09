@@ -331,7 +331,7 @@ Notes: Database persistence and file writing remain open. This formatter support
 
 ### Epic 1.3: Local User Profile
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -371,6 +371,17 @@ Changed files: lib/settings/application/local_profile_controller.dart, lib/core/
 Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all tests passed.
 Commit: See Git history for `feat: add local profile initialization`
 Notes: Adds load-or-create behavior for the local-only profile and exposes it through Riverpod.
+```
+
+```text
+Task: Store local profile goals and baseline values
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/settings/domain/local_user_profile.dart, lib/settings/application/local_profile_controller.dart, lib/core/data/app_database.dart, lib/core/data/app_database.g.dart, lib/core/data/drift_local_data_store.dart, test/local_user_profile_test.dart, test/local_profile_controller_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat pub run build_runner build --delete-conflicting-outputs`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\local_user_profile_test.dart test\local_profile_controller_test.dart test\drift_local_data_store_test.dart test\app_database_test.dart`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 151 tests passed.
+Commit: See Git history for `feat: store local profile goals`
+Notes: Goals were already captured through onboarding and persisted locally. Added profile baseline ERS storage, Drift migration/schema mapping, and a controller method that derives baseline WPM, comprehension, and ERS from a local reading session, quiz result, and passage metadata without login or network access.
+Follow-up: None.
 ```
 
 ## Milestone 2: Content Library

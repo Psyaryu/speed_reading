@@ -75,6 +75,13 @@ class $LocalProfilesTable extends LocalProfiles
   late final GeneratedColumn<double> baselineComprehension =
       GeneratedColumn<double>('baseline_comprehension', aliasedName, true,
           type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _baselineEffectiveReadingScoreMeta =
+      const VerificationMeta('baselineEffectiveReadingScore');
+  @override
+  late final GeneratedColumn<double> baselineEffectiveReadingScore =
+      GeneratedColumn<double>(
+          'baseline_effective_reading_score', aliasedName, true,
+          type: DriftSqlType.double, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -86,7 +93,8 @@ class $LocalProfilesTable extends LocalProfiles
         preferredThemeMode,
         reducedMotion,
         baselineWpm,
-        baselineComprehension
+        baselineComprehension,
+        baselineEffectiveReadingScore
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -163,6 +171,13 @@ class $LocalProfilesTable extends LocalProfiles
           baselineComprehension.isAcceptableOrUnknown(
               data['baseline_comprehension']!, _baselineComprehensionMeta));
     }
+    if (data.containsKey('baseline_effective_reading_score')) {
+      context.handle(
+          _baselineEffectiveReadingScoreMeta,
+          baselineEffectiveReadingScore.isAcceptableOrUnknown(
+              data['baseline_effective_reading_score']!,
+              _baselineEffectiveReadingScoreMeta));
+    }
     return context;
   }
 
@@ -195,6 +210,9 @@ class $LocalProfilesTable extends LocalProfiles
       baselineComprehension: attachedDatabase.typeMapping.read(
           DriftSqlType.double,
           data['${effectivePrefix}baseline_comprehension']),
+      baselineEffectiveReadingScore: attachedDatabase.typeMapping.read(
+          DriftSqlType.double,
+          data['${effectivePrefix}baseline_effective_reading_score']),
     );
   }
 
@@ -215,6 +233,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
   final bool reducedMotion;
   final double? baselineWpm;
   final double? baselineComprehension;
+  final double? baselineEffectiveReadingScore;
   const LocalProfile(
       {required this.id,
       required this.createdAt,
@@ -225,7 +244,8 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       required this.preferredThemeMode,
       required this.reducedMotion,
       this.baselineWpm,
-      this.baselineComprehension});
+      this.baselineComprehension,
+      this.baselineEffectiveReadingScore});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -242,6 +262,10 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
     }
     if (!nullToAbsent || baselineComprehension != null) {
       map['baseline_comprehension'] = Variable<double>(baselineComprehension);
+    }
+    if (!nullToAbsent || baselineEffectiveReadingScore != null) {
+      map['baseline_effective_reading_score'] =
+          Variable<double>(baselineEffectiveReadingScore);
     }
     return map;
   }
@@ -262,6 +286,10 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       baselineComprehension: baselineComprehension == null && nullToAbsent
           ? const Value.absent()
           : Value(baselineComprehension),
+      baselineEffectiveReadingScore:
+          baselineEffectiveReadingScore == null && nullToAbsent
+              ? const Value.absent()
+              : Value(baselineEffectiveReadingScore),
     );
   }
 
@@ -283,6 +311,8 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       baselineWpm: serializer.fromJson<double?>(json['baselineWpm']),
       baselineComprehension:
           serializer.fromJson<double?>(json['baselineComprehension']),
+      baselineEffectiveReadingScore:
+          serializer.fromJson<double?>(json['baselineEffectiveReadingScore']),
     );
   }
   @override
@@ -300,6 +330,8 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       'baselineWpm': serializer.toJson<double?>(baselineWpm),
       'baselineComprehension':
           serializer.toJson<double?>(baselineComprehension),
+      'baselineEffectiveReadingScore':
+          serializer.toJson<double?>(baselineEffectiveReadingScore),
     };
   }
 
@@ -313,7 +345,9 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
           String? preferredThemeMode,
           bool? reducedMotion,
           Value<double?> baselineWpm = const Value.absent(),
-          Value<double?> baselineComprehension = const Value.absent()}) =>
+          Value<double?> baselineComprehension = const Value.absent(),
+          Value<double?> baselineEffectiveReadingScore =
+              const Value.absent()}) =>
       LocalProfile(
         id: id ?? this.id,
         createdAt: createdAt ?? this.createdAt,
@@ -327,6 +361,9 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
         baselineComprehension: baselineComprehension.present
             ? baselineComprehension.value
             : this.baselineComprehension,
+        baselineEffectiveReadingScore: baselineEffectiveReadingScore.present
+            ? baselineEffectiveReadingScore.value
+            : this.baselineEffectiveReadingScore,
       );
   LocalProfile copyWithCompanion(LocalProfilesCompanion data) {
     return LocalProfile(
@@ -353,6 +390,9 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       baselineComprehension: data.baselineComprehension.present
           ? data.baselineComprehension.value
           : this.baselineComprehension,
+      baselineEffectiveReadingScore: data.baselineEffectiveReadingScore.present
+          ? data.baselineEffectiveReadingScore.value
+          : this.baselineEffectiveReadingScore,
     );
   }
 
@@ -368,7 +408,9 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
           ..write('preferredThemeMode: $preferredThemeMode, ')
           ..write('reducedMotion: $reducedMotion, ')
           ..write('baselineWpm: $baselineWpm, ')
-          ..write('baselineComprehension: $baselineComprehension')
+          ..write('baselineComprehension: $baselineComprehension, ')
+          ..write(
+              'baselineEffectiveReadingScore: $baselineEffectiveReadingScore')
           ..write(')'))
         .toString();
   }
@@ -384,7 +426,8 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       preferredThemeMode,
       reducedMotion,
       baselineWpm,
-      baselineComprehension);
+      baselineComprehension,
+      baselineEffectiveReadingScore);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -398,7 +441,9 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
           other.preferredThemeMode == this.preferredThemeMode &&
           other.reducedMotion == this.reducedMotion &&
           other.baselineWpm == this.baselineWpm &&
-          other.baselineComprehension == this.baselineComprehension);
+          other.baselineComprehension == this.baselineComprehension &&
+          other.baselineEffectiveReadingScore ==
+              this.baselineEffectiveReadingScore);
 }
 
 class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
@@ -412,6 +457,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
   final Value<bool> reducedMotion;
   final Value<double?> baselineWpm;
   final Value<double?> baselineComprehension;
+  final Value<double?> baselineEffectiveReadingScore;
   final Value<int> rowid;
   const LocalProfilesCompanion({
     this.id = const Value.absent(),
@@ -424,6 +470,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
     this.reducedMotion = const Value.absent(),
     this.baselineWpm = const Value.absent(),
     this.baselineComprehension = const Value.absent(),
+    this.baselineEffectiveReadingScore = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   LocalProfilesCompanion.insert({
@@ -437,6 +484,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
     required bool reducedMotion,
     this.baselineWpm = const Value.absent(),
     this.baselineComprehension = const Value.absent(),
+    this.baselineEffectiveReadingScore = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         createdAt = Value(createdAt),
@@ -455,6 +503,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
     Expression<bool>? reducedMotion,
     Expression<double>? baselineWpm,
     Expression<double>? baselineComprehension,
+    Expression<double>? baselineEffectiveReadingScore,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -472,6 +521,8 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       if (baselineWpm != null) 'baseline_wpm': baselineWpm,
       if (baselineComprehension != null)
         'baseline_comprehension': baselineComprehension,
+      if (baselineEffectiveReadingScore != null)
+        'baseline_effective_reading_score': baselineEffectiveReadingScore,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -487,6 +538,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       Value<bool>? reducedMotion,
       Value<double?>? baselineWpm,
       Value<double?>? baselineComprehension,
+      Value<double?>? baselineEffectiveReadingScore,
       Value<int>? rowid}) {
     return LocalProfilesCompanion(
       id: id ?? this.id,
@@ -500,6 +552,8 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       baselineWpm: baselineWpm ?? this.baselineWpm,
       baselineComprehension:
           baselineComprehension ?? this.baselineComprehension,
+      baselineEffectiveReadingScore:
+          baselineEffectiveReadingScore ?? this.baselineEffectiveReadingScore,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -540,6 +594,10 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       map['baseline_comprehension'] =
           Variable<double>(baselineComprehension.value);
     }
+    if (baselineEffectiveReadingScore.present) {
+      map['baseline_effective_reading_score'] =
+          Variable<double>(baselineEffectiveReadingScore.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -559,6 +617,8 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
           ..write('reducedMotion: $reducedMotion, ')
           ..write('baselineWpm: $baselineWpm, ')
           ..write('baselineComprehension: $baselineComprehension, ')
+          ..write(
+              'baselineEffectiveReadingScore: $baselineEffectiveReadingScore, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3172,6 +3232,7 @@ typedef $$LocalProfilesTableCreateCompanionBuilder = LocalProfilesCompanion
   required bool reducedMotion,
   Value<double?> baselineWpm,
   Value<double?> baselineComprehension,
+  Value<double?> baselineEffectiveReadingScore,
   Value<int> rowid,
 });
 typedef $$LocalProfilesTableUpdateCompanionBuilder = LocalProfilesCompanion
@@ -3186,6 +3247,7 @@ typedef $$LocalProfilesTableUpdateCompanionBuilder = LocalProfilesCompanion
   Value<bool> reducedMotion,
   Value<double?> baselineWpm,
   Value<double?> baselineComprehension,
+  Value<double?> baselineEffectiveReadingScore,
   Value<int> rowid,
 });
 
@@ -3231,6 +3293,10 @@ class $$LocalProfilesTableFilterComposer
 
   ColumnFilters<double> get baselineComprehension => $composableBuilder(
       column: $table.baselineComprehension,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get baselineEffectiveReadingScore => $composableBuilder(
+      column: $table.baselineEffectiveReadingScore,
       builder: (column) => ColumnFilters(column));
 }
 
@@ -3278,6 +3344,11 @@ class $$LocalProfilesTableOrderingComposer
   ColumnOrderings<double> get baselineComprehension => $composableBuilder(
       column: $table.baselineComprehension,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get baselineEffectiveReadingScore =>
+      $composableBuilder(
+          column: $table.baselineEffectiveReadingScore,
+          builder: (column) => ColumnOrderings(column));
 }
 
 class $$LocalProfilesTableAnnotationComposer
@@ -3318,6 +3389,11 @@ class $$LocalProfilesTableAnnotationComposer
 
   GeneratedColumn<double> get baselineComprehension => $composableBuilder(
       column: $table.baselineComprehension, builder: (column) => column);
+
+  GeneratedColumn<double> get baselineEffectiveReadingScore =>
+      $composableBuilder(
+          column: $table.baselineEffectiveReadingScore,
+          builder: (column) => column);
 }
 
 class $$LocalProfilesTableTableManager extends RootTableManager<
@@ -3356,6 +3432,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             Value<bool> reducedMotion = const Value.absent(),
             Value<double?> baselineWpm = const Value.absent(),
             Value<double?> baselineComprehension = const Value.absent(),
+            Value<double?> baselineEffectiveReadingScore = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               LocalProfilesCompanion(
@@ -3369,6 +3446,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             reducedMotion: reducedMotion,
             baselineWpm: baselineWpm,
             baselineComprehension: baselineComprehension,
+            baselineEffectiveReadingScore: baselineEffectiveReadingScore,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -3382,6 +3460,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             required bool reducedMotion,
             Value<double?> baselineWpm = const Value.absent(),
             Value<double?> baselineComprehension = const Value.absent(),
+            Value<double?> baselineEffectiveReadingScore = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               LocalProfilesCompanion.insert(
@@ -3395,6 +3474,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             reducedMotion: reducedMotion,
             baselineWpm: baselineWpm,
             baselineComprehension: baselineComprehension,
+            baselineEffectiveReadingScore: baselineEffectiveReadingScore,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
