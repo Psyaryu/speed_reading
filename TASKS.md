@@ -729,7 +729,7 @@ Dependencies:
 
 ### Epic 4.3: RSVP Mode
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -764,6 +764,17 @@ Changed files: lib/reading/domain/rsvp_timing.dart, test/rsvp_timing_test.dart, 
 Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for tokenization, base WPM timing, punctuation pauses, sentence-boundary pauses, and invalid WPM.
 Commit: See Git history for `feat: add RSVP timing`
 Notes: RSVP UI controls remain open. Timing supports punctuation-aware scheduling for future player implementation.
+```
+
+```text
+Task: Add usable RSVP reader mode
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/reading/domain/rsvp_timing.dart, lib/reading/presentation/reader_screen.dart, test/rsvp_timing_test.dart, test/reader_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 158 tests passed.
+Commit: See Git history for `feat: add rsvp reader mode`
+Notes: Reader now supports Manual/RSVP mode selection, word or phrase RSVP display, adjustable WPM, pause/resume, rewind, punctuation-aware timing, sentence-boundary pauses, RSVP session persistence with target WPM, and quiz handoff after completion. RSVP ERS mode multiplier was already implemented as 0.9.
+Follow-up: None.
 ```
 
 ### Epic 4.4: Skim and Scan Modes

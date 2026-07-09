@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +10,7 @@ import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
 import '../domain/reading_session.dart';
 import '../domain/reading_session_factory.dart';
+import '../domain/rsvp_timing.dart';
 
 final readerPassagesProvider = FutureProvider<List<Passage>>((ref) {
   return ref.watch(passageRepositoryProvider).search(const PassageFilter());
@@ -33,9 +36,20 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   int _pauseCount = 0;
   ReadingSession? _completedSession;
   bool _isSaving = false;
+  ReadingMode _readingMode = ReadingMode.manual;
+  int _rsvpWpm = 300;
+  bool _rsvpPhraseMode = false;
+  int _rsvpIndex = 0;
+  Timer? _rsvpTimer;
 
   bool get _isReading => _startedAt != null && _completedSession == null;
   bool get _isPaused => _pausedAt != null;
+
+  @override
+  void dispose() {
+    _rsvpTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +82,17 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               lineHeight: profile?.preferredLineHeight ?? 1.5,
               columnWidth: profile?.preferredColumnWidth ?? 760,
               completedSession: _completedSession,
+              readingMode: _readingMode,
+              rsvpWpm: _rsvpWpm,
+              rsvpPhraseMode: _rsvpPhraseMode,
+              rsvpIndex: _rsvpIndex,
               onStart: _startReading,
               onPause: _pauseReading,
               onResume: _resumeReading,
+              onRewind: _rewindRsvp,
+              onSelectMode: _selectMode,
+              onWpmChanged: _setRsvpWpm,
+              onPhraseModeChanged: _setRsvpPhraseMode,
               onSelectPassage: _selectPassage,
               onFinish: () => _finishReading(selectedPassage),
             );
@@ -104,6 +126,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     setState(() {
       _selectedPassageId = passageId;
       _completedSession = null;
+      _rsvpIndex = 0;
     });
   }
 
@@ -114,7 +137,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       _pausedDuration = Duration.zero;
       _pauseCount = 0;
       _completedSession = null;
+      _rsvpIndex = 0;
     });
+    _scheduleNextRsvpTick();
   }
 
   void _pauseReading() {
@@ -122,6 +147,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       return;
     }
 
+    _rsvpTimer?.cancel();
     setState(() {
       _pausedAt = ref.read(currentDateTimeProvider).call();
       _pauseCount += 1;
@@ -139,6 +165,74 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       _pausedDuration += resumedAt.difference(pausedAt);
       _pausedAt = null;
     });
+    _scheduleNextRsvpTick();
+  }
+
+  void _rewindRsvp() {
+    if (_readingMode != ReadingMode.rsvp) {
+      return;
+    }
+
+    setState(() {
+      _rsvpIndex =
+          (_rsvpIndex - (_rsvpPhraseMode ? 3 : 10)).clamp(0, _rsvpIndex);
+    });
+    _scheduleNextRsvpTick();
+  }
+
+  void _selectMode(ReadingMode? mode) {
+    if (mode == null || _isReading) {
+      return;
+    }
+
+    setState(() {
+      _readingMode = mode;
+      _completedSession = null;
+      _rsvpIndex = 0;
+    });
+  }
+
+  void _setRsvpWpm(double value) {
+    setState(() {
+      _rsvpWpm = value.round();
+    });
+    _scheduleNextRsvpTick();
+  }
+
+  void _setRsvpPhraseMode(bool value) {
+    setState(() {
+      _rsvpPhraseMode = value;
+      _rsvpIndex = 0;
+    });
+    _scheduleNextRsvpTick();
+  }
+
+  void _scheduleNextRsvpTick() {
+    _rsvpTimer?.cancel();
+    if (!_isReading || _isPaused || _readingMode != ReadingMode.rsvp) {
+      return;
+    }
+
+    final passages = ref.read(readerPassagesProvider).valueOrNull;
+    if (passages == null || passages.isEmpty) {
+      return;
+    }
+
+    final passage = _selectedPassage(passages);
+    final schedule = _rsvpScheduleFor(passage);
+    if (schedule.isEmpty || _rsvpIndex >= schedule.length - 1) {
+      return;
+    }
+
+    _rsvpTimer = Timer(schedule[_rsvpIndex].duration, () {
+      if (!mounted || !_isReading || _isPaused) {
+        return;
+      }
+      setState(() {
+        _rsvpIndex += 1;
+      });
+      _scheduleNextRsvpTick();
+    });
   }
 
   Future<void> _finishReading(Passage passage) async {
@@ -150,6 +244,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     setState(() {
       _isSaving = true;
     });
+    _rsvpTimer?.cancel();
 
     final completedAt = ref.read(currentDateTimeProvider).call();
     final pausedAt = _pausedAt;
@@ -159,12 +254,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final session = ReadingSessionFactory.complete(
       id: ref.read(readerSessionIdProvider).call(),
       passageId: passage.id,
-      mode: ReadingMode.manual,
+      mode: _readingMode,
       startedAt: startedAt,
       completedAt: completedAt,
       wordCount: passage.metadata.wordCount,
       pausedDuration: pausedDuration,
       pauseCount: _pauseCount,
+      targetWpm: _readingMode == ReadingMode.rsvp ? _rsvpWpm : null,
     );
 
     await ref.read(localDataStoreProvider).saveReadingSession(session);
@@ -180,7 +276,22 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       _pauseCount = 0;
       _completedSession = session;
       _isSaving = false;
+      _rsvpIndex = 0;
     });
+  }
+
+  List<RsvpToken> _rsvpScheduleFor(Passage passage) {
+    if (_rsvpPhraseMode) {
+      return RsvpTiming.schedulePhrases(
+        text: passage.body,
+        wordsPerMinute: _rsvpWpm,
+      );
+    }
+
+    return RsvpTiming.schedule(
+      text: passage.body,
+      wordsPerMinute: _rsvpWpm,
+    );
   }
 
   Future<void> _confirmDiscardSession() async {
@@ -211,7 +322,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       _pausedAt = null;
       _pausedDuration = Duration.zero;
       _pauseCount = 0;
+      _rsvpIndex = 0;
     });
+    _rsvpTimer?.cancel();
 
     Navigator.of(context).pop();
   }
@@ -228,9 +341,17 @@ class _ReaderBody extends StatelessWidget {
     required this.lineHeight,
     required this.columnWidth,
     required this.completedSession,
+    required this.readingMode,
+    required this.rsvpWpm,
+    required this.rsvpPhraseMode,
+    required this.rsvpIndex,
     required this.onStart,
     required this.onPause,
     required this.onResume,
+    required this.onRewind,
+    required this.onSelectMode,
+    required this.onWpmChanged,
+    required this.onPhraseModeChanged,
     required this.onSelectPassage,
     required this.onFinish,
   });
@@ -244,9 +365,17 @@ class _ReaderBody extends StatelessWidget {
   final double lineHeight;
   final double columnWidth;
   final ReadingSession? completedSession;
+  final ReadingMode readingMode;
+  final int rsvpWpm;
+  final bool rsvpPhraseMode;
+  final int rsvpIndex;
   final VoidCallback onStart;
   final VoidCallback onPause;
   final VoidCallback onResume;
+  final VoidCallback onRewind;
+  final ValueChanged<ReadingMode?> onSelectMode;
+  final ValueChanged<double> onWpmChanged;
+  final ValueChanged<bool> onPhraseModeChanged;
   final ValueChanged<String?> onSelectPassage;
   final VoidCallback onFinish;
 
@@ -295,6 +424,40 @@ class _ReaderBody extends StatelessWidget {
                       .toList(growable: false),
                 ),
                 const SizedBox(height: 16),
+                DropdownButtonFormField<ReadingMode>(
+                  initialValue: readingMode,
+                  onChanged: isReading ? null : onSelectMode,
+                  decoration: const InputDecoration(
+                    labelText: 'Reading mode',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: ReadingMode.manual,
+                      child: Text('Manual'),
+                    ),
+                    DropdownMenuItem(
+                      value: ReadingMode.rsvp,
+                      child: Text('RSVP'),
+                    ),
+                  ],
+                ),
+                if (readingMode == ReadingMode.rsvp) ...[
+                  const SizedBox(height: 16),
+                  _RsvpPanel(
+                    passage: selectedPassage,
+                    isReading: isReading,
+                    isPaused: isPaused,
+                    isSaving: isSaving,
+                    wpm: rsvpWpm,
+                    phraseMode: rsvpPhraseMode,
+                    index: rsvpIndex,
+                    onWpmChanged: onWpmChanged,
+                    onPhraseModeChanged: onPhraseModeChanged,
+                    onRewind: onRewind,
+                  ),
+                ],
+                const SizedBox(height: 16),
                 Wrap(
                   spacing: 12,
                   runSpacing: 12,
@@ -316,6 +479,12 @@ class _ReaderBody extends StatelessWidget {
                       icon: const Icon(Icons.play_arrow),
                       label: const Text('Resume'),
                     ),
+                    if (readingMode == ReadingMode.rsvp)
+                      OutlinedButton.icon(
+                        onPressed: isReading && !isSaving ? onRewind : null,
+                        icon: const Icon(Icons.replay_10),
+                        label: const Text('Rewind'),
+                      ),
                     OutlinedButton.icon(
                       onPressed: isReading && !isSaving ? onFinish : null,
                       icon: isSaving
@@ -340,6 +509,11 @@ class _ReaderBody extends StatelessWidget {
                 if (session != null) ...[
                   const SizedBox(height: 12),
                   Text('WPM: ${session.wpm.round()}'),
+                  if (session.mode == ReadingMode.rsvp &&
+                      session.targetWpm != null) ...[
+                    const SizedBox(height: 4),
+                    Text('RSVP target: ${session.targetWpm} WPM'),
+                  ],
                   const SizedBox(height: 12),
                   Align(
                     alignment: Alignment.centerLeft,
@@ -350,19 +524,122 @@ class _ReaderBody extends StatelessWidget {
                     ),
                   ),
                 ],
-                const SizedBox(height: 24),
-                Text(
-                  selectedPassage.body,
-                  style: textTheme.bodyLarge?.copyWith(
-                    fontSize: fontSize,
-                    height: lineHeight,
+                if (readingMode == ReadingMode.manual) ...[
+                  const SizedBox(height: 24),
+                  Text(
+                    selectedPassage.body,
+                    style: textTheme.bodyLarge?.copyWith(
+                      fontSize: fontSize,
+                      height: lineHeight,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _RsvpPanel extends StatelessWidget {
+  const _RsvpPanel({
+    required this.passage,
+    required this.isReading,
+    required this.isPaused,
+    required this.isSaving,
+    required this.wpm,
+    required this.phraseMode,
+    required this.index,
+    required this.onWpmChanged,
+    required this.onPhraseModeChanged,
+    required this.onRewind,
+  });
+
+  final Passage passage;
+  final bool isReading;
+  final bool isPaused;
+  final bool isSaving;
+  final int wpm;
+  final bool phraseMode;
+  final int index;
+  final ValueChanged<double> onWpmChanged;
+  final ValueChanged<bool> onPhraseModeChanged;
+  final VoidCallback onRewind;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final schedule = phraseMode
+        ? RsvpTiming.schedulePhrases(text: passage.body, wordsPerMinute: wpm)
+        : RsvpTiming.schedule(text: passage.body, wordsPerMinute: wpm);
+    final safeIndex =
+        schedule.isEmpty ? 0 : index.clamp(0, schedule.length - 1);
+    final tokenText = schedule.isEmpty ? '' : schedule[safeIndex].text;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Semantics(
+              label: 'RSVP display',
+              child: Container(
+                key: const ValueKey('rsvp-display'),
+                alignment: Alignment.center,
+                constraints: const BoxConstraints(minHeight: 120),
+                child: Text(
+                  tokenText,
+                  textAlign: TextAlign.center,
+                  style: textTheme.displaySmall,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              schedule.isEmpty
+                  ? 'No RSVP tokens available.'
+                  : '${safeIndex + 1} of ${schedule.length}',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Text('RSVP speed: $wpm WPM'),
+            Slider(
+              key: const ValueKey('rsvp-wpm-slider'),
+              value: wpm.toDouble(),
+              min: 100,
+              max: 900,
+              divisions: 16,
+              label: '$wpm WPM',
+              onChanged: isSaving ? null : onWpmChanged,
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Phrase chunks'),
+              value: phraseMode,
+              onChanged: isReading ? null : onPhraseModeChanged,
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                onPressed: isReading && !isSaving ? onRewind : null,
+                icon: const Icon(Icons.replay_10),
+                label: const Text('Rewind RSVP'),
+              ),
+            ),
+            if (isPaused) ...[
+              const SizedBox(height: 8),
+              const Text('RSVP playback paused.'),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

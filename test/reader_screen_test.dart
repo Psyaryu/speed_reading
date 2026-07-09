@@ -254,6 +254,99 @@ void main() {
     expect(find.text('Quiz Route'), findsOneWidget);
   });
 
+  testWidgets('runs RSVP mode with WPM, pause, resume, and rewind controls',
+      (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    final clock = _FakeClock([
+      DateTime.utc(2026, 7, 7, 12),
+      DateTime.utc(2026, 7, 7, 12, 0, 10),
+      DateTime.utc(2026, 7, 7, 12, 0, 20),
+      DateTime.utc(2026, 7, 7, 12, 1, 20),
+    ]);
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(clock.call),
+          localProfileProvider.overrideWith((ref) async => _profile()),
+          readerSessionIdProvider.overrideWithValue(() => 'rsvp-session'),
+          readerPassagesProvider.overrideWith((ref) async => [
+                _passage(
+                  body: 'A flare tore through the fog. The runner climbed.',
+                  wordCount: 700,
+                ),
+              ]),
+        ],
+        child: const MaterialApp(home: ReaderScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(DropdownButtonFormField<ReadingMode>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('RSVP').last);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('rsvp-display')), findsOneWidget);
+    expect(find.text('A'), findsOneWidget);
+
+    final slider = tester.widget<Slider>(
+      find.byKey(const ValueKey('rsvp-wpm-slider')),
+    );
+    slider.onChanged?.call(600);
+    await tester.pump();
+
+    await tester.drag(find.byType(ListView), const Offset(0, -260));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Phrase chunks'));
+    await tester.pump();
+
+    expect(find.text('A flare tore'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Start'));
+    await tester.tap(find.text('Start'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 310));
+
+    expect(find.textContaining('through the fog'), findsOneWidget);
+
+    await tester.tap(find.text('Pause'));
+    await tester.pump();
+
+    expect(find.text('Reading session paused.'), findsOneWidget);
+    expect(find.text('RSVP playback paused.'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.textContaining('through the fog'), findsOneWidget);
+
+    await tester.tap(find.text('Resume'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 640));
+
+    expect(find.textContaining('The runner climbed'), findsOneWidget);
+
+    await tester.tap(find.text('Rewind').first);
+    await tester.pump();
+
+    expect(find.text('A flare tore'), findsOneWidget);
+
+    await tester.tap(find.text('Finish'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('RSVP target: 600 WPM'), findsOneWidget);
+
+    final sessions =
+        await database.select(database.readingSessionRecords).get();
+    expect(sessions.single.id, 'rsvp-session');
+    expect(sessions.single.mode, ReadingMode.rsvp.name);
+    expect(sessions.single.targetWpm, 600);
+    expect(sessions.single.pauseCount, 1);
+    expect(sessions.single.activeReadingSeconds, 70);
+  });
+
   testWidgets('asks before leaving an active manual session', (tester) async {
     final database = AppDatabase(NativeDatabase.memory());
     final clock = _FakeClock([

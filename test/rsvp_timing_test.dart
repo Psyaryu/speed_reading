@@ -31,11 +31,35 @@ void main() {
     expect(period.duration, const Duration(milliseconds: 180));
   });
 
+  test('schedules phrase chunks while preserving punctuation timing', () {
+    final phrases = RsvpTiming.schedulePhrases(
+      text: 'Run, now. Go fast.',
+      wordsPerMinute: 600,
+      wordsPerPhrase: 3,
+    );
+
+    expect(phrases.map((phrase) => phrase.text), [
+      'Run, now.',
+      'Go fast.',
+    ]);
+    expect(phrases.first.duration, const Duration(milliseconds: 510));
+  });
+
   test('rejects non-positive WPM', () {
     expect(
       () => RsvpTiming.schedule(text: 'Run', wordsPerMinute: 0),
       throwsArgumentError,
     );
   });
-}
 
+  test('rejects non-positive phrase size', () {
+    expect(
+      () => RsvpTiming.schedulePhrases(
+        text: 'Run',
+        wordsPerMinute: 600,
+        wordsPerPhrase: 0,
+      ),
+      throwsArgumentError,
+    );
+  });
+}
