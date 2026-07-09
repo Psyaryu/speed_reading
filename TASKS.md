@@ -1137,7 +1137,7 @@ Follow-up: None.
 
 ### Epic 6.4: Mastery
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -1239,6 +1239,16 @@ Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\quiz
 Commit: See Git history for `feat: schedule mastery candidate reminders`
 Notes: Quiz completion now schedules a delayed recall reminder through `delayedRecallReminderSchedulerProvider` and `DelayedRecallReminderFactory` after a persisted official standard/hard 800+ WPM result with 100% immediate comprehension qualifies as a mastery candidate. The reminder ID is deterministic for the persisted quiz and passage, so repeated scheduling updates the same reminder slot instead of creating duplicate in-memory or platform notifications.
 Follow-up: None.
+```
+
+```text
+Task: Close mastery acceptance criteria
+Status: Done
+Completed: 2026-07-09
+Changed files: TASKS.md
+Verification: Confirmed mastery remains separate from standard certification; delayed recall is required only for mastery; 800 WPM Mastery requires three official standard/hard passages at 800+ WPM with 100% immediate comprehension, at least one non-RSVP attempt, no excessive pausing or unqualified attempts, delayed recall at least 24 hours later, and recall score >=90%. Confirmed delayed recall attempts and mastery status persist locally, mastery progress is shown from local history, local notification reminders are scheduled for persisted mastery candidates, and reminder copy has playful provocative guardrail tests. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all tests passed.
+Commit: See Git history for `test: close mastery criteria`
+Notes: No mastery follow-up tasks remain.
 ```
 
 ## Milestone 7: Training Curriculum and Adaptive Plan
