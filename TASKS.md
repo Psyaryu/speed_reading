@@ -507,6 +507,8 @@ Goal: Establish each user's starting speed, comprehension, focus, and recommende
 
 ### Epic 3.1: Onboarding Flow
 
+Status: In Progress
+
 Tasks:
 
 - Build welcome screen.
@@ -525,6 +527,18 @@ Dependencies:
 
 - Local user profile.
 - Theme/settings foundation.
+
+Completed task log:
+
+```text
+Task: Build local onboarding setup flow
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/settings/application/local_profile_controller.dart, lib/training/presentation/onboarding_screen.dart, test/local_profile_controller_test.dart, test/onboarding_screen_test.dart, TASKS.md
+Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 109 tests passed.
+Commit: See Git history for `feat: build local onboarding setup`
+Notes: Onboarding now explains speed plus comprehension, saves selected goals, reader font size, and reduced motion to the local profile, and returns to the dashboard. Theme choice and baseline assessment remain open.
+```
 
 ### Epic 3.2: Baseline Assessment
 

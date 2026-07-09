@@ -2,6 +2,7 @@ import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_reading/core/data/app_database.dart';
+import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
 
 void main() {
@@ -66,5 +67,19 @@ void main() {
     expect(stored?.preferredFontSize, 24);
     expect(stored?.preferredLineHeight, 1.8);
     expect(stored?.reducedMotion, isTrue);
+  });
+
+  test('updates onboarding goals and preferences', () async {
+    final controller = container.read(localProfileControllerProvider);
+
+    final updated = await controller.updateOnboarding(
+      goals: const [TrainingGoal.school, TrainingGoal.exam],
+      preferredFontSize: 22,
+      reducedMotion: true,
+    );
+
+    expect(updated.goals, [TrainingGoal.school, TrainingGoal.exam]);
+    expect(updated.preferredFontSize, 22);
+    expect(updated.reducedMotion, isTrue);
   });
 }
