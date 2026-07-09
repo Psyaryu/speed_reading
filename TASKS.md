@@ -1289,6 +1289,16 @@ Commit: See Git history for `feat: show best qualified attempt`
 Notes: Progress now selects the highest-ERS official qualified attempt with paired quiz comprehension at or above 70%, then displays WPM, comprehension, ERS, passage title, and date without exposing imported passage text.
 ```
 
+```text
+Task: Build passage difficulty distribution view
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/progress/domain/passage_difficulty_distribution.dart, lib/progress/presentation/progress_screen.dart, test/passage_difficulty_distribution_test.dart, test/progress_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 125 tests passed.
+Commit: See Git history for `feat: show difficulty distribution`
+Notes: Progress now summarizes completed practice sessions by passage difficulty with official/imported counts, unmatched-session context, and an empty-data state without exposing imported passage text.
+```
+
 ### Epic 8.3: Shareable Progress Summary
 
 Status: Done

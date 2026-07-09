@@ -9,6 +9,7 @@ import 'package:speed_reading/content/domain/passage_filter.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
+import 'package:speed_reading/progress/domain/passage_difficulty_distribution.dart';
 import 'package:speed_reading/progress/presentation/progress_screen.dart';
 import 'package:speed_reading/reading/domain/reading_session.dart';
 
@@ -23,6 +24,9 @@ void main() {
           appDatabaseProvider.overrideWithValue(database),
           progressShareableSummaryProvider.overrideWith((ref) async => null),
           bestQualifiedAttemptProvider.overrideWith((ref) async => null),
+          passageDifficultyDistributionProvider.overrideWith(
+            (ref) async => _emptyDifficultyDistribution,
+          ),
         ],
         child: const MaterialApp(home: ProgressScreen()),
       ),
@@ -42,6 +46,9 @@ void main() {
         appDatabaseProvider.overrideWithValue(database),
         progressShareableSummaryProvider.overrideWith((ref) async => null),
         bestQualifiedAttemptProvider.overrideWith((ref) async => null),
+        passageDifficultyDistributionProvider.overrideWith(
+          (ref) async => _emptyDifficultyDistribution,
+        ),
       ],
     );
     addTearDown(container.dispose);
@@ -288,6 +295,131 @@ void main() {
     expect(find.text('2026-07-08'), findsOneWidget);
     expect(find.text('Private imported passage text.'), findsNothing);
   });
+
+  testWidgets('shows passage difficulty distribution by source',
+      (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    final container = ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(database),
+        passageRepositoryProvider.overrideWithValue(
+          const _FakePassageRepository(
+            passages: [
+              Passage(
+                id: 'official-easy',
+                title: 'Official Easy',
+                body: 'Official bundled body.',
+                metadata: PassageMetadata(
+                  wordCount: 700,
+                  difficulty: PassageDifficulty.easy,
+                  topic: 'Adventure',
+                  source: PassageSource.official,
+                  license: 'Public domain',
+                  type: PassageType.fiction,
+                  vocabularyDensity: 0.2,
+                  tags: ['official'],
+                  isCertificationEligible: true,
+                  isMasteryEligible: false,
+                ),
+              ),
+              Passage(
+                id: 'imported-easy',
+                title: 'Private Import',
+                body: 'Private imported passage text.',
+                metadata: PassageMetadata(
+                  wordCount: 700,
+                  difficulty: PassageDifficulty.easy,
+                  topic: 'Private',
+                  source: PassageSource.imported,
+                  license: 'User provided',
+                  type: PassageType.workplace,
+                  vocabularyDensity: 0.2,
+                  tags: ['private'],
+                  isCertificationEligible: false,
+                  isMasteryEligible: false,
+                ),
+              ),
+              Passage(
+                id: 'official-hard',
+                title: 'Official Hard',
+                body: 'Official bundled body.',
+                metadata: PassageMetadata(
+                  wordCount: 900,
+                  difficulty: PassageDifficulty.hard,
+                  topic: 'Adventure',
+                  source: PassageSource.official,
+                  license: 'Public domain',
+                  type: PassageType.fiction,
+                  vocabularyDensity: 0.3,
+                  tags: ['official'],
+                  isCertificationEligible: true,
+                  isMasteryEligible: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        progressShareProvider.overrideWithValue((text) async {}),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final store = container.read(localDataStoreProvider);
+    await store.saveReadingSession(
+      _session(id: 'official-easy-session', passageId: 'official-easy'),
+    );
+    await store.saveReadingSession(
+      _session(id: 'imported-easy-session', passageId: 'imported-easy'),
+    );
+    await store.saveReadingSession(
+      _session(id: 'official-hard-session', passageId: 'official-hard'),
+    );
+    await store.saveReadingSession(
+      _session(id: 'missing-passage-session', passageId: 'missing-passage'),
+    );
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: ProgressScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Passage Difficulty Distribution'), findsOneWidget);
+    expect(find.text('Easy'), findsOneWidget);
+    expect(find.text('Hard'), findsOneWidget);
+    expect(find.text('Official 1 / Imported 1'), findsOneWidget);
+    expect(find.text('Official 1 / Imported 0'), findsOneWidget);
+    expect(
+      find.text('1 completed session could not be matched to a passage.'),
+      findsOneWidget,
+    );
+    expect(find.text('Private imported passage text.'), findsNothing);
+  });
+}
+
+const _emptyDifficultyDistribution = PassageDifficultyDistribution(
+  entries: [],
+  unmatchedSessionCount: 0,
+);
+
+ReadingSession _session({
+  required String id,
+  required String passageId,
+}) {
+  return ReadingSession(
+    id: id,
+    passageId: passageId,
+    mode: ReadingMode.manual,
+    startedAt: DateTime.utc(2026, 7, 8, 12),
+    activeReadingSeconds: 60,
+    wordCount: 700,
+    status: AttemptQualificationStatus.qualified,
+  );
 }
 
 class _FakePassageRepository implements PassageRepository {

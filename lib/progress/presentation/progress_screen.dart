@@ -6,6 +6,7 @@ import '../../assessment/domain/quiz.dart';
 import '../../content/domain/passage_filter.dart';
 import '../../core/providers/app_providers.dart';
 import '../../progress/domain/best_qualified_attempt.dart';
+import '../../progress/domain/passage_difficulty_distribution.dart';
 import '../../progress/domain/shareable_progress_summary.dart';
 import '../../reading/domain/reading_session.dart';
 
@@ -41,6 +42,18 @@ final bestQualifiedAttemptProvider =
   return BestQualifiedAttemptSelector.fromHistory(
     sessions: history.sessions,
     quizResults: history.quizResults,
+    passages: passages,
+  );
+});
+
+final passageDifficultyDistributionProvider =
+    FutureProvider<PassageDifficultyDistribution>((ref) async {
+  final history = await ref.watch(progressHistoryProvider.future);
+  final passages = await ref.watch(passageRepositoryProvider).search(
+        const PassageFilter(),
+      );
+  return PassageDifficultyDistributionBuilder.fromHistory(
+    sessions: history.sessions,
     passages: passages,
   );
 });
@@ -82,6 +95,8 @@ class ProgressScreen extends ConsumerWidget {
     final history = ref.watch(progressHistoryProvider);
     final shareSummary = ref.watch(progressShareableSummaryProvider);
     final bestQualifiedAttempt = ref.watch(bestQualifiedAttemptProvider);
+    final difficultyDistribution =
+        ref.watch(passageDifficultyDistributionProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Progress')),
@@ -90,6 +105,7 @@ class ProgressScreen extends ConsumerWidget {
           history: history,
           shareSummary: shareSummary,
           bestQualifiedAttempt: bestQualifiedAttempt,
+          difficultyDistribution: difficultyDistribution,
         ),
         error: (error, stackTrace) => Center(
           child: Text('Unable to load progress: $error'),
@@ -105,11 +121,13 @@ class _ProgressBody extends ConsumerWidget {
     required this.history,
     required this.shareSummary,
     required this.bestQualifiedAttempt,
+    required this.difficultyDistribution,
   });
 
   final ProgressHistory history;
   final AsyncValue<ShareableProgressSummary?> shareSummary;
   final AsyncValue<BestQualifiedAttempt?> bestQualifiedAttempt;
+  final AsyncValue<PassageDifficultyDistribution> difficultyDistribution;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -145,6 +163,8 @@ class _ProgressBody extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
         _BestQualifiedAttemptCard(attempt: bestQualifiedAttempt),
+        const SizedBox(height: 16),
+        _DifficultyDistributionCard(distribution: difficultyDistribution),
         const SizedBox(height: 24),
         Text(
           'Session History',
@@ -174,6 +194,97 @@ class _ProgressBody extends ConsumerWidget {
       return 'Pending quiz';
     }
     return '${(quiz.comprehensionScore * 100).round()}%';
+  }
+}
+
+class _DifficultyDistributionCard extends StatelessWidget {
+  const _DifficultyDistributionCard({required this.distribution});
+
+  final AsyncValue<PassageDifficultyDistribution> distribution;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: distribution.when(
+          data: (distribution) {
+            if (!distribution.hasClassifiedSessions) {
+              return const Text('Not enough completed passage data yet.');
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Passage Difficulty Distribution',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                ...distribution.entries.map(
+                  (entry) => _DifficultyDistributionRow(
+                    entry: entry,
+                    totalSessions: distribution.totalClassifiedSessions,
+                  ),
+                ),
+                if (distribution.unmatchedSessionCount > 0) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '${distribution.unmatchedSessionCount} completed '
+                    'session could not be matched to a passage.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ],
+            );
+          },
+          error: (error, stackTrace) => Text(
+            'Difficulty distribution unavailable: $error',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+          loading: () => const LinearProgressIndicator(),
+        ),
+      ),
+    );
+  }
+}
+
+class _DifficultyDistributionRow extends StatelessWidget {
+  const _DifficultyDistributionRow({
+    required this.entry,
+    required this.totalSessions,
+  });
+
+  final PassageDifficultyDistributionEntry entry;
+  final int totalSessions;
+
+  @override
+  Widget build(BuildContext context) {
+    final ratio = totalSessions == 0 ? 0.0 : entry.totalCount / totalSessions;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(entry.label)),
+              Text(
+                '${entry.totalCount}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          LinearProgressIndicator(value: ratio),
+          const SizedBox(height: 4),
+          Text(
+            'Official ${entry.officialCount} / Imported ${entry.importedCount}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ),
+    );
   }
 }
 
