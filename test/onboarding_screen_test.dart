@@ -45,6 +45,15 @@ void main() {
     );
 
     await tester.pumpAndSettle();
+    expect(find.text('Speed with proof'), findsOneWidget);
+    expect(
+      find.textContaining('reading speed plus comprehension'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('70% comprehension'), findsOneWidget);
+    expect(find.textContaining('800 WPM'), findsOneWidget);
+    expect(find.textContaining('fast attempts only count'), findsOneWidget);
+
     await tester.tap(find.text('School'));
     await tester.tap(find.text('Exam'));
     await tester.scrollUntilVisible(find.text('Dark'), 300);

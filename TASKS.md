@@ -565,7 +565,7 @@ Goal: Establish each user's starting speed, comprehension, focus, and recommende
 
 ### Epic 3.1: Onboarding Flow
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -606,6 +606,17 @@ Changed files: lib/settings/application/local_profile_controller.dart, lib/train
 Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 151 tests passed.
 Commit: See Git history for `feat: collect onboarding preferences`
 Notes: Onboarding now collects an allowed training goal selection plus reader font size, system/light/dark theme mode, and reduced motion, persists them through the local profile without login or network access, invalidates the profile provider, and routes to the dashboard when complete.
+Follow-up: None.
+```
+
+```text
+Task: Close onboarding flow acceptance criteria
+Status: Done
+Completed: 2026-07-09
+Changed files: lib/training/presentation/onboarding_screen.dart, test/onboarding_screen_test.dart, TASKS.md
+Verification: Confirmed onboarding has a welcome screen, explains WPM plus comprehension, states the 70% standard threshold, frames 800 WPM as a mastery aspiration, collects user goals plus font size/theme/reduced motion preferences, persists them locally, and routes to the dashboard. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all tests passed.
+Commit: See Git history for `feat: close onboarding flow`
+Notes: Added concise onboarding copy that makes clear speed alone is not rewarded; no onboarding follow-up tasks remain.
 Follow-up: None.
 ```
 

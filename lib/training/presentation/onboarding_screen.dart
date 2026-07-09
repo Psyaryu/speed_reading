@@ -35,6 +35,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           const Text(
             'Progress requires reading speed plus comprehension. Standard advancement starts at 70% comprehension on qualifying passages.',
           ),
+          const SizedBox(height: 8),
+          const Text(
+            '800 WPM is the mastery aspiration, not a shortcut: fast attempts only count when comprehension holds up.',
+          ),
           const SizedBox(height: 24),
           Text(
             'Training Goals',
