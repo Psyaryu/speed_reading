@@ -7,6 +7,7 @@ import '../../content/domain/passage_filter.dart';
 import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
 import '../../progress/domain/best_qualified_attempt.dart';
+import '../../progress/domain/certification_progress.dart';
 import '../../progress/domain/mastery_progress.dart';
 import '../../progress/domain/passage_difficulty_distribution.dart';
 import '../../progress/domain/progress_trend.dart';
@@ -95,6 +96,19 @@ final masteryProgressProvider = FutureProvider<MasteryProgress>((ref) async {
   );
 });
 
+final certificationProgressProvider =
+    FutureProvider<CertificationProgress>((ref) async {
+  final history = await ref.watch(progressHistoryProvider.future);
+  final passages = await ref.watch(passageRepositoryProvider).search(
+        const PassageFilter(),
+      );
+  return CertificationProgressBuilder.fromHistory(
+    sessions: history.sessions,
+    quizResults: history.quizResults,
+    passages: passages,
+  );
+});
+
 final progressShareProvider = Provider<Future<void> Function(String)>((ref) {
   return (text) async {
     await Share.share(text, subject: 'Speed Reading Progress');
@@ -137,6 +151,7 @@ class ProgressScreen extends ConsumerWidget {
     final progressTrend = ref.watch(progressTrendProvider);
     final skillBreakdown = ref.watch(skillBreakdownProvider);
     final masteryProgress = ref.watch(masteryProgressProvider);
+    final certificationProgress = ref.watch(certificationProgressProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Progress')),
@@ -149,6 +164,7 @@ class ProgressScreen extends ConsumerWidget {
           progressTrend: progressTrend,
           skillBreakdown: skillBreakdown,
           masteryProgress: masteryProgress,
+          certificationProgress: certificationProgress,
         ),
         error: (error, stackTrace) => Center(
           child: Text('Unable to load progress: $error'),
@@ -168,6 +184,7 @@ class _ProgressBody extends ConsumerWidget {
     required this.progressTrend,
     required this.skillBreakdown,
     required this.masteryProgress,
+    required this.certificationProgress,
   });
 
   final ProgressHistory history;
@@ -177,6 +194,7 @@ class _ProgressBody extends ConsumerWidget {
   final AsyncValue<ProgressTrend> progressTrend;
   final AsyncValue<SkillBreakdown> skillBreakdown;
   final AsyncValue<MasteryProgress> masteryProgress;
+  final AsyncValue<CertificationProgress> certificationProgress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -215,6 +233,8 @@ class _ProgressBody extends ConsumerWidget {
         const SizedBox(height: 16),
         _BestQualifiedAttemptCard(attempt: bestQualifiedAttempt),
         const SizedBox(height: 16),
+        _CertificationProgressCard(progress: certificationProgress),
+        const SizedBox(height: 16),
         _MasteryProgressCard(progress: masteryProgress),
         const SizedBox(height: 16),
         _SkillBreakdownCard(breakdown: skillBreakdown),
@@ -249,6 +269,95 @@ class _ProgressBody extends ConsumerWidget {
       return 'Pending quiz';
     }
     return '${(quiz.comprehensionScore * 100).round()}%';
+  }
+}
+
+class _CertificationProgressCard extends StatelessWidget {
+  const _CertificationProgressCard({required this.progress});
+
+  final AsyncValue<CertificationProgress> progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: progress.when(
+          data: (progress) {
+            final bestAttempt = progress.bestQualifiedAttempt;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Standard Certification Progress',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                _MetricRow(label: 'Status', value: progress.statusLabel),
+                _MetricRow(
+                  label: 'Qualified passages',
+                  value: '${progress.qualifiedPassageCount}/'
+                      '${progress.requiredPassageCount}',
+                ),
+                _MetricRow(
+                  label: 'Non-RSVP attempt',
+                  value: progress.hasNonRsvpAttempt ? 'Met' : 'Needed',
+                ),
+                _MetricRow(
+                  label: 'Remaining gap',
+                  value: progress.remainingGapLabel,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Requires 3 official non-fiction passages at 800+ WPM '
+                  'with at least 70% comprehension, including 1 non-RSVP '
+                  'attempt.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 12),
+                if (bestAttempt == null)
+                  const Text('No standard certification attempt yet.')
+                else
+                  _CertificationBestAttempt(attempt: bestAttempt),
+              ],
+            );
+          },
+          error: (error, stackTrace) => Text(
+            'Certification progress unavailable: $error',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+          loading: () => const LinearProgressIndicator(),
+        ),
+      ),
+    );
+  }
+}
+
+class _CertificationBestAttempt extends StatelessWidget {
+  const _CertificationBestAttempt({required this.attempt});
+
+  final CertificationProgressAttempt attempt;
+
+  @override
+  Widget build(BuildContext context) {
+    final comprehensionPercent = (attempt.comprehensionScore * 100).round();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Best certification attempt',
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+        const SizedBox(height: 8),
+        _MetricRow(label: 'Passage', value: attempt.passageTitle),
+        _MetricRow(label: 'WPM', value: attempt.wpm.round().toString()),
+        _MetricRow(
+          label: 'Comprehension',
+          value: '$comprehensionPercent%',
+        ),
+        _MetricRow(label: 'Mode', value: attempt.mode.name),
+      ],
+    );
   }
 }
 

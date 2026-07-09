@@ -9,6 +9,7 @@ import 'package:speed_reading/content/domain/passage_filter.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
+import 'package:speed_reading/progress/domain/certification_progress.dart';
 import 'package:speed_reading/progress/domain/mastery_progress.dart';
 import 'package:speed_reading/progress/domain/passage_difficulty_distribution.dart';
 import 'package:speed_reading/progress/domain/progress_trend.dart';
@@ -36,6 +37,8 @@ void main() {
               .overrideWith((ref) async => _emptySkillBreakdown),
           masteryProgressProvider
               .overrideWith((ref) async => _emptyMasteryProgress),
+          certificationProgressProvider
+              .overrideWith((ref) async => _emptyCertificationProgress),
         ],
         child: const MaterialApp(home: ProgressScreen()),
       ),
@@ -63,6 +66,8 @@ void main() {
             .overrideWith((ref) async => _emptySkillBreakdown),
         masteryProgressProvider
             .overrideWith((ref) async => _emptyMasteryProgress),
+        certificationProgressProvider
+            .overrideWith((ref) async => _emptyCertificationProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -147,6 +152,8 @@ void main() {
             .overrideWith((ref) async => _emptySkillBreakdown),
         masteryProgressProvider
             .overrideWith((ref) async => _emptyMasteryProgress),
+        certificationProgressProvider
+            .overrideWith((ref) async => _emptyCertificationProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -253,6 +260,8 @@ void main() {
             .overrideWith((ref) async => _emptySkillBreakdown),
         masteryProgressProvider
             .overrideWith((ref) async => _emptyMasteryProgress),
+        certificationProgressProvider
+            .overrideWith((ref) async => _emptyCertificationProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -394,6 +403,8 @@ void main() {
             .overrideWith((ref) async => _emptySkillBreakdown),
         masteryProgressProvider
             .overrideWith((ref) async => _emptyMasteryProgress),
+        certificationProgressProvider
+            .overrideWith((ref) async => _emptyCertificationProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -493,6 +504,8 @@ void main() {
         ),
         masteryProgressProvider
             .overrideWith((ref) async => _emptyMasteryProgress),
+        certificationProgressProvider
+            .overrideWith((ref) async => _emptyCertificationProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -599,6 +612,8 @@ void main() {
             .overrideWith((ref) async => _emptySkillBreakdown),
         masteryProgressProvider
             .overrideWith((ref) async => _emptyMasteryProgress),
+        certificationProgressProvider
+            .overrideWith((ref) async => _emptyCertificationProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -666,6 +681,180 @@ void main() {
     expect(find.text('Imported'), findsOneWidget);
     expect(find.text('420'), findsOneWidget);
     expect(find.text('552'), findsOneWidget);
+    expect(find.text('Private imported passage text.'), findsNothing);
+  });
+
+  testWidgets('shows standard certification progress and remaining gap',
+      (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    final container = ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(database),
+        passageRepositoryProvider.overrideWithValue(
+          const _FakePassageRepository(
+            passages: [
+              Passage(
+                id: 'cert-one',
+                title: 'Certification One',
+                body: 'Official non-fiction body.',
+                metadata: PassageMetadata(
+                  wordCount: 800,
+                  difficulty: PassageDifficulty.standard,
+                  topic: 'History',
+                  source: PassageSource.official,
+                  license: 'Public domain',
+                  type: PassageType.nonFiction,
+                  vocabularyDensity: 0.2,
+                  tags: ['certification'],
+                  isCertificationEligible: true,
+                  isMasteryEligible: false,
+                ),
+              ),
+              Passage(
+                id: 'cert-two',
+                title: 'Certification Two',
+                body: 'Official non-fiction body.',
+                metadata: PassageMetadata(
+                  wordCount: 810,
+                  difficulty: PassageDifficulty.hard,
+                  topic: 'Science',
+                  source: PassageSource.official,
+                  license: 'Public domain',
+                  type: PassageType.nonFiction,
+                  vocabularyDensity: 0.3,
+                  tags: ['certification'],
+                  isCertificationEligible: true,
+                  isMasteryEligible: false,
+                ),
+              ),
+              Passage(
+                id: 'private-import',
+                title: 'Private Import',
+                body: 'Private imported passage text.',
+                metadata: PassageMetadata(
+                  wordCount: 900,
+                  difficulty: PassageDifficulty.hard,
+                  topic: 'Private',
+                  source: PassageSource.imported,
+                  license: 'User provided',
+                  type: PassageType.nonFiction,
+                  vocabularyDensity: 0.3,
+                  tags: ['private'],
+                  isCertificationEligible: false,
+                  isMasteryEligible: false,
+                ),
+              ),
+            ],
+          ),
+        ),
+        progressShareableSummaryProvider.overrideWith((ref) async => null),
+        bestQualifiedAttemptProvider.overrideWith((ref) async => null),
+        passageDifficultyDistributionProvider.overrideWith(
+          (ref) async => _emptyDifficultyDistribution,
+        ),
+        progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
+        skillBreakdownProvider
+            .overrideWith((ref) async => _emptySkillBreakdown),
+        masteryProgressProvider
+            .overrideWith((ref) async => _emptyMasteryProgress),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final store = container.read(localDataStoreProvider);
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'cert-one-session',
+        passageId: 'cert-one',
+        mode: ReadingMode.rsvp,
+        startedAt: DateTime.utc(2026, 7, 8, 12),
+        activeReadingSeconds: 60,
+        wordCount: 800,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'cert-two-session',
+        passageId: 'cert-two',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8, 13),
+        activeReadingSeconds: 60,
+        wordCount: 840,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'private-session',
+        passageId: 'private-import',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8, 14),
+        activeReadingSeconds: 60,
+        wordCount: 900,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'cert-one-quiz',
+        sessionId: 'cert-one-session',
+        passageId: 'cert-one',
+        correctCount: 7,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 12, 2),
+      ),
+    );
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'cert-two-quiz',
+        sessionId: 'cert-two-session',
+        passageId: 'cert-two',
+        correctCount: 8,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 13, 2),
+      ),
+    );
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'private-quiz',
+        sessionId: 'private-session',
+        passageId: 'private-import',
+        correctCount: 10,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 14, 2),
+      ),
+    );
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: ProgressScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Standard Certification Progress'),
+      500,
+    );
+
+    expect(find.text('Standard Certification Progress'), findsOneWidget);
+    expect(find.text('Certification in progress'), findsOneWidget);
+    expect(find.text('2/3'), findsOneWidget);
+    expect(find.text('Met'), findsOneWidget);
+    expect(find.text('1 more official passage'), findsOneWidget);
+    expect(find.text('Best certification attempt'), findsOneWidget);
+    expect(find.text('Certification Two'), findsOneWidget);
+    expect(find.text('840'), findsOneWidget);
+    expect(find.text('80%'), findsOneWidget);
+    expect(find.text('manual'), findsWidgets);
     expect(find.text('Private imported passage text.'), findsNothing);
   });
 
@@ -818,6 +1007,13 @@ const _emptyMasteryProgress = MasteryProgress(
   hasNonRsvpCandidate: false,
   delayedRecallTracked: false,
   masteryEarned: false,
+);
+
+const _emptyCertificationProgress = CertificationProgress(
+  qualifiedAttempts: [],
+  requiredPassageCount: 3,
+  hasNonRsvpAttempt: false,
+  certificationEarned: false,
 );
 
 ReadingSession _session({

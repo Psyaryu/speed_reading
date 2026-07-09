@@ -1045,6 +1045,17 @@ Commit: See Git history for `feat: add certification rules`
 Notes: Certification logic currently follows the PRD standard-certification rule: official non-fiction, standard-or-higher difficulty, 800+ WPM, 70%+ comprehension, and at least one non-RSVP attempt.
 ```
 
+```text
+Task: Show standard certification progress
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/progress/domain/certification_progress.dart, lib/progress/presentation/progress_screen.dart, test/certification_progress_test.dart, test/progress_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\certification_progress_test.dart test\progress_screen_test.dart`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Targeted tests passed, analyze passed with no issues, and the full test suite passed.
+Commit: See Git history for `feat: show certification progress`
+Notes: Progress now shows standard 800 WPM certification status, qualified official non-fiction passage count, non-RSVP requirement state, remaining gap, and best certification attempt using the existing standard certification rules.
+Follow-up: None.
+```
+
 ### Epic 6.4: Mastery
 
 Status: In Progress
