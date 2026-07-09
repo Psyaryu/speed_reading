@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_reading/assessment/domain/quiz.dart';
 import 'package:speed_reading/content/domain/passage.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
+import 'package:speed_reading/progress/domain/delayed_recall_attempt.dart';
 import 'package:speed_reading/progress/domain/mastery_progress.dart';
 import 'package:speed_reading/reading/domain/reading_session.dart';
 
@@ -76,6 +77,69 @@ void main() {
     expect(progress.immediateCandidateCount, 0);
     expect(progress.hasEnoughImmediateCandidates, isFalse);
   });
+
+  test('earns mastery when stored delayed recall attempts qualify', () {
+    final immediateAt = DateTime.utc(2026, 7, 8, 12);
+    final progress = MasteryProgressBuilder.fromHistory(
+      sessions: [
+        _session(id: 's1', passageId: 'p1', mode: ReadingMode.rsvp),
+        _session(id: 's2', passageId: 'p2', mode: ReadingMode.manual),
+        _session(id: 's3', passageId: 'p3', mode: ReadingMode.rsvp),
+      ],
+      quizResults: [
+        _quiz(id: 'q1', sessionId: 's1', passageId: 'p1'),
+        _quiz(id: 'q2', sessionId: 's2', passageId: 'p2'),
+        _quiz(id: 'q3', sessionId: 's3', passageId: 'p3'),
+      ],
+      passages: [
+        _passage('p1'),
+        _passage('p2'),
+        _passage('p3'),
+      ],
+      delayedRecallAttempts: [
+        _recall('r1', 'p1', immediateAt),
+        _recall('r2', 'p2', immediateAt),
+        _recall('r3', 'p3', immediateAt),
+      ],
+    );
+
+    expect(progress.delayedRecallTracked, isTrue);
+    expect(progress.masteryEarned, isTrue);
+  });
+
+  test('keeps mastery pending when delayed recall is too early or low', () {
+    final immediateAt = DateTime.utc(2026, 7, 8, 12);
+    final progress = MasteryProgressBuilder.fromHistory(
+      sessions: [
+        _session(id: 's1', passageId: 'p1', mode: ReadingMode.rsvp),
+        _session(id: 's2', passageId: 'p2', mode: ReadingMode.manual),
+        _session(id: 's3', passageId: 'p3', mode: ReadingMode.rsvp),
+      ],
+      quizResults: [
+        _quiz(id: 'q1', sessionId: 's1', passageId: 'p1'),
+        _quiz(id: 'q2', sessionId: 's2', passageId: 'p2'),
+        _quiz(id: 'q3', sessionId: 's3', passageId: 'p3'),
+      ],
+      passages: [
+        _passage('p1'),
+        _passage('p2'),
+        _passage('p3'),
+      ],
+      delayedRecallAttempts: [
+        _recall('r1', 'p1', immediateAt, score: 0.89),
+        _recall(
+          'r2',
+          'p2',
+          immediateAt,
+          recallCompletedAt: immediateAt.add(const Duration(hours: 23)),
+        ),
+        _recall('r3', 'p3', immediateAt),
+      ],
+    );
+
+    expect(progress.delayedRecallTracked, isTrue);
+    expect(progress.masteryEarned, isFalse);
+  });
 }
 
 ReadingSession _session({
@@ -112,6 +176,24 @@ QuizResult _quiz({
     totalQuestions: 10,
     answersByQuestionId: const {},
     completedAt: DateTime.utc(2026, 7, 8, 12, 2),
+  );
+}
+
+DelayedRecallAttempt _recall(
+  String id,
+  String passageId,
+  DateTime immediateAt, {
+  double score = 0.9,
+  DateTime? recallCompletedAt,
+}) {
+  return DelayedRecallAttempt(
+    id: id,
+    passageId: passageId,
+    immediateAttemptCompletedAt: immediateAt,
+    dueAt: immediateAt.add(const Duration(hours: 24)),
+    recallCompletedAt:
+        recallCompletedAt ?? immediateAt.add(const Duration(hours: 24)),
+    score: score,
   );
 }
 

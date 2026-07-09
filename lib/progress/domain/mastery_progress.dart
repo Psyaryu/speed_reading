@@ -2,6 +2,7 @@ import '../../assessment/domain/quiz.dart';
 import '../../content/domain/passage.dart';
 import '../../core/domain/reading_enums.dart';
 import '../../reading/domain/reading_session.dart';
+import 'delayed_recall_attempt.dart';
 import 'mastery_rules.dart';
 
 class MasteryProgress {
@@ -52,6 +53,7 @@ class MasteryProgressBuilder {
     required List<ReadingSession> sessions,
     required List<QuizResult> quizResults,
     required List<Passage> passages,
+    List<DelayedRecallAttempt> delayedRecallAttempts = const [],
   }) {
     final passagesById = {
       for (final passage in passages) passage.id: passage,
@@ -105,6 +107,29 @@ class MasteryProgressBuilder {
       }
     }
 
+    for (final recallAttempt in delayedRecallAttempts) {
+      if (!recallAttempt.qualifiesForMastery) {
+        continue;
+      }
+      final candidate = bestCandidatesByPassageId[recallAttempt.passageId];
+      if (candidate == null) {
+        continue;
+      }
+      masteryResults.add(
+        MasterySessionResult(
+          passageId: candidate.passageId,
+          wpm: candidate.wpm,
+          immediateComprehensionScore: 1.0,
+          delayedRecallScore: recallAttempt.score,
+          mode: candidate.mode,
+          difficulty: passagesById[candidate.passageId]!.metadata.difficulty,
+          source: passagesById[candidate.passageId]!.metadata.source,
+          status: AttemptQualificationStatus.qualified,
+          excessivePausing: false,
+        ),
+      );
+    }
+
     final candidates = bestCandidatesByPassageId.values.toList()
       ..sort((a, b) {
         final byDate = b.completedAt.compareTo(a.completedAt);
@@ -118,7 +143,7 @@ class MasteryProgressBuilder {
       immediateCandidates: candidates,
       requiredPassageCount: requiredPassageCount,
       hasNonRsvpCandidate: hasNonRsvpCandidate,
-      delayedRecallTracked: false,
+      delayedRecallTracked: delayedRecallAttempts.isNotEmpty,
       masteryEarned: MasteryRules.isMastered(masteryResults),
     );
   }

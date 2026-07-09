@@ -6,6 +6,7 @@ import '../../assessment/domain/quiz.dart';
 import '../../content/domain/passage.dart';
 import '../../core/domain/reading_enums.dart';
 import '../../progress/domain/certification_attempt.dart';
+import '../../progress/domain/delayed_recall_attempt.dart';
 import '../../progress/domain/progress_snapshot.dart';
 import '../../reading/domain/reading_session.dart';
 import '../../settings/domain/local_user_profile.dart';
@@ -136,6 +137,33 @@ class DriftLocalDataStore implements LocalDataStore {
   }
 
   @override
+  Future<void> saveDelayedRecallAttempt(DelayedRecallAttempt attempt) {
+    return database
+        .into(database.delayedRecallAttemptRecords)
+        .insertOnConflictUpdate(
+          DelayedRecallAttemptRecordsCompanion.insert(
+            id: attempt.id,
+            passageId: attempt.passageId,
+            immediateSessionId: Value(attempt.immediateSessionId),
+            immediateQuizResultId: Value(attempt.immediateQuizResultId),
+            recallCompletedAt: attempt.recallCompletedAt,
+            immediateAttemptCompletedAt: Value(
+              attempt.immediateAttemptCompletedAt,
+            ),
+            dueAt: Value(attempt.dueAt),
+            score: attempt.score,
+          ),
+        );
+  }
+
+  @override
+  Future<List<DelayedRecallAttempt>> loadDelayedRecallAttempts() async {
+    final rows =
+        await database.select(database.delayedRecallAttemptRecords).get();
+    return rows.map(_delayedRecallAttemptFromRow).toList(growable: false);
+  }
+
+  @override
   Future<void> saveProgressSnapshot(ProgressSnapshot snapshot) {
     return database
         .into(database.progressSnapshotRecords)
@@ -207,6 +235,7 @@ class DriftLocalDataStore implements LocalDataStore {
   Future<void> resetProgress() {
     return database.transaction(() async {
       await database.delete(database.quizResultRecords).go();
+      await database.delete(database.delayedRecallAttemptRecords).go();
       await database.delete(database.readingSessionRecords).go();
       await database.delete(database.progressSnapshotRecords).go();
       await database.delete(database.certificationAttemptRecords).go();
@@ -270,6 +299,21 @@ class DriftLocalDataStore implements LocalDataStore {
       answersByQuestionId: _intMapFromJson(row.answersByQuestionIdJson),
       completedAt: row.completedAt,
       writtenSummary: row.writtenSummary,
+    );
+  }
+
+  DelayedRecallAttempt _delayedRecallAttemptFromRow(
+    DelayedRecallAttemptRecord row,
+  ) {
+    return DelayedRecallAttempt(
+      id: row.id,
+      passageId: row.passageId,
+      immediateSessionId: row.immediateSessionId,
+      immediateQuizResultId: row.immediateQuizResultId,
+      recallCompletedAt: row.recallCompletedAt,
+      immediateAttemptCompletedAt: row.immediateAttemptCompletedAt,
+      dueAt: row.dueAt,
+      score: row.score,
     );
   }
 

@@ -8,6 +8,7 @@ import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
 import '../../progress/domain/best_qualified_attempt.dart';
 import '../../progress/domain/certification_progress.dart';
+import '../../progress/domain/delayed_recall_attempt.dart';
 import '../../progress/domain/mastery_progress.dart';
 import '../../progress/domain/passage_difficulty_distribution.dart';
 import '../../progress/domain/progress_trend.dart';
@@ -19,9 +20,11 @@ final progressHistoryProvider = FutureProvider<ProgressHistory>((ref) async {
   final store = ref.watch(localDataStoreProvider);
   final sessions = await store.loadReadingSessions();
   final quizResults = await store.loadQuizResults();
+  final delayedRecallAttempts = await store.loadDelayedRecallAttempts();
   return ProgressHistory(
     sessions: sessions,
     quizResults: quizResults,
+    delayedRecallAttempts: delayedRecallAttempts,
   );
 });
 
@@ -119,10 +122,12 @@ class ProgressHistory {
   const ProgressHistory({
     required this.sessions,
     required this.quizResults,
+    this.delayedRecallAttempts = const [],
   });
 
   final List<ReadingSession> sessions;
   final List<QuizResult> quizResults;
+  final List<DelayedRecallAttempt> delayedRecallAttempts;
 
   List<ReadingSession> get newestSessions {
     return [...sessions]..sort((a, b) => b.startedAt.compareTo(a.startedAt));

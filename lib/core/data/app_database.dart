@@ -64,6 +64,20 @@ class QuizResultRecords extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+class DelayedRecallAttemptRecords extends Table {
+  TextColumn get id => text()();
+  TextColumn get passageId => text()();
+  TextColumn get immediateSessionId => text().nullable()();
+  TextColumn get immediateQuizResultId => text().nullable()();
+  DateTimeColumn get recallCompletedAt => dateTime()();
+  DateTimeColumn get immediateAttemptCompletedAt => dateTime().nullable()();
+  DateTimeColumn get dueAt => dateTime().nullable()();
+  RealColumn get score => real()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 class ProgressSnapshotRecords extends Table {
   TextColumn get id => text()();
   DateTimeColumn get createdAt => dateTime()();
@@ -107,6 +121,7 @@ class MasteryAttemptRecords extends Table {
     PassageRecords,
     ReadingSessionRecords,
     QuizResultRecords,
+    DelayedRecallAttemptRecords,
     ProgressSnapshotRecords,
     CertificationAttemptRecords,
     MasteryAttemptRecords,
@@ -116,7 +131,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -144,6 +159,9 @@ class AppDatabase extends _$AppDatabase {
               localProfiles,
               localProfiles.baselineEffectiveReadingScore,
             );
+          }
+          if (from < 6) {
+            await migrator.createTable(delayedRecallAttemptRecords);
           }
         },
       );

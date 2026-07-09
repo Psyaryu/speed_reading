@@ -2016,6 +2016,493 @@ class QuizResultRecordsCompanion extends UpdateCompanion<QuizResultRecord> {
   }
 }
 
+class $DelayedRecallAttemptRecordsTable extends DelayedRecallAttemptRecords
+    with
+        TableInfo<$DelayedRecallAttemptRecordsTable,
+            DelayedRecallAttemptRecord> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DelayedRecallAttemptRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _passageIdMeta =
+      const VerificationMeta('passageId');
+  @override
+  late final GeneratedColumn<String> passageId = GeneratedColumn<String>(
+      'passage_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _immediateSessionIdMeta =
+      const VerificationMeta('immediateSessionId');
+  @override
+  late final GeneratedColumn<String> immediateSessionId =
+      GeneratedColumn<String>('immediate_session_id', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _immediateQuizResultIdMeta =
+      const VerificationMeta('immediateQuizResultId');
+  @override
+  late final GeneratedColumn<String> immediateQuizResultId =
+      GeneratedColumn<String>('immediate_quiz_result_id', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _recallCompletedAtMeta =
+      const VerificationMeta('recallCompletedAt');
+  @override
+  late final GeneratedColumn<DateTime> recallCompletedAt =
+      GeneratedColumn<DateTime>('recall_completed_at', aliasedName, false,
+          type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _immediateAttemptCompletedAtMeta =
+      const VerificationMeta('immediateAttemptCompletedAt');
+  @override
+  late final GeneratedColumn<DateTime> immediateAttemptCompletedAt =
+      GeneratedColumn<DateTime>(
+          'immediate_attempt_completed_at', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _dueAtMeta = const VerificationMeta('dueAt');
+  @override
+  late final GeneratedColumn<DateTime> dueAt = GeneratedColumn<DateTime>(
+      'due_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _scoreMeta = const VerificationMeta('score');
+  @override
+  late final GeneratedColumn<double> score = GeneratedColumn<double>(
+      'score', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        passageId,
+        immediateSessionId,
+        immediateQuizResultId,
+        recallCompletedAt,
+        immediateAttemptCompletedAt,
+        dueAt,
+        score
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'delayed_recall_attempt_records';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<DelayedRecallAttemptRecord> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('passage_id')) {
+      context.handle(_passageIdMeta,
+          passageId.isAcceptableOrUnknown(data['passage_id']!, _passageIdMeta));
+    } else if (isInserting) {
+      context.missing(_passageIdMeta);
+    }
+    if (data.containsKey('immediate_session_id')) {
+      context.handle(
+          _immediateSessionIdMeta,
+          immediateSessionId.isAcceptableOrUnknown(
+              data['immediate_session_id']!, _immediateSessionIdMeta));
+    }
+    if (data.containsKey('immediate_quiz_result_id')) {
+      context.handle(
+          _immediateQuizResultIdMeta,
+          immediateQuizResultId.isAcceptableOrUnknown(
+              data['immediate_quiz_result_id']!, _immediateQuizResultIdMeta));
+    }
+    if (data.containsKey('recall_completed_at')) {
+      context.handle(
+          _recallCompletedAtMeta,
+          recallCompletedAt.isAcceptableOrUnknown(
+              data['recall_completed_at']!, _recallCompletedAtMeta));
+    } else if (isInserting) {
+      context.missing(_recallCompletedAtMeta);
+    }
+    if (data.containsKey('immediate_attempt_completed_at')) {
+      context.handle(
+          _immediateAttemptCompletedAtMeta,
+          immediateAttemptCompletedAt.isAcceptableOrUnknown(
+              data['immediate_attempt_completed_at']!,
+              _immediateAttemptCompletedAtMeta));
+    }
+    if (data.containsKey('due_at')) {
+      context.handle(
+          _dueAtMeta, dueAt.isAcceptableOrUnknown(data['due_at']!, _dueAtMeta));
+    }
+    if (data.containsKey('score')) {
+      context.handle(
+          _scoreMeta, score.isAcceptableOrUnknown(data['score']!, _scoreMeta));
+    } else if (isInserting) {
+      context.missing(_scoreMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DelayedRecallAttemptRecord map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DelayedRecallAttemptRecord(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      passageId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}passage_id'])!,
+      immediateSessionId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}immediate_session_id']),
+      immediateQuizResultId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}immediate_quiz_result_id']),
+      recallCompletedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime,
+          data['${effectivePrefix}recall_completed_at'])!,
+      immediateAttemptCompletedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime,
+          data['${effectivePrefix}immediate_attempt_completed_at']),
+      dueAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}due_at']),
+      score: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}score'])!,
+    );
+  }
+
+  @override
+  $DelayedRecallAttemptRecordsTable createAlias(String alias) {
+    return $DelayedRecallAttemptRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class DelayedRecallAttemptRecord extends DataClass
+    implements Insertable<DelayedRecallAttemptRecord> {
+  final String id;
+  final String passageId;
+  final String? immediateSessionId;
+  final String? immediateQuizResultId;
+  final DateTime recallCompletedAt;
+  final DateTime? immediateAttemptCompletedAt;
+  final DateTime? dueAt;
+  final double score;
+  const DelayedRecallAttemptRecord(
+      {required this.id,
+      required this.passageId,
+      this.immediateSessionId,
+      this.immediateQuizResultId,
+      required this.recallCompletedAt,
+      this.immediateAttemptCompletedAt,
+      this.dueAt,
+      required this.score});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['passage_id'] = Variable<String>(passageId);
+    if (!nullToAbsent || immediateSessionId != null) {
+      map['immediate_session_id'] = Variable<String>(immediateSessionId);
+    }
+    if (!nullToAbsent || immediateQuizResultId != null) {
+      map['immediate_quiz_result_id'] = Variable<String>(immediateQuizResultId);
+    }
+    map['recall_completed_at'] = Variable<DateTime>(recallCompletedAt);
+    if (!nullToAbsent || immediateAttemptCompletedAt != null) {
+      map['immediate_attempt_completed_at'] =
+          Variable<DateTime>(immediateAttemptCompletedAt);
+    }
+    if (!nullToAbsent || dueAt != null) {
+      map['due_at'] = Variable<DateTime>(dueAt);
+    }
+    map['score'] = Variable<double>(score);
+    return map;
+  }
+
+  DelayedRecallAttemptRecordsCompanion toCompanion(bool nullToAbsent) {
+    return DelayedRecallAttemptRecordsCompanion(
+      id: Value(id),
+      passageId: Value(passageId),
+      immediateSessionId: immediateSessionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(immediateSessionId),
+      immediateQuizResultId: immediateQuizResultId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(immediateQuizResultId),
+      recallCompletedAt: Value(recallCompletedAt),
+      immediateAttemptCompletedAt:
+          immediateAttemptCompletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(immediateAttemptCompletedAt),
+      dueAt:
+          dueAt == null && nullToAbsent ? const Value.absent() : Value(dueAt),
+      score: Value(score),
+    );
+  }
+
+  factory DelayedRecallAttemptRecord.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DelayedRecallAttemptRecord(
+      id: serializer.fromJson<String>(json['id']),
+      passageId: serializer.fromJson<String>(json['passageId']),
+      immediateSessionId:
+          serializer.fromJson<String?>(json['immediateSessionId']),
+      immediateQuizResultId:
+          serializer.fromJson<String?>(json['immediateQuizResultId']),
+      recallCompletedAt:
+          serializer.fromJson<DateTime>(json['recallCompletedAt']),
+      immediateAttemptCompletedAt:
+          serializer.fromJson<DateTime?>(json['immediateAttemptCompletedAt']),
+      dueAt: serializer.fromJson<DateTime?>(json['dueAt']),
+      score: serializer.fromJson<double>(json['score']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'passageId': serializer.toJson<String>(passageId),
+      'immediateSessionId': serializer.toJson<String?>(immediateSessionId),
+      'immediateQuizResultId':
+          serializer.toJson<String?>(immediateQuizResultId),
+      'recallCompletedAt': serializer.toJson<DateTime>(recallCompletedAt),
+      'immediateAttemptCompletedAt':
+          serializer.toJson<DateTime?>(immediateAttemptCompletedAt),
+      'dueAt': serializer.toJson<DateTime?>(dueAt),
+      'score': serializer.toJson<double>(score),
+    };
+  }
+
+  DelayedRecallAttemptRecord copyWith(
+          {String? id,
+          String? passageId,
+          Value<String?> immediateSessionId = const Value.absent(),
+          Value<String?> immediateQuizResultId = const Value.absent(),
+          DateTime? recallCompletedAt,
+          Value<DateTime?> immediateAttemptCompletedAt = const Value.absent(),
+          Value<DateTime?> dueAt = const Value.absent(),
+          double? score}) =>
+      DelayedRecallAttemptRecord(
+        id: id ?? this.id,
+        passageId: passageId ?? this.passageId,
+        immediateSessionId: immediateSessionId.present
+            ? immediateSessionId.value
+            : this.immediateSessionId,
+        immediateQuizResultId: immediateQuizResultId.present
+            ? immediateQuizResultId.value
+            : this.immediateQuizResultId,
+        recallCompletedAt: recallCompletedAt ?? this.recallCompletedAt,
+        immediateAttemptCompletedAt: immediateAttemptCompletedAt.present
+            ? immediateAttemptCompletedAt.value
+            : this.immediateAttemptCompletedAt,
+        dueAt: dueAt.present ? dueAt.value : this.dueAt,
+        score: score ?? this.score,
+      );
+  DelayedRecallAttemptRecord copyWithCompanion(
+      DelayedRecallAttemptRecordsCompanion data) {
+    return DelayedRecallAttemptRecord(
+      id: data.id.present ? data.id.value : this.id,
+      passageId: data.passageId.present ? data.passageId.value : this.passageId,
+      immediateSessionId: data.immediateSessionId.present
+          ? data.immediateSessionId.value
+          : this.immediateSessionId,
+      immediateQuizResultId: data.immediateQuizResultId.present
+          ? data.immediateQuizResultId.value
+          : this.immediateQuizResultId,
+      recallCompletedAt: data.recallCompletedAt.present
+          ? data.recallCompletedAt.value
+          : this.recallCompletedAt,
+      immediateAttemptCompletedAt: data.immediateAttemptCompletedAt.present
+          ? data.immediateAttemptCompletedAt.value
+          : this.immediateAttemptCompletedAt,
+      dueAt: data.dueAt.present ? data.dueAt.value : this.dueAt,
+      score: data.score.present ? data.score.value : this.score,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DelayedRecallAttemptRecord(')
+          ..write('id: $id, ')
+          ..write('passageId: $passageId, ')
+          ..write('immediateSessionId: $immediateSessionId, ')
+          ..write('immediateQuizResultId: $immediateQuizResultId, ')
+          ..write('recallCompletedAt: $recallCompletedAt, ')
+          ..write('immediateAttemptCompletedAt: $immediateAttemptCompletedAt, ')
+          ..write('dueAt: $dueAt, ')
+          ..write('score: $score')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      passageId,
+      immediateSessionId,
+      immediateQuizResultId,
+      recallCompletedAt,
+      immediateAttemptCompletedAt,
+      dueAt,
+      score);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DelayedRecallAttemptRecord &&
+          other.id == this.id &&
+          other.passageId == this.passageId &&
+          other.immediateSessionId == this.immediateSessionId &&
+          other.immediateQuizResultId == this.immediateQuizResultId &&
+          other.recallCompletedAt == this.recallCompletedAt &&
+          other.immediateAttemptCompletedAt ==
+              this.immediateAttemptCompletedAt &&
+          other.dueAt == this.dueAt &&
+          other.score == this.score);
+}
+
+class DelayedRecallAttemptRecordsCompanion
+    extends UpdateCompanion<DelayedRecallAttemptRecord> {
+  final Value<String> id;
+  final Value<String> passageId;
+  final Value<String?> immediateSessionId;
+  final Value<String?> immediateQuizResultId;
+  final Value<DateTime> recallCompletedAt;
+  final Value<DateTime?> immediateAttemptCompletedAt;
+  final Value<DateTime?> dueAt;
+  final Value<double> score;
+  final Value<int> rowid;
+  const DelayedRecallAttemptRecordsCompanion({
+    this.id = const Value.absent(),
+    this.passageId = const Value.absent(),
+    this.immediateSessionId = const Value.absent(),
+    this.immediateQuizResultId = const Value.absent(),
+    this.recallCompletedAt = const Value.absent(),
+    this.immediateAttemptCompletedAt = const Value.absent(),
+    this.dueAt = const Value.absent(),
+    this.score = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DelayedRecallAttemptRecordsCompanion.insert({
+    required String id,
+    required String passageId,
+    this.immediateSessionId = const Value.absent(),
+    this.immediateQuizResultId = const Value.absent(),
+    required DateTime recallCompletedAt,
+    this.immediateAttemptCompletedAt = const Value.absent(),
+    this.dueAt = const Value.absent(),
+    required double score,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        passageId = Value(passageId),
+        recallCompletedAt = Value(recallCompletedAt),
+        score = Value(score);
+  static Insertable<DelayedRecallAttemptRecord> custom({
+    Expression<String>? id,
+    Expression<String>? passageId,
+    Expression<String>? immediateSessionId,
+    Expression<String>? immediateQuizResultId,
+    Expression<DateTime>? recallCompletedAt,
+    Expression<DateTime>? immediateAttemptCompletedAt,
+    Expression<DateTime>? dueAt,
+    Expression<double>? score,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (passageId != null) 'passage_id': passageId,
+      if (immediateSessionId != null)
+        'immediate_session_id': immediateSessionId,
+      if (immediateQuizResultId != null)
+        'immediate_quiz_result_id': immediateQuizResultId,
+      if (recallCompletedAt != null) 'recall_completed_at': recallCompletedAt,
+      if (immediateAttemptCompletedAt != null)
+        'immediate_attempt_completed_at': immediateAttemptCompletedAt,
+      if (dueAt != null) 'due_at': dueAt,
+      if (score != null) 'score': score,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DelayedRecallAttemptRecordsCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? passageId,
+      Value<String?>? immediateSessionId,
+      Value<String?>? immediateQuizResultId,
+      Value<DateTime>? recallCompletedAt,
+      Value<DateTime?>? immediateAttemptCompletedAt,
+      Value<DateTime?>? dueAt,
+      Value<double>? score,
+      Value<int>? rowid}) {
+    return DelayedRecallAttemptRecordsCompanion(
+      id: id ?? this.id,
+      passageId: passageId ?? this.passageId,
+      immediateSessionId: immediateSessionId ?? this.immediateSessionId,
+      immediateQuizResultId:
+          immediateQuizResultId ?? this.immediateQuizResultId,
+      recallCompletedAt: recallCompletedAt ?? this.recallCompletedAt,
+      immediateAttemptCompletedAt:
+          immediateAttemptCompletedAt ?? this.immediateAttemptCompletedAt,
+      dueAt: dueAt ?? this.dueAt,
+      score: score ?? this.score,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (passageId.present) {
+      map['passage_id'] = Variable<String>(passageId.value);
+    }
+    if (immediateSessionId.present) {
+      map['immediate_session_id'] = Variable<String>(immediateSessionId.value);
+    }
+    if (immediateQuizResultId.present) {
+      map['immediate_quiz_result_id'] =
+          Variable<String>(immediateQuizResultId.value);
+    }
+    if (recallCompletedAt.present) {
+      map['recall_completed_at'] = Variable<DateTime>(recallCompletedAt.value);
+    }
+    if (immediateAttemptCompletedAt.present) {
+      map['immediate_attempt_completed_at'] =
+          Variable<DateTime>(immediateAttemptCompletedAt.value);
+    }
+    if (dueAt.present) {
+      map['due_at'] = Variable<DateTime>(dueAt.value);
+    }
+    if (score.present) {
+      map['score'] = Variable<double>(score.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DelayedRecallAttemptRecordsCompanion(')
+          ..write('id: $id, ')
+          ..write('passageId: $passageId, ')
+          ..write('immediateSessionId: $immediateSessionId, ')
+          ..write('immediateQuizResultId: $immediateQuizResultId, ')
+          ..write('recallCompletedAt: $recallCompletedAt, ')
+          ..write('immediateAttemptCompletedAt: $immediateAttemptCompletedAt, ')
+          ..write('dueAt: $dueAt, ')
+          ..write('score: $score, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ProgressSnapshotRecordsTable extends ProgressSnapshotRecords
     with TableInfo<$ProgressSnapshotRecordsTable, ProgressSnapshotRecord> {
   @override
@@ -3199,6 +3686,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $ReadingSessionRecordsTable(this);
   late final $QuizResultRecordsTable quizResultRecords =
       $QuizResultRecordsTable(this);
+  late final $DelayedRecallAttemptRecordsTable delayedRecallAttemptRecords =
+      $DelayedRecallAttemptRecordsTable(this);
   late final $ProgressSnapshotRecordsTable progressSnapshotRecords =
       $ProgressSnapshotRecordsTable(this);
   late final $CertificationAttemptRecordsTable certificationAttemptRecords =
@@ -3214,6 +3703,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         passageRecords,
         readingSessionRecords,
         quizResultRecords,
+        delayedRecallAttemptRecords,
         progressSnapshotRecords,
         certificationAttemptRecords,
         masteryAttemptRecords
@@ -4192,6 +4682,242 @@ typedef $$QuizResultRecordsTableProcessedTableManager = ProcessedTableManager<
     ),
     QuizResultRecord,
     PrefetchHooks Function()>;
+typedef $$DelayedRecallAttemptRecordsTableCreateCompanionBuilder
+    = DelayedRecallAttemptRecordsCompanion Function({
+  required String id,
+  required String passageId,
+  Value<String?> immediateSessionId,
+  Value<String?> immediateQuizResultId,
+  required DateTime recallCompletedAt,
+  Value<DateTime?> immediateAttemptCompletedAt,
+  Value<DateTime?> dueAt,
+  required double score,
+  Value<int> rowid,
+});
+typedef $$DelayedRecallAttemptRecordsTableUpdateCompanionBuilder
+    = DelayedRecallAttemptRecordsCompanion Function({
+  Value<String> id,
+  Value<String> passageId,
+  Value<String?> immediateSessionId,
+  Value<String?> immediateQuizResultId,
+  Value<DateTime> recallCompletedAt,
+  Value<DateTime?> immediateAttemptCompletedAt,
+  Value<DateTime?> dueAt,
+  Value<double> score,
+  Value<int> rowid,
+});
+
+class $$DelayedRecallAttemptRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $DelayedRecallAttemptRecordsTable> {
+  $$DelayedRecallAttemptRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get passageId => $composableBuilder(
+      column: $table.passageId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get immediateSessionId => $composableBuilder(
+      column: $table.immediateSessionId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get immediateQuizResultId => $composableBuilder(
+      column: $table.immediateQuizResultId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get recallCompletedAt => $composableBuilder(
+      column: $table.recallCompletedAt,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get immediateAttemptCompletedAt => $composableBuilder(
+      column: $table.immediateAttemptCompletedAt,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get dueAt => $composableBuilder(
+      column: $table.dueAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get score => $composableBuilder(
+      column: $table.score, builder: (column) => ColumnFilters(column));
+}
+
+class $$DelayedRecallAttemptRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DelayedRecallAttemptRecordsTable> {
+  $$DelayedRecallAttemptRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get passageId => $composableBuilder(
+      column: $table.passageId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get immediateSessionId => $composableBuilder(
+      column: $table.immediateSessionId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get immediateQuizResultId => $composableBuilder(
+      column: $table.immediateQuizResultId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get recallCompletedAt => $composableBuilder(
+      column: $table.recallCompletedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get immediateAttemptCompletedAt =>
+      $composableBuilder(
+          column: $table.immediateAttemptCompletedAt,
+          builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get dueAt => $composableBuilder(
+      column: $table.dueAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get score => $composableBuilder(
+      column: $table.score, builder: (column) => ColumnOrderings(column));
+}
+
+class $$DelayedRecallAttemptRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DelayedRecallAttemptRecordsTable> {
+  $$DelayedRecallAttemptRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get passageId =>
+      $composableBuilder(column: $table.passageId, builder: (column) => column);
+
+  GeneratedColumn<String> get immediateSessionId => $composableBuilder(
+      column: $table.immediateSessionId, builder: (column) => column);
+
+  GeneratedColumn<String> get immediateQuizResultId => $composableBuilder(
+      column: $table.immediateQuizResultId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get recallCompletedAt => $composableBuilder(
+      column: $table.recallCompletedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get immediateAttemptCompletedAt =>
+      $composableBuilder(
+          column: $table.immediateAttemptCompletedAt,
+          builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dueAt =>
+      $composableBuilder(column: $table.dueAt, builder: (column) => column);
+
+  GeneratedColumn<double> get score =>
+      $composableBuilder(column: $table.score, builder: (column) => column);
+}
+
+class $$DelayedRecallAttemptRecordsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $DelayedRecallAttemptRecordsTable,
+    DelayedRecallAttemptRecord,
+    $$DelayedRecallAttemptRecordsTableFilterComposer,
+    $$DelayedRecallAttemptRecordsTableOrderingComposer,
+    $$DelayedRecallAttemptRecordsTableAnnotationComposer,
+    $$DelayedRecallAttemptRecordsTableCreateCompanionBuilder,
+    $$DelayedRecallAttemptRecordsTableUpdateCompanionBuilder,
+    (
+      DelayedRecallAttemptRecord,
+      BaseReferences<_$AppDatabase, $DelayedRecallAttemptRecordsTable,
+          DelayedRecallAttemptRecord>
+    ),
+    DelayedRecallAttemptRecord,
+    PrefetchHooks Function()> {
+  $$DelayedRecallAttemptRecordsTableTableManager(
+      _$AppDatabase db, $DelayedRecallAttemptRecordsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DelayedRecallAttemptRecordsTableFilterComposer(
+                  $db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DelayedRecallAttemptRecordsTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DelayedRecallAttemptRecordsTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> passageId = const Value.absent(),
+            Value<String?> immediateSessionId = const Value.absent(),
+            Value<String?> immediateQuizResultId = const Value.absent(),
+            Value<DateTime> recallCompletedAt = const Value.absent(),
+            Value<DateTime?> immediateAttemptCompletedAt = const Value.absent(),
+            Value<DateTime?> dueAt = const Value.absent(),
+            Value<double> score = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DelayedRecallAttemptRecordsCompanion(
+            id: id,
+            passageId: passageId,
+            immediateSessionId: immediateSessionId,
+            immediateQuizResultId: immediateQuizResultId,
+            recallCompletedAt: recallCompletedAt,
+            immediateAttemptCompletedAt: immediateAttemptCompletedAt,
+            dueAt: dueAt,
+            score: score,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String passageId,
+            Value<String?> immediateSessionId = const Value.absent(),
+            Value<String?> immediateQuizResultId = const Value.absent(),
+            required DateTime recallCompletedAt,
+            Value<DateTime?> immediateAttemptCompletedAt = const Value.absent(),
+            Value<DateTime?> dueAt = const Value.absent(),
+            required double score,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DelayedRecallAttemptRecordsCompanion.insert(
+            id: id,
+            passageId: passageId,
+            immediateSessionId: immediateSessionId,
+            immediateQuizResultId: immediateQuizResultId,
+            recallCompletedAt: recallCompletedAt,
+            immediateAttemptCompletedAt: immediateAttemptCompletedAt,
+            dueAt: dueAt,
+            score: score,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$DelayedRecallAttemptRecordsTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $DelayedRecallAttemptRecordsTable,
+        DelayedRecallAttemptRecord,
+        $$DelayedRecallAttemptRecordsTableFilterComposer,
+        $$DelayedRecallAttemptRecordsTableOrderingComposer,
+        $$DelayedRecallAttemptRecordsTableAnnotationComposer,
+        $$DelayedRecallAttemptRecordsTableCreateCompanionBuilder,
+        $$DelayedRecallAttemptRecordsTableUpdateCompanionBuilder,
+        (
+          DelayedRecallAttemptRecord,
+          BaseReferences<_$AppDatabase, $DelayedRecallAttemptRecordsTable,
+              DelayedRecallAttemptRecord>
+        ),
+        DelayedRecallAttemptRecord,
+        PrefetchHooks Function()>;
 typedef $$ProgressSnapshotRecordsTableCreateCompanionBuilder
     = ProgressSnapshotRecordsCompanion Function({
   required String id,
@@ -4820,6 +5546,10 @@ class $AppDatabaseManager {
       $$ReadingSessionRecordsTableTableManager(_db, _db.readingSessionRecords);
   $$QuizResultRecordsTableTableManager get quizResultRecords =>
       $$QuizResultRecordsTableTableManager(_db, _db.quizResultRecords);
+  $$DelayedRecallAttemptRecordsTableTableManager
+      get delayedRecallAttemptRecords =>
+          $$DelayedRecallAttemptRecordsTableTableManager(
+              _db, _db.delayedRecallAttemptRecords);
   $$ProgressSnapshotRecordsTableTableManager get progressSnapshotRecords =>
       $$ProgressSnapshotRecordsTableTableManager(
           _db, _db.progressSnapshotRecords);

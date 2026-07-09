@@ -1,6 +1,7 @@
 import '../../assessment/domain/quiz.dart';
 import '../../content/domain/passage.dart';
 import '../../progress/domain/certification_attempt.dart';
+import '../../progress/domain/delayed_recall_attempt.dart';
 import '../../progress/domain/progress_snapshot.dart';
 import '../../reading/domain/reading_session.dart';
 import '../../settings/domain/local_user_profile.dart';
@@ -24,6 +25,10 @@ abstract interface class LocalDataStore {
 
   Future<List<QuizResult>> loadQuizResults();
 
+  Future<void> saveDelayedRecallAttempt(DelayedRecallAttempt attempt);
+
+  Future<List<DelayedRecallAttempt>> loadDelayedRecallAttempts();
+
   Future<void> saveProgressSnapshot(ProgressSnapshot snapshot);
 
   Future<List<ProgressSnapshot>> loadProgressSnapshots();
@@ -38,4 +43,3 @@ abstract interface class LocalDataStore {
 
   Future<void> resetProgress();
 }
-

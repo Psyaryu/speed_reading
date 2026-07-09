@@ -6,6 +6,7 @@ import 'package:speed_reading/content/domain/passage.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/data/drift_local_data_store.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
+import 'package:speed_reading/progress/domain/delayed_recall_attempt.dart';
 import 'package:speed_reading/reading/domain/reading_session.dart';
 import 'package:speed_reading/settings/domain/local_user_profile.dart';
 
@@ -122,6 +123,33 @@ void main() {
     expect(
         results.single.writtenSummary, 'The passage is about a signal fire.');
     expect(results.single.comprehensionScore, 0.5);
+  });
+
+  test('saves and loads delayed recall attempt qualification fields', () async {
+    final immediateCompletedAt = DateTime.utc(2026, 7, 7, 12);
+    final dueAt = immediateCompletedAt.add(const Duration(hours: 24));
+
+    await store.saveDelayedRecallAttempt(
+      DelayedRecallAttempt(
+        id: 'recall-1',
+        passageId: 'p1',
+        immediateSessionId: 's1',
+        immediateQuizResultId: 'q1',
+        immediateAttemptCompletedAt: immediateCompletedAt,
+        dueAt: dueAt,
+        recallCompletedAt: DateTime.utc(2026, 7, 8, 12, 5),
+        score: 0.9,
+      ),
+    );
+
+    final attempts = await store.loadDelayedRecallAttempts();
+
+    expect(attempts, hasLength(1));
+    expect(attempts.single.passageId, 'p1');
+    expect(attempts.single.immediateSessionId, 's1');
+    expect(attempts.single.immediateQuizResultId, 'q1');
+    expect(attempts.single.dueAt?.toUtc(), dueAt);
+    expect(attempts.single.qualifiesForMastery, isTrue);
   });
 
   test('reset progress keeps imported passages', () async {

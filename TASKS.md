@@ -1100,9 +1100,6 @@ Follow-up tasks:
 - Status: Todo
   Task: Schedule delayed recall reminders when persisted mastery candidates are created.
   Notes: Use `delayedRecallReminderSchedulerProvider` and `DelayedRecallReminderFactory` from the mastery candidate creation flow once immediate 800 WPM mastery attempts are persisted.
-- Status: Todo
-  Task: Persist delayed recall quiz attempts and connect them to mastery progress.
-  Notes: Add loadable delayed recall attempt storage or a typed recall quiz result model so mastery progress can verify checks completed at least 24 hours after immediate attempts with scores of at least 90%.
 
 Completed task log:
 
@@ -1154,6 +1151,17 @@ Changed files: lib/progress/domain/mastery_rules.dart, lib/progress/domain/maste
 Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 150 tests passed.
 Commit: See Git history for `feat: show mastery progress`
 Notes: Progress now shows immediate 800 WPM mastery candidates from official standard/hard passages with 100% immediate comprehension, qualified status, no excessive pausing, and a non-RSVP requirement indicator. Delayed recall is clearly labeled as pending/not yet tracked until loadable delayed recall persistence exists.
+```
+
+```text
+Task: Persist delayed recall quiz attempts and connect them to mastery progress
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/progress/domain/delayed_recall_attempt.dart, lib/core/data/app_database.dart, lib/core/data/app_database.g.dart, lib/core/data/drift_local_data_store.dart, lib/core/services/local_data_store.dart, lib/progress/domain/mastery_progress.dart, lib/progress/presentation/progress_screen.dart, test/drift_local_data_store_test.dart, test/mastery_progress_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat pub run build_runner build --delete-conflicting-outputs`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 167 tests passed.
+Commit: See Git history for `feat: persist delayed recall attempts`
+Notes: Added loadable local delayed recall attempt storage with passage/session/quiz linkage, recall timestamp, due/original timestamps, score, and mastery qualification. Mastery progress now uses stored delayed recall attempts to satisfy the 24-hour and 90% requirements while remaining pending when no attempts are stored.
+Follow-up: Keep `Schedule delayed recall reminders when persisted mastery candidates are created` open; this task did not implement the candidate creation scheduling hook.
 ```
 
 ## Milestone 7: Training Curriculum and Adaptive Plan
