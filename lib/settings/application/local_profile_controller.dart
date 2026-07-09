@@ -28,12 +28,14 @@ class LocalProfileController {
   Future<LocalUserProfile> updateReadingPreferences({
     required double preferredFontSize,
     required double preferredLineHeight,
+    required double preferredColumnWidth,
     required bool reducedMotion,
   }) async {
     final profile = await loadOrCreate();
     final updated = profile.copyWith(
       preferredFontSize: preferredFontSize,
       preferredLineHeight: preferredLineHeight,
+      preferredColumnWidth: preferredColumnWidth,
       reducedMotion: reducedMotion,
     );
     await localDataStore.saveProfile(updated);

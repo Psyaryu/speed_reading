@@ -38,6 +38,7 @@ class DriftLocalDataStore implements LocalDataStore {
             ),
             preferredFontSize: profile.preferredFontSize,
             preferredLineHeight: profile.preferredLineHeight,
+            preferredColumnWidth: Value(profile.preferredColumnWidth),
             reducedMotion: profile.reducedMotion,
             baselineWpm: Value(profile.baselineWpm),
             baselineComprehension: Value(profile.baselineComprehension),
@@ -124,7 +125,9 @@ class DriftLocalDataStore implements LocalDataStore {
 
   @override
   Future<void> saveProgressSnapshot(ProgressSnapshot snapshot) {
-    return database.into(database.progressSnapshotRecords).insertOnConflictUpdate(
+    return database
+        .into(database.progressSnapshotRecords)
+        .insertOnConflictUpdate(
           ProgressSnapshotRecordsCompanion.insert(
             id: snapshot.id,
             createdAt: snapshot.createdAt,
@@ -208,6 +211,7 @@ class DriftLocalDataStore implements LocalDataStore {
           .toList(growable: false),
       preferredFontSize: row.preferredFontSize,
       preferredLineHeight: row.preferredLineHeight,
+      preferredColumnWidth: row.preferredColumnWidth,
       reducedMotion: row.reducedMotion,
       baselineWpm: row.baselineWpm,
       baselineComprehension: row.baselineComprehension,
@@ -274,4 +278,3 @@ class DriftLocalDataStore implements LocalDataStore {
     );
   }
 }
-

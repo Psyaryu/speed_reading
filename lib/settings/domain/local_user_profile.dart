@@ -7,6 +7,7 @@ class LocalUserProfile {
     required this.goals,
     required this.preferredFontSize,
     required this.preferredLineHeight,
+    required this.preferredColumnWidth,
     required this.reducedMotion,
     this.baselineWpm,
     this.baselineComprehension,
@@ -17,6 +18,7 @@ class LocalUserProfile {
   final List<TrainingGoal> goals;
   final double preferredFontSize;
   final double preferredLineHeight;
+  final double preferredColumnWidth;
   final bool reducedMotion;
   final double? baselineWpm;
   final double? baselineComprehension;
@@ -25,6 +27,7 @@ class LocalUserProfile {
     List<TrainingGoal>? goals,
     double? preferredFontSize,
     double? preferredLineHeight,
+    double? preferredColumnWidth,
     bool? reducedMotion,
     double? baselineWpm,
     double? baselineComprehension,
@@ -35,6 +38,7 @@ class LocalUserProfile {
       goals: goals ?? this.goals,
       preferredFontSize: preferredFontSize ?? this.preferredFontSize,
       preferredLineHeight: preferredLineHeight ?? this.preferredLineHeight,
+      preferredColumnWidth: preferredColumnWidth ?? this.preferredColumnWidth,
       reducedMotion: reducedMotion ?? this.reducedMotion,
       baselineWpm: baselineWpm ?? this.baselineWpm,
       baselineComprehension:
@@ -52,6 +56,7 @@ class LocalUserProfile {
       goals: const [TrainingGoal.generalImprovement],
       preferredFontSize: 18,
       preferredLineHeight: 1.5,
+      preferredColumnWidth: 760,
       reducedMotion: false,
     );
   }
@@ -63,6 +68,7 @@ class LocalUserProfile {
       'goals': goals.map((goal) => goal.name).toList(growable: false),
       'preferredFontSize': preferredFontSize,
       'preferredLineHeight': preferredLineHeight,
+      'preferredColumnWidth': preferredColumnWidth,
       'reducedMotion': reducedMotion,
       'baselineWpm': baselineWpm,
       'baselineComprehension': baselineComprehension,
@@ -78,6 +84,8 @@ class LocalUserProfile {
           .toList(growable: false),
       preferredFontSize: (json['preferredFontSize'] as num).toDouble(),
       preferredLineHeight: (json['preferredLineHeight'] as num).toDouble(),
+      preferredColumnWidth:
+          (json['preferredColumnWidth'] as num?)?.toDouble() ?? 760,
       reducedMotion: json['reducedMotion'] as bool,
       baselineWpm: (json['baselineWpm'] as num?)?.toDouble(),
       baselineComprehension:

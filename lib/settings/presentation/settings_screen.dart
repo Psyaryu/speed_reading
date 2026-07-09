@@ -36,6 +36,7 @@ class _SettingsForm extends ConsumerStatefulWidget {
 class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late double _fontSize;
   late double _lineHeight;
+  late double _columnWidth;
   late bool _reducedMotion;
   bool _isSaving = false;
   bool _isResetting = false;
@@ -93,6 +94,20 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             });
           },
         ),
+        const SizedBox(height: 16),
+        _SliderSetting(
+          label: 'Column Width',
+          valueLabel: '${_columnWidth.round()} px',
+          value: _columnWidth,
+          min: 520,
+          max: 920,
+          divisions: 8,
+          onChanged: (value) {
+            setState(() {
+              _columnWidth = value;
+            });
+          },
+        ),
         const SizedBox(height: 8),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
@@ -146,12 +161,14 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
           runSpacing: 12,
           children: [
             OutlinedButton.icon(
-              onPressed: _isExporting ? null : () => _exportData(_ExportFormat.json),
+              onPressed:
+                  _isExporting ? null : () => _exportData(_ExportFormat.json),
               icon: const Icon(Icons.data_object),
               label: const Text('Export JSON'),
             ),
             OutlinedButton.icon(
-              onPressed: _isExporting ? null : () => _exportData(_ExportFormat.csv),
+              onPressed:
+                  _isExporting ? null : () => _exportData(_ExportFormat.csv),
               icon: const Icon(Icons.table_chart),
               label: const Text('Export CSV'),
             ),
@@ -190,6 +207,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   void _applyProfile(LocalUserProfile profile) {
     _fontSize = profile.preferredFontSize;
     _lineHeight = profile.preferredLineHeight;
+    _columnWidth = profile.preferredColumnWidth;
     _reducedMotion = profile.reducedMotion;
   }
 
@@ -201,6 +219,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     await ref.read(localProfileControllerProvider).updateReadingPreferences(
           preferredFontSize: _fontSize,
           preferredLineHeight: _lineHeight,
+          preferredColumnWidth: _columnWidth,
           reducedMotion: _reducedMotion,
         );
     ref.invalidate(localProfileProvider);

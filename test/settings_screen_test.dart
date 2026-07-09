@@ -30,6 +30,7 @@ void main() {
     final sliders = tester.widgetList<Slider>(find.byType(Slider)).toList();
     sliders[0].onChanged?.call(24);
     sliders[1].onChanged?.call(1.8);
+    sliders[2].onChanged?.call(820);
     await tester.tap(find.byType(SwitchListTile));
     await tester.pump();
 
@@ -41,6 +42,7 @@ void main() {
     final profile = await database.select(database.localProfiles).getSingle();
     expect(profile.preferredFontSize, 24);
     expect(profile.preferredLineHeight, 1.8);
+    expect(profile.preferredColumnWidth, 820);
     expect(profile.reducedMotion, isTrue);
   });
 
@@ -77,6 +79,13 @@ void main() {
       ),
     );
 
+    await tester.scrollUntilVisible(
+      find.text('Reset Progress'),
+      120,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.drag(find.byType(ListView), const Offset(0, -80));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Reset Progress'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Cancel'));
@@ -84,6 +93,13 @@ void main() {
 
     expect(await store.loadReadingSessions(), hasLength(1));
 
+    await tester.scrollUntilVisible(
+      find.text('Reset Progress'),
+      120,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.drag(find.byType(ListView), const Offset(0, -80));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Reset Progress'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Reset'));
@@ -126,7 +142,11 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('Export JSON'));
+    await tester.scrollUntilVisible(
+      find.text('Export JSON'),
+      120,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('Export JSON'));
     await tester.pumpAndSettle();
 
@@ -140,7 +160,11 @@ void main() {
     expect(jsonPreview.data, contains('"sessions"'));
     expect(jsonPreview.data, contains('session-1'));
 
-    await tester.ensureVisible(find.text('Export CSV'));
+    await tester.scrollUntilVisible(
+      find.text('Export CSV'),
+      120,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('Export CSV'));
     await tester.pumpAndSettle();
 

@@ -1354,6 +1354,16 @@ Notes: Settings now persists font size, line height, and reduced motion locally 
 ```
 
 ```text
+Task: Add reader column width setting
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/core/data/app_database.dart, lib/core/data/app_database.g.dart, lib/core/data/drift_local_data_store.dart, lib/settings/domain/local_user_profile.dart, lib/settings/application/local_profile_controller.dart, lib/settings/presentation/settings_screen.dart, lib/reading/presentation/reader_screen.dart, test/local_user_profile_test.dart, test/local_profile_controller_test.dart, test/settings_screen_test.dart, test/reader_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 114 tests passed.
+Commit: See Git history for `feat: add reader column width setting`
+Notes: Settings now persists reader column width locally, migrates existing profile rows with a 760 px default, and the Reader applies the saved width instead of a hard-coded max width.
+```
+
+```text
 Task: Add reset progress settings flow
 Status: Done
 Completed: 2026-07-08

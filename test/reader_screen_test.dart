@@ -51,7 +51,8 @@ void main() {
 
     expect(find.text('WPM: 800'), findsOneWidget);
 
-    final sessions = await database.select(database.readingSessionRecords).get();
+    final sessions =
+        await database.select(database.readingSessionRecords).get();
     expect(sessions.single.id, 'session-1');
     expect(sessions.single.mode, ReadingMode.manual.name);
     expect(sessions.single.activeReadingSeconds, 60);
@@ -98,13 +99,15 @@ void main() {
 
     expect(find.text('WPM: 600'), findsOneWidget);
 
-    final sessions = await database.select(database.readingSessionRecords).get();
+    final sessions =
+        await database.select(database.readingSessionRecords).get();
     expect(sessions.single.id, 'paused-session');
     expect(sessions.single.activeReadingSeconds, 60);
     expect(sessions.single.pauseCount, 1);
   });
 
-  testWidgets('shows empty state when no passages are available', (tester) async {
+  testWidgets('shows empty state when no passages are available',
+      (tester) async {
     final database = AppDatabase(NativeDatabase.memory());
     addTearDown(database.close);
 
@@ -170,7 +173,11 @@ void main() {
         overrides: [
           appDatabaseProvider.overrideWithValue(database),
           localProfileProvider.overrideWith(
-            (ref) async => _profile(fontSize: 24, lineHeight: 1.8),
+            (ref) async => _profile(
+              fontSize: 24,
+              lineHeight: 1.8,
+              columnWidth: 640,
+            ),
           ),
           readerPassagesProvider.overrideWith((ref) async => [
                 _passage(),
@@ -188,6 +195,11 @@ void main() {
 
     expect(bodyText.style?.fontSize, 24);
     expect(bodyText.style?.height, 1.8);
+
+    final readerColumn = tester.widget<ConstrainedBox>(
+      find.byKey(const ValueKey('reader-column')),
+    );
+    expect(readerColumn.constraints.maxWidth, 640);
   });
 
   testWidgets('navigates to quiz after completing a session', (tester) async {
@@ -330,6 +342,7 @@ Passage _passage({
 LocalUserProfile _profile({
   double fontSize = 18,
   double lineHeight = 1.5,
+  double columnWidth = 760,
 }) {
   return LocalUserProfile(
     id: 'local',
@@ -337,6 +350,7 @@ LocalUserProfile _profile({
     goals: const [TrainingGoal.generalImprovement],
     preferredFontSize: fontSize,
     preferredLineHeight: lineHeight,
+    preferredColumnWidth: columnWidth,
     reducedMotion: false,
   );
 }

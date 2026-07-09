@@ -66,6 +66,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               isSaving: _isSaving,
               fontSize: profile?.preferredFontSize ?? 18,
               lineHeight: profile?.preferredLineHeight ?? 1.5,
+              columnWidth: profile?.preferredColumnWidth ?? 760,
               completedSession: _completedSession,
               onStart: _startReading,
               onPause: _pauseReading,
@@ -225,6 +226,7 @@ class _ReaderBody extends StatelessWidget {
     required this.isSaving,
     required this.fontSize,
     required this.lineHeight,
+    required this.columnWidth,
     required this.completedSession,
     required this.onStart,
     required this.onPause,
@@ -240,6 +242,7 @@ class _ReaderBody extends StatelessWidget {
   final bool isSaving;
   final double fontSize;
   final double lineHeight;
+  final double columnWidth;
   final ReadingSession? completedSession;
   final VoidCallback onStart;
   final VoidCallback onPause;
@@ -257,7 +260,8 @@ class _ReaderBody extends StatelessWidget {
       children: [
         Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 760),
+            key: const ValueKey('reader-column'),
+            constraints: BoxConstraints(maxWidth: columnWidth),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -333,19 +337,19 @@ class _ReaderBody extends StatelessWidget {
                         : 'Reading session active.',
                   ),
                 ],
-        if (session != null) ...[
-          const SizedBox(height: 12),
-          Text('WPM: ${session.wpm.round()}'),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: FilledButton.icon(
-              onPressed: () => context.goNamed('quiz'),
-              icon: const Icon(Icons.quiz),
-              label: const Text('Take Quiz'),
-            ),
-          ),
-        ],
+                if (session != null) ...[
+                  const SizedBox(height: 12),
+                  Text('WPM: ${session.wpm.round()}'),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: FilledButton.icon(
+                      onPressed: () => context.goNamed('quiz'),
+                      icon: const Icon(Icons.quiz),
+                      label: const Text('Take Quiz'),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 24),
                 Text(
                   selectedPassage.body,

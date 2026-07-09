@@ -8,6 +8,8 @@ class LocalProfiles extends Table {
   TextColumn get goalsJson => text()();
   RealColumn get preferredFontSize => real()();
   RealColumn get preferredLineHeight => real()();
+  RealColumn get preferredColumnWidth =>
+      real().withDefault(const Constant(760.0))();
   BoolColumn get reducedMotion => boolean()();
   RealColumn get baselineWpm => real().nullable()();
   RealColumn get baselineComprehension => real().nullable()();
@@ -110,5 +112,17 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onUpgrade: (migrator, from, to) async {
+          if (from < 2) {
+            await migrator.addColumn(
+              localProfiles,
+              localProfiles.preferredColumnWidth,
+            );
+          }
+        },
+      );
 }

@@ -38,6 +38,14 @@ class $LocalProfilesTable extends LocalProfiles
   late final GeneratedColumn<double> preferredLineHeight =
       GeneratedColumn<double>('preferred_line_height', aliasedName, false,
           type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _preferredColumnWidthMeta =
+      const VerificationMeta('preferredColumnWidth');
+  @override
+  late final GeneratedColumn<double> preferredColumnWidth =
+      GeneratedColumn<double>('preferred_column_width', aliasedName, false,
+          type: DriftSqlType.double,
+          requiredDuringInsert: false,
+          defaultValue: const Constant(760.0));
   static const VerificationMeta _reducedMotionMeta =
       const VerificationMeta('reducedMotion');
   @override
@@ -66,6 +74,7 @@ class $LocalProfilesTable extends LocalProfiles
         goalsJson,
         preferredFontSize,
         preferredLineHeight,
+        preferredColumnWidth,
         reducedMotion,
         baselineWpm,
         baselineComprehension
@@ -113,6 +122,12 @@ class $LocalProfilesTable extends LocalProfiles
     } else if (isInserting) {
       context.missing(_preferredLineHeightMeta);
     }
+    if (data.containsKey('preferred_column_width')) {
+      context.handle(
+          _preferredColumnWidthMeta,
+          preferredColumnWidth.isAcceptableOrUnknown(
+              data['preferred_column_width']!, _preferredColumnWidthMeta));
+    }
     if (data.containsKey('reduced_motion')) {
       context.handle(
           _reducedMotionMeta,
@@ -153,6 +168,9 @@ class $LocalProfilesTable extends LocalProfiles
       preferredLineHeight: attachedDatabase.typeMapping.read(
           DriftSqlType.double,
           data['${effectivePrefix}preferred_line_height'])!,
+      preferredColumnWidth: attachedDatabase.typeMapping.read(
+          DriftSqlType.double,
+          data['${effectivePrefix}preferred_column_width'])!,
       reducedMotion: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}reduced_motion'])!,
       baselineWpm: attachedDatabase.typeMapping
@@ -175,6 +193,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
   final String goalsJson;
   final double preferredFontSize;
   final double preferredLineHeight;
+  final double preferredColumnWidth;
   final bool reducedMotion;
   final double? baselineWpm;
   final double? baselineComprehension;
@@ -184,6 +203,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       required this.goalsJson,
       required this.preferredFontSize,
       required this.preferredLineHeight,
+      required this.preferredColumnWidth,
       required this.reducedMotion,
       this.baselineWpm,
       this.baselineComprehension});
@@ -195,6 +215,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
     map['goals_json'] = Variable<String>(goalsJson);
     map['preferred_font_size'] = Variable<double>(preferredFontSize);
     map['preferred_line_height'] = Variable<double>(preferredLineHeight);
+    map['preferred_column_width'] = Variable<double>(preferredColumnWidth);
     map['reduced_motion'] = Variable<bool>(reducedMotion);
     if (!nullToAbsent || baselineWpm != null) {
       map['baseline_wpm'] = Variable<double>(baselineWpm);
@@ -212,6 +233,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       goalsJson: Value(goalsJson),
       preferredFontSize: Value(preferredFontSize),
       preferredLineHeight: Value(preferredLineHeight),
+      preferredColumnWidth: Value(preferredColumnWidth),
       reducedMotion: Value(reducedMotion),
       baselineWpm: baselineWpm == null && nullToAbsent
           ? const Value.absent()
@@ -232,6 +254,8 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       preferredFontSize: serializer.fromJson<double>(json['preferredFontSize']),
       preferredLineHeight:
           serializer.fromJson<double>(json['preferredLineHeight']),
+      preferredColumnWidth:
+          serializer.fromJson<double>(json['preferredColumnWidth']),
       reducedMotion: serializer.fromJson<bool>(json['reducedMotion']),
       baselineWpm: serializer.fromJson<double?>(json['baselineWpm']),
       baselineComprehension:
@@ -247,6 +271,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       'goalsJson': serializer.toJson<String>(goalsJson),
       'preferredFontSize': serializer.toJson<double>(preferredFontSize),
       'preferredLineHeight': serializer.toJson<double>(preferredLineHeight),
+      'preferredColumnWidth': serializer.toJson<double>(preferredColumnWidth),
       'reducedMotion': serializer.toJson<bool>(reducedMotion),
       'baselineWpm': serializer.toJson<double?>(baselineWpm),
       'baselineComprehension':
@@ -260,6 +285,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
           String? goalsJson,
           double? preferredFontSize,
           double? preferredLineHeight,
+          double? preferredColumnWidth,
           bool? reducedMotion,
           Value<double?> baselineWpm = const Value.absent(),
           Value<double?> baselineComprehension = const Value.absent()}) =>
@@ -269,6 +295,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
         goalsJson: goalsJson ?? this.goalsJson,
         preferredFontSize: preferredFontSize ?? this.preferredFontSize,
         preferredLineHeight: preferredLineHeight ?? this.preferredLineHeight,
+        preferredColumnWidth: preferredColumnWidth ?? this.preferredColumnWidth,
         reducedMotion: reducedMotion ?? this.reducedMotion,
         baselineWpm: baselineWpm.present ? baselineWpm.value : this.baselineWpm,
         baselineComprehension: baselineComprehension.present
@@ -286,6 +313,9 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
       preferredLineHeight: data.preferredLineHeight.present
           ? data.preferredLineHeight.value
           : this.preferredLineHeight,
+      preferredColumnWidth: data.preferredColumnWidth.present
+          ? data.preferredColumnWidth.value
+          : this.preferredColumnWidth,
       reducedMotion: data.reducedMotion.present
           ? data.reducedMotion.value
           : this.reducedMotion,
@@ -305,6 +335,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
           ..write('goalsJson: $goalsJson, ')
           ..write('preferredFontSize: $preferredFontSize, ')
           ..write('preferredLineHeight: $preferredLineHeight, ')
+          ..write('preferredColumnWidth: $preferredColumnWidth, ')
           ..write('reducedMotion: $reducedMotion, ')
           ..write('baselineWpm: $baselineWpm, ')
           ..write('baselineComprehension: $baselineComprehension')
@@ -313,8 +344,16 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
   }
 
   @override
-  int get hashCode => Object.hash(id, createdAt, goalsJson, preferredFontSize,
-      preferredLineHeight, reducedMotion, baselineWpm, baselineComprehension);
+  int get hashCode => Object.hash(
+      id,
+      createdAt,
+      goalsJson,
+      preferredFontSize,
+      preferredLineHeight,
+      preferredColumnWidth,
+      reducedMotion,
+      baselineWpm,
+      baselineComprehension);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -324,6 +363,7 @@ class LocalProfile extends DataClass implements Insertable<LocalProfile> {
           other.goalsJson == this.goalsJson &&
           other.preferredFontSize == this.preferredFontSize &&
           other.preferredLineHeight == this.preferredLineHeight &&
+          other.preferredColumnWidth == this.preferredColumnWidth &&
           other.reducedMotion == this.reducedMotion &&
           other.baselineWpm == this.baselineWpm &&
           other.baselineComprehension == this.baselineComprehension);
@@ -335,6 +375,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
   final Value<String> goalsJson;
   final Value<double> preferredFontSize;
   final Value<double> preferredLineHeight;
+  final Value<double> preferredColumnWidth;
   final Value<bool> reducedMotion;
   final Value<double?> baselineWpm;
   final Value<double?> baselineComprehension;
@@ -345,6 +386,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
     this.goalsJson = const Value.absent(),
     this.preferredFontSize = const Value.absent(),
     this.preferredLineHeight = const Value.absent(),
+    this.preferredColumnWidth = const Value.absent(),
     this.reducedMotion = const Value.absent(),
     this.baselineWpm = const Value.absent(),
     this.baselineComprehension = const Value.absent(),
@@ -356,6 +398,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
     required String goalsJson,
     required double preferredFontSize,
     required double preferredLineHeight,
+    this.preferredColumnWidth = const Value.absent(),
     required bool reducedMotion,
     this.baselineWpm = const Value.absent(),
     this.baselineComprehension = const Value.absent(),
@@ -372,6 +415,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
     Expression<String>? goalsJson,
     Expression<double>? preferredFontSize,
     Expression<double>? preferredLineHeight,
+    Expression<double>? preferredColumnWidth,
     Expression<bool>? reducedMotion,
     Expression<double>? baselineWpm,
     Expression<double>? baselineComprehension,
@@ -384,6 +428,8 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       if (preferredFontSize != null) 'preferred_font_size': preferredFontSize,
       if (preferredLineHeight != null)
         'preferred_line_height': preferredLineHeight,
+      if (preferredColumnWidth != null)
+        'preferred_column_width': preferredColumnWidth,
       if (reducedMotion != null) 'reduced_motion': reducedMotion,
       if (baselineWpm != null) 'baseline_wpm': baselineWpm,
       if (baselineComprehension != null)
@@ -398,6 +444,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       Value<String>? goalsJson,
       Value<double>? preferredFontSize,
       Value<double>? preferredLineHeight,
+      Value<double>? preferredColumnWidth,
       Value<bool>? reducedMotion,
       Value<double?>? baselineWpm,
       Value<double?>? baselineComprehension,
@@ -408,6 +455,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       goalsJson: goalsJson ?? this.goalsJson,
       preferredFontSize: preferredFontSize ?? this.preferredFontSize,
       preferredLineHeight: preferredLineHeight ?? this.preferredLineHeight,
+      preferredColumnWidth: preferredColumnWidth ?? this.preferredColumnWidth,
       reducedMotion: reducedMotion ?? this.reducedMotion,
       baselineWpm: baselineWpm ?? this.baselineWpm,
       baselineComprehension:
@@ -435,6 +483,10 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
       map['preferred_line_height'] =
           Variable<double>(preferredLineHeight.value);
     }
+    if (preferredColumnWidth.present) {
+      map['preferred_column_width'] =
+          Variable<double>(preferredColumnWidth.value);
+    }
     if (reducedMotion.present) {
       map['reduced_motion'] = Variable<bool>(reducedMotion.value);
     }
@@ -459,6 +511,7 @@ class LocalProfilesCompanion extends UpdateCompanion<LocalProfile> {
           ..write('goalsJson: $goalsJson, ')
           ..write('preferredFontSize: $preferredFontSize, ')
           ..write('preferredLineHeight: $preferredLineHeight, ')
+          ..write('preferredColumnWidth: $preferredColumnWidth, ')
           ..write('reducedMotion: $reducedMotion, ')
           ..write('baselineWpm: $baselineWpm, ')
           ..write('baselineComprehension: $baselineComprehension, ')
@@ -3026,6 +3079,7 @@ typedef $$LocalProfilesTableCreateCompanionBuilder = LocalProfilesCompanion
   required String goalsJson,
   required double preferredFontSize,
   required double preferredLineHeight,
+  Value<double> preferredColumnWidth,
   required bool reducedMotion,
   Value<double?> baselineWpm,
   Value<double?> baselineComprehension,
@@ -3038,6 +3092,7 @@ typedef $$LocalProfilesTableUpdateCompanionBuilder = LocalProfilesCompanion
   Value<String> goalsJson,
   Value<double> preferredFontSize,
   Value<double> preferredLineHeight,
+  Value<double> preferredColumnWidth,
   Value<bool> reducedMotion,
   Value<double?> baselineWpm,
   Value<double?> baselineComprehension,
@@ -3068,6 +3123,10 @@ class $$LocalProfilesTableFilterComposer
 
   ColumnFilters<double> get preferredLineHeight => $composableBuilder(
       column: $table.preferredLineHeight,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get preferredColumnWidth => $composableBuilder(
+      column: $table.preferredColumnWidth,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get reducedMotion => $composableBuilder(
@@ -3107,6 +3166,10 @@ class $$LocalProfilesTableOrderingComposer
       column: $table.preferredLineHeight,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<double> get preferredColumnWidth => $composableBuilder(
+      column: $table.preferredColumnWidth,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<bool> get reducedMotion => $composableBuilder(
       column: $table.reducedMotion,
       builder: (column) => ColumnOrderings(column));
@@ -3142,6 +3205,9 @@ class $$LocalProfilesTableAnnotationComposer
 
   GeneratedColumn<double> get preferredLineHeight => $composableBuilder(
       column: $table.preferredLineHeight, builder: (column) => column);
+
+  GeneratedColumn<double> get preferredColumnWidth => $composableBuilder(
+      column: $table.preferredColumnWidth, builder: (column) => column);
 
   GeneratedColumn<bool> get reducedMotion => $composableBuilder(
       column: $table.reducedMotion, builder: (column) => column);
@@ -3184,6 +3250,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             Value<String> goalsJson = const Value.absent(),
             Value<double> preferredFontSize = const Value.absent(),
             Value<double> preferredLineHeight = const Value.absent(),
+            Value<double> preferredColumnWidth = const Value.absent(),
             Value<bool> reducedMotion = const Value.absent(),
             Value<double?> baselineWpm = const Value.absent(),
             Value<double?> baselineComprehension = const Value.absent(),
@@ -3195,6 +3262,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             goalsJson: goalsJson,
             preferredFontSize: preferredFontSize,
             preferredLineHeight: preferredLineHeight,
+            preferredColumnWidth: preferredColumnWidth,
             reducedMotion: reducedMotion,
             baselineWpm: baselineWpm,
             baselineComprehension: baselineComprehension,
@@ -3206,6 +3274,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             required String goalsJson,
             required double preferredFontSize,
             required double preferredLineHeight,
+            Value<double> preferredColumnWidth = const Value.absent(),
             required bool reducedMotion,
             Value<double?> baselineWpm = const Value.absent(),
             Value<double?> baselineComprehension = const Value.absent(),
@@ -3217,6 +3286,7 @@ class $$LocalProfilesTableTableManager extends RootTableManager<
             goalsJson: goalsJson,
             preferredFontSize: preferredFontSize,
             preferredLineHeight: preferredLineHeight,
+            preferredColumnWidth: preferredColumnWidth,
             reducedMotion: reducedMotion,
             baselineWpm: baselineWpm,
             baselineComprehension: baselineComprehension,

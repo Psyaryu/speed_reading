@@ -33,7 +33,8 @@ void main() {
 
     expect(profile.id, 'local');
     expect(profile.createdAt, DateTime.utc(2026, 7, 7));
-    expect(await container.read(localDataStoreProvider).loadProfile(), isNotNull);
+    expect(
+        await container.read(localDataStoreProvider).loadProfile(), isNotNull);
   });
 
   test('returns existing profile instead of replacing it', () async {
@@ -56,16 +57,19 @@ void main() {
     final updated = await controller.updateReadingPreferences(
       preferredFontSize: 24,
       preferredLineHeight: 1.8,
+      preferredColumnWidth: 820,
       reducedMotion: true,
     );
 
     expect(updated.preferredFontSize, 24);
     expect(updated.preferredLineHeight, 1.8);
+    expect(updated.preferredColumnWidth, 820);
     expect(updated.reducedMotion, isTrue);
 
     final stored = await container.read(localDataStoreProvider).loadProfile();
     expect(stored?.preferredFontSize, 24);
     expect(stored?.preferredLineHeight, 1.8);
+    expect(stored?.preferredColumnWidth, 820);
     expect(stored?.reducedMotion, isTrue);
   });
 
