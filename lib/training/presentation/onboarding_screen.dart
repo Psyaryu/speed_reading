@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
+import '../../settings/domain/local_user_profile.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -15,6 +16,7 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _selectedGoals = <TrainingGoal>{TrainingGoal.generalImprovement};
   double _fontSize = 18;
+  LocalThemeMode _themeMode = LocalThemeMode.system;
   bool _reducedMotion = false;
   bool _isSaving = false;
 
@@ -73,6 +75,32 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               });
             },
           ),
+          const SizedBox(height: 16),
+          SegmentedButton<LocalThemeMode>(
+            segments: const [
+              ButtonSegment(
+                value: LocalThemeMode.system,
+                icon: Icon(Icons.devices),
+                label: Text('System'),
+              ),
+              ButtonSegment(
+                value: LocalThemeMode.light,
+                icon: Icon(Icons.light_mode),
+                label: Text('Light'),
+              ),
+              ButtonSegment(
+                value: LocalThemeMode.dark,
+                icon: Icon(Icons.dark_mode),
+                label: Text('Dark'),
+              ),
+            ],
+            selected: {_themeMode},
+            onSelectionChanged: (selection) {
+              setState(() {
+                _themeMode = selection.single;
+              });
+            },
+          ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('Reduced Motion'),
@@ -111,6 +139,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     await ref.read(localProfileControllerProvider).updateOnboarding(
           goals: _selectedGoals.toList(growable: false),
           preferredFontSize: _fontSize,
+          preferredThemeMode: _themeMode,
           reducedMotion: _reducedMotion,
         );
     ref.invalidate(localProfileProvider);

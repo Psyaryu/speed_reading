@@ -51,12 +51,14 @@ class LocalProfileController {
   Future<LocalUserProfile> updateOnboarding({
     required List<TrainingGoal> goals,
     required double preferredFontSize,
+    required LocalThemeMode preferredThemeMode,
     required bool reducedMotion,
   }) async {
     final profile = await loadOrCreate();
     final updated = profile.copyWith(
       goals: goals.isEmpty ? const [TrainingGoal.generalImprovement] : goals,
       preferredFontSize: preferredFontSize,
+      preferredThemeMode: preferredThemeMode,
       reducedMotion: reducedMotion,
     );
     await localDataStore.saveProfile(updated);

@@ -86,12 +86,17 @@ void main() {
     final updated = await controller.updateOnboarding(
       goals: const [TrainingGoal.school, TrainingGoal.exam],
       preferredFontSize: 22,
+      preferredThemeMode: LocalThemeMode.dark,
       reducedMotion: true,
     );
 
     expect(updated.goals, [TrainingGoal.school, TrainingGoal.exam]);
     expect(updated.preferredFontSize, 22);
+    expect(updated.preferredThemeMode, LocalThemeMode.dark);
     expect(updated.reducedMotion, isTrue);
+
+    final stored = await container.read(localDataStoreProvider).loadProfile();
+    expect(stored?.preferredThemeMode, LocalThemeMode.dark);
   });
 
   test('stores derived baseline values from a reading result', () async {

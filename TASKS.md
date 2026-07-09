@@ -571,6 +571,17 @@ Commit: See Git history for `feat: build local onboarding setup`
 Notes: Onboarding now explains speed plus comprehension, saves selected goals, reader font size, and reduced motion to the local profile, and returns to the dashboard. Theme choice and baseline assessment remain open.
 ```
 
+```text
+Task: Collect user goal and accessibility/preferences basics
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/settings/application/local_profile_controller.dart, lib/training/presentation/onboarding_screen.dart, test/local_profile_controller_test.dart, test/onboarding_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 151 tests passed.
+Commit: See Git history for `feat: collect onboarding preferences`
+Notes: Onboarding now collects an allowed training goal selection plus reader font size, system/light/dark theme mode, and reduced motion, persists them through the local profile without login or network access, invalidates the profile provider, and routes to the dashboard when complete.
+Follow-up: None.
+```
+
 ### Epic 3.2: Baseline Assessment
 
 Tasks:
