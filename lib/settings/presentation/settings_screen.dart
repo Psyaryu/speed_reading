@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/providers/app_providers.dart';
 import '../domain/local_user_profile.dart';
@@ -43,6 +44,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   bool _isResetting = false;
   bool _isExporting = false;
   String? _exportText;
+  _ExportFormat? _exportFormat;
 
   @override
   void initState() {
@@ -211,9 +213,20 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
         ],
         if (_exportText != null) ...[
           const SizedBox(height: 16),
-          Text(
-            'Export Preview',
-            style: Theme.of(context).textTheme.titleMedium,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Export Preview',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: _shareExport,
+                icon: const Icon(Icons.ios_share),
+                label: const Text('Share Export'),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Container(
@@ -329,8 +342,26 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
 
     setState(() {
       _exportText = exported;
+      _exportFormat = format;
       _isExporting = false;
     });
+  }
+
+  Future<void> _shareExport() async {
+    final exportText = _exportText;
+    if (exportText == null) {
+      return;
+    }
+
+    final label = switch (_exportFormat) {
+      _ExportFormat.json => 'JSON',
+      _ExportFormat.csv => 'CSV',
+      null => 'Progress',
+    };
+    await Share.share(
+      exportText,
+      subject: 'Speed Reading $label Export',
+    );
   }
 }
 

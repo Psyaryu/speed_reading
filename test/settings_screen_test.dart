@@ -2,6 +2,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:speed_reading/content/domain/imported_passage_factory.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
@@ -73,10 +74,17 @@ void main() {
     final store = ProviderScope.containerOf(
       tester.element(find.byType(SettingsScreen)),
     ).read(localDataStoreProvider);
+    await store.saveImportedPassage(
+      ImportedPassageFactory.create(
+        id: 'import-1',
+        title: 'Saved Passage',
+        body: 'This imported passage should stay on this device.',
+      ),
+    );
     await store.saveReadingSession(
       ReadingSession(
         id: 'session-1',
-        passageId: 'passage-1',
+        passageId: 'import-1',
         mode: ReadingMode.manual,
         startedAt: DateTime.utc(2026, 7, 8),
         activeReadingSeconds: 60,
@@ -113,6 +121,8 @@ void main() {
 
     expect(find.text('Progress reset.'), findsOneWidget);
     expect(await store.loadReadingSessions(), isEmpty);
+    expect(await store.loadPassages(), hasLength(1));
+    expect((await store.loadPassages()).single.id, 'import-1');
   });
 
   testWidgets('shows JSON and CSV export previews', (tester) async {
@@ -158,6 +168,7 @@ void main() {
 
     await tester.ensureVisible(find.text('Export Preview'));
     expect(find.text('Export Preview'), findsOneWidget);
+    expect(find.text('Share Export'), findsOneWidget);
     await tester.drag(find.byType(ListView), const Offset(0, -300));
     await tester.pumpAndSettle();
     final jsonPreview = tester.widget<SelectableText>(

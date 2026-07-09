@@ -1499,7 +1499,7 @@ Goal: Make the app comfortable, private, and resilient across target platforms.
 
 ### Epic 9.1: Settings
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -1581,6 +1581,17 @@ Changed files: lib/settings/presentation/settings_screen.dart, test/settings_scr
 Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 95 tests passed.
 Commit: See Git history for `feat: add local progress export preview`
 Notes: Settings now generates JSON and CSV progress exports from local storage and displays a selectable preview. Platform file save/share behavior remains open.
+```
+
+```text
+Task: Add shareable settings data export
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/settings/presentation/settings_screen.dart, test/settings_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 169 tests passed.
+Commit: See Git history for `feat: add settings export share flow`
+Notes: Settings export now supports user-initiated sharing of generated JSON or CSV text through the existing platform share integration, while retaining the selectable preview. Reset behavior was reverified from the settings UI and keeps imported passages and settings on device.
+Follow-up: None.
 ```
 
 ### Epic 9.2: Accessibility
