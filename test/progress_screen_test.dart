@@ -49,6 +49,73 @@ void main() {
     expect(find.text('No reading sessions yet.'), findsOneWidget);
   });
 
+  testWidgets('shows clear empty states for analytics views', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    final container = ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(database),
+        progressShareableSummaryProvider.overrideWith((ref) async => null),
+        bestQualifiedAttemptProvider.overrideWith((ref) async => null),
+        passageDifficultyDistributionProvider.overrideWith(
+          (ref) async => _emptyDifficultyDistribution,
+        ),
+        progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
+        skillBreakdownProvider
+            .overrideWith((ref) async => _emptySkillBreakdown),
+        masteryProgressProvider
+            .overrideWith((ref) async => _emptyMasteryProgress),
+        certificationProgressProvider
+            .overrideWith((ref) async => _emptyCertificationProgress),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final store = container.read(localDataStoreProvider);
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'pending-session',
+        passageId: 'passage-1',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8, 12),
+        activeReadingSeconds: 60,
+        wordCount: 600,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: ProgressScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Complete at least two sessions with quizzes to see WPM, '
+        'comprehension, and ERS trends.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('No official qualified attempt yet.'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Not enough skill data yet.'),
+      500,
+    );
+    expect(find.text('Not enough skill data yet.'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Not enough completed passage data yet.'),
+      500,
+    );
+    expect(find.text('Not enough completed passage data yet.'), findsOneWidget);
+  });
+
   testWidgets('shows latest WPM with comprehension context', (tester) async {
     final database = AppDatabase(NativeDatabase.memory());
     addTearDown(database.close);

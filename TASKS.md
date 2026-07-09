@@ -1547,6 +1547,16 @@ Commit: See Git history for `feat: show skill breakdown`
 Notes: Progress now summarizes quiz answer accuracy by matched local question skills, including main idea, detail recall, inference, and vocabulary categories, with unmatched-answer context and an empty-data state without exposing imported passage text.
 ```
 
+```text
+Task: Close analytics views acceptance criteria
+Status: Done
+Completed: 2026-07-09
+Changed files: test/progress_screen_test.dart, TASKS.md
+Verification: Confirmed Progress includes WPM, comprehension, and ERS over time; skill breakdown; passage difficulty distribution with official/imported counts; best official qualified attempt; analytics empty states; and tests asserting private imported passage text is excluded from analytics and sharing views. Added focused widget coverage for empty analytics view states. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\progress_screen_test.dart`; all 10 progress screen tests passed. Full `flutter analyze` and `flutter test` were rerun before commit.
+Commit: See Git history for `test: close analytics criteria`
+Notes: No Epic 8.2 follow-up tasks remain.
+```
+
 ### Epic 8.3: Shareable Progress Summary
 
 Status: Done
