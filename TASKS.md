@@ -1257,7 +1257,7 @@ Goal: Deliver structured daily practice that teaches the major speed-reading ski
 
 ### Epic 7.1: Curriculum Structure
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -1288,6 +1288,16 @@ Changed files: lib/training/domain/curriculum.dart, test/curriculum_test.dart, T
 Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for required concept coverage and level-based unlocks.
 Commit: See Git history for `feat: add curriculum structure`
 Notes: Dedicated vocabulary capture and review UI remains open.
+```
+
+```text
+Task: Close curriculum structure acceptance criteria
+Status: Done
+Completed: 2026-07-09
+Changed files: lib/training/domain/curriculum.dart, test/curriculum_test.dart, TASKS.md
+Verification: Added and tested explicit lesson order, rapid-reading versus deep-reading guidance, structured unlock criteria, drill templates for every adaptive recommendation drill, and 10-20 minute generated daily plans. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\curriculum_test.dart`; all curriculum tests passed. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all 178 tests passed.
+Commit: See Git history for `feat: complete curriculum structure`
+Notes: No Epic 7.1 follow-up tasks remain.
 ```
 
 ### Epic 7.2: Skill Drills
