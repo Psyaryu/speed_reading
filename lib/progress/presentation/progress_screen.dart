@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../assessment/domain/quiz.dart';
+import '../../content/domain/passage_filter.dart';
 import '../../core/providers/app_providers.dart';
+import '../../progress/domain/shareable_progress_summary.dart';
 import '../../reading/domain/reading_session.dart';
 
 final progressHistoryProvider = FutureProvider<ProgressHistory>((ref) async {
@@ -15,6 +18,25 @@ final progressHistoryProvider = FutureProvider<ProgressHistory>((ref) async {
   );
 });
 
+final progressShareableSummaryProvider =
+    FutureProvider<ShareableProgressSummary?>((ref) async {
+  final history = await ref.watch(progressHistoryProvider.future);
+  final passages = await ref.watch(passageRepositoryProvider).search(
+        const PassageFilter(),
+      );
+  return ShareableProgressSummaryBuilder.fromHistory(
+    sessions: history.sessions,
+    quizResults: history.quizResults,
+    passages: passages,
+  );
+});
+
+final progressShareProvider = Provider<Future<void> Function(String)>((ref) {
+  return (text) async {
+    await Share.share(text, subject: 'Speed Reading Progress');
+  };
+});
+
 class ProgressHistory {
   const ProgressHistory({
     required this.sessions,
@@ -25,8 +47,7 @@ class ProgressHistory {
   final List<QuizResult> quizResults;
 
   List<ReadingSession> get newestSessions {
-    return [...sessions]
-      ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
+    return [...sessions]..sort((a, b) => b.startedAt.compareTo(a.startedAt));
   }
 
   QuizResult? quizForSession(String sessionId) {
@@ -45,11 +66,15 @@ class ProgressScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final history = ref.watch(progressHistoryProvider);
+    final shareSummary = ref.watch(progressShareableSummaryProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Progress')),
       body: history.when(
-        data: (history) => _ProgressBody(history: history),
+        data: (history) => _ProgressBody(
+          history: history,
+          shareSummary: shareSummary,
+        ),
         error: (error, stackTrace) => Center(
           child: Text('Unable to load progress: $error'),
         ),
@@ -59,13 +84,17 @@ class ProgressScreen extends ConsumerWidget {
   }
 }
 
-class _ProgressBody extends StatelessWidget {
-  const _ProgressBody({required this.history});
+class _ProgressBody extends ConsumerWidget {
+  const _ProgressBody({
+    required this.history,
+    required this.shareSummary,
+  });
 
   final ProgressHistory history;
+  final AsyncValue<ShareableProgressSummary?> shareSummary;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final sessions = history.newestSessions;
     if (sessions.isEmpty) {
       return const Center(
@@ -88,6 +117,13 @@ class _ProgressBody extends StatelessWidget {
         _MetricRow(
           label: 'Comprehension',
           value: _comprehensionLabel(latestQuiz),
+        ),
+        const SizedBox(height: 16),
+        _ShareableProgressCard(
+          summary: shareSummary,
+          onShare: (summary) {
+            ref.read(progressShareProvider).call(summary.toShareText());
+          },
         ),
         const SizedBox(height: 24),
         Text(
@@ -118,6 +154,81 @@ class _ProgressBody extends StatelessWidget {
       return 'Pending quiz';
     }
     return '${(quiz.comprehensionScore * 100).round()}%';
+  }
+}
+
+class _ShareableProgressCard extends StatelessWidget {
+  const _ShareableProgressCard({
+    required this.summary,
+    required this.onShare,
+  });
+
+  final AsyncValue<ShareableProgressSummary?> summary;
+  final ValueChanged<ShareableProgressSummary> onShare;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: summary.when(
+          data: (summary) {
+            if (summary == null) {
+              return const Text('No qualified progress summary to share yet.');
+            }
+
+            final comprehensionPercent =
+                (summary.comprehensionScore * 100).round();
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Shareable Progress Summary',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                _MetricRow(label: 'Level', value: summary.levelName),
+                _MetricRow(
+                  label: 'Qualified ERS',
+                  value: summary.effectiveReadingScore.round().toString(),
+                ),
+                _MetricRow(
+                  label: 'Qualified Attempt',
+                  value: '${summary.qualifiedWpm.round()} WPM / '
+                      '$comprehensionPercent%',
+                ),
+                _MetricRow(
+                  label: 'Streak',
+                  value: '${summary.streakDays} day',
+                ),
+                _MetricRow(
+                  label: 'Certification',
+                  value: summary.certificationStatus,
+                ),
+                _MetricRow(
+                  label: 'Mastery',
+                  value: summary.masteryStatus,
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: FilledButton.icon(
+                    onPressed: () => onShare(summary),
+                    icon: const Icon(Icons.share),
+                    label: const Text('Share Progress'),
+                  ),
+                ),
+              ],
+            );
+          },
+          error: (error, stackTrace) => Text(
+            'Share summary unavailable: $error',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+          loading: () => const LinearProgressIndicator(),
+        ),
+      ),
+    );
   }
 }
 

@@ -1271,7 +1271,7 @@ Notes: Progress now shows persisted reading sessions with WPM and comprehension 
 
 ### Epic 8.3: Shareable Progress Summary
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -1311,6 +1311,16 @@ Changed files: lib/assessment/presentation/results_screen.dart, test/results_scr
 Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 110 tests passed.
 Commit: See Git history for `feat: add results progress sharing`
 Notes: Results now builds a public share summary from WPM, comprehension, ERS, and level, then invokes the platform share sheet through `share_plus`. Tests verify private passage text is excluded.
+```
+
+```text
+Task: Add local progress summary share card
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/progress/domain/shareable_progress_summary.dart, lib/progress/presentation/progress_screen.dart, test/progress_screen_test.dart, test/shareable_progress_summary_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 118 tests passed.
+Commit: See Git history for `feat: add shareable progress card`
+Notes: Progress now builds a shareable summary from local sessions, quiz results, and passage metadata only, displays level, ERS, qualified WPM/comprehension, streak, certification, and mastery status, and invokes the existing `share_plus` platform share sheet without including imported passage text.
 ```
 
 ## Milestone 9: Settings, Accessibility, Privacy, and Reliability
