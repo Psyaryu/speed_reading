@@ -28,12 +28,17 @@ class MasteryRules {
   const MasteryRules._();
 
   static bool isEligibleSession(MasterySessionResult result) {
+    return isImmediateCandidate(result) &&
+        result.delayedRecallScore >= 0.9 &&
+        result.status == AttemptQualificationStatus.qualified;
+  }
+
+  static bool isImmediateCandidate(MasterySessionResult result) {
     return result.source == PassageSource.official &&
         (result.difficulty == PassageDifficulty.standard ||
             result.difficulty == PassageDifficulty.hard) &&
         result.wpm >= 800 &&
         result.immediateComprehensionScore == 1.0 &&
-        result.delayedRecallScore >= 0.9 &&
         result.status == AttemptQualificationStatus.qualified &&
         !result.excessivePausing;
   }
@@ -49,4 +54,3 @@ class MasteryRules {
     return hasThreePassages && hasNonRsvpAttempt;
   }
 }
-

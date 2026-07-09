@@ -7,6 +7,7 @@ import '../../content/domain/passage_filter.dart';
 import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
 import '../../progress/domain/best_qualified_attempt.dart';
+import '../../progress/domain/mastery_progress.dart';
 import '../../progress/domain/passage_difficulty_distribution.dart';
 import '../../progress/domain/progress_trend.dart';
 import '../../progress/domain/shareable_progress_summary.dart';
@@ -82,6 +83,18 @@ final skillBreakdownProvider = FutureProvider<SkillBreakdown>((ref) async {
   );
 });
 
+final masteryProgressProvider = FutureProvider<MasteryProgress>((ref) async {
+  final history = await ref.watch(progressHistoryProvider.future);
+  final passages = await ref.watch(passageRepositoryProvider).search(
+        const PassageFilter(),
+      );
+  return MasteryProgressBuilder.fromHistory(
+    sessions: history.sessions,
+    quizResults: history.quizResults,
+    passages: passages,
+  );
+});
+
 final progressShareProvider = Provider<Future<void> Function(String)>((ref) {
   return (text) async {
     await Share.share(text, subject: 'Speed Reading Progress');
@@ -123,6 +136,7 @@ class ProgressScreen extends ConsumerWidget {
         ref.watch(passageDifficultyDistributionProvider);
     final progressTrend = ref.watch(progressTrendProvider);
     final skillBreakdown = ref.watch(skillBreakdownProvider);
+    final masteryProgress = ref.watch(masteryProgressProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Progress')),
@@ -134,6 +148,7 @@ class ProgressScreen extends ConsumerWidget {
           difficultyDistribution: difficultyDistribution,
           progressTrend: progressTrend,
           skillBreakdown: skillBreakdown,
+          masteryProgress: masteryProgress,
         ),
         error: (error, stackTrace) => Center(
           child: Text('Unable to load progress: $error'),
@@ -152,6 +167,7 @@ class _ProgressBody extends ConsumerWidget {
     required this.difficultyDistribution,
     required this.progressTrend,
     required this.skillBreakdown,
+    required this.masteryProgress,
   });
 
   final ProgressHistory history;
@@ -160,6 +176,7 @@ class _ProgressBody extends ConsumerWidget {
   final AsyncValue<PassageDifficultyDistribution> difficultyDistribution;
   final AsyncValue<ProgressTrend> progressTrend;
   final AsyncValue<SkillBreakdown> skillBreakdown;
+  final AsyncValue<MasteryProgress> masteryProgress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -198,6 +215,8 @@ class _ProgressBody extends ConsumerWidget {
         const SizedBox(height: 16),
         _BestQualifiedAttemptCard(attempt: bestQualifiedAttempt),
         const SizedBox(height: 16),
+        _MasteryProgressCard(progress: masteryProgress),
+        const SizedBox(height: 16),
         _SkillBreakdownCard(breakdown: skillBreakdown),
         const SizedBox(height: 16),
         _DifficultyDistributionCard(distribution: difficultyDistribution),
@@ -230,6 +249,93 @@ class _ProgressBody extends ConsumerWidget {
       return 'Pending quiz';
     }
     return '${(quiz.comprehensionScore * 100).round()}%';
+  }
+}
+
+class _MasteryProgressCard extends StatelessWidget {
+  const _MasteryProgressCard({required this.progress});
+
+  final AsyncValue<MasteryProgress> progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: progress.when(
+          data: (progress) {
+            final count = progress.immediateCandidateCount;
+            final required = progress.requiredPassageCount;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '800 WPM Mastery Progress',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                _MetricRow(
+                  label: 'Immediate candidates',
+                  value: '$count/$required',
+                ),
+                _MetricRow(
+                  label: 'Non-RSVP candidate',
+                  value: progress.hasNonRsvpCandidate ? 'Met' : 'Needed',
+                ),
+                _MetricRow(
+                  label: 'Delayed recall',
+                  value: progress.delayedRecallTracked
+                      ? 'Tracked'
+                      : 'Pending - not yet tracked',
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Requires 3 official standard or hard passages at 800+ WPM '
+                  'with 100% immediate comprehension, then delayed recall '
+                  'checks at least 24 hours later scoring 90% or better.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                if (progress.immediateCandidates.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  ...progress.immediateCandidates
+                      .take(required)
+                      .map((candidate) => _MasteryCandidateRow(
+                            candidate: candidate,
+                          )),
+                ],
+              ],
+            );
+          },
+          error: (error, stackTrace) => Text(
+            'Mastery progress unavailable: $error',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+          loading: () => const LinearProgressIndicator(),
+        ),
+      ),
+    );
+  }
+}
+
+class _MasteryCandidateRow extends StatelessWidget {
+  const _MasteryCandidateRow({required this.candidate});
+
+  final MasteryProgressCandidate candidate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          Expanded(child: Text(candidate.passageTitle)),
+          Text(
+            '${candidate.wpm.round()} WPM',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ),
+    );
   }
 }
 

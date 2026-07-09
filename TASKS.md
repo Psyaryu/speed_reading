@@ -1056,6 +1056,9 @@ Follow-up tasks:
 - Status: Todo
   Task: Schedule delayed recall reminders when persisted mastery candidates are created.
   Notes: Use `delayedRecallReminderSchedulerProvider` and `DelayedRecallReminderFactory` from the mastery candidate creation flow once immediate 800 WPM mastery attempts are persisted.
+- Status: Todo
+  Task: Persist delayed recall quiz attempts and connect them to mastery progress.
+  Notes: Add loadable delayed recall attempt storage or a typed recall quiz result model so mastery progress can verify checks completed at least 24 hours after immediate attempts with scores of at least 90%.
 
 Completed task log:
 
@@ -1097,6 +1100,16 @@ Changed files: pubspec.yaml, pubspec.lock, android/app/src/main/AndroidManifest.
 Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 147 tests passed.
 Commit: See Git history for `feat: schedule delayed recall reminders`
 Notes: Added a reminder factory, in-memory scheduler, Android/iOS `flutter_local_notifications` scheduler, Riverpod provider wiring, stable notification IDs, delayed recall payloads, and focused tests. Unsupported platforms such as Windows use the in-memory scheduler instead of calling unsupported plugin APIs.
+```
+
+```text
+Task: Track mastery progress
+Status: Done
+Completed: 2026-07-08
+Changed files: lib/progress/domain/mastery_rules.dart, lib/progress/domain/mastery_progress.dart, lib/progress/presentation/progress_screen.dart, test/mastery_progress_test.dart, test/progress_screen_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 150 tests passed.
+Commit: See Git history for `feat: show mastery progress`
+Notes: Progress now shows immediate 800 WPM mastery candidates from official standard/hard passages with 100% immediate comprehension, qualified status, no excessive pausing, and a non-RSVP requirement indicator. Delayed recall is clearly labeled as pending/not yet tracked until loadable delayed recall persistence exists.
 ```
 
 ## Milestone 7: Training Curriculum and Adaptive Plan

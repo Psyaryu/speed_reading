@@ -9,6 +9,7 @@ import 'package:speed_reading/content/domain/passage_filter.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
+import 'package:speed_reading/progress/domain/mastery_progress.dart';
 import 'package:speed_reading/progress/domain/passage_difficulty_distribution.dart';
 import 'package:speed_reading/progress/domain/progress_trend.dart';
 import 'package:speed_reading/progress/domain/skill_breakdown.dart';
@@ -33,6 +34,8 @@ void main() {
               .overrideWith((ref) async => _emptyProgressTrend),
           skillBreakdownProvider
               .overrideWith((ref) async => _emptySkillBreakdown),
+          masteryProgressProvider
+              .overrideWith((ref) async => _emptyMasteryProgress),
         ],
         child: const MaterialApp(home: ProgressScreen()),
       ),
@@ -58,6 +61,8 @@ void main() {
         progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
         skillBreakdownProvider
             .overrideWith((ref) async => _emptySkillBreakdown),
+        masteryProgressProvider
+            .overrideWith((ref) async => _emptyMasteryProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -140,6 +145,8 @@ void main() {
         progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
         skillBreakdownProvider
             .overrideWith((ref) async => _emptySkillBreakdown),
+        masteryProgressProvider
+            .overrideWith((ref) async => _emptyMasteryProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -244,6 +251,8 @@ void main() {
         progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
         skillBreakdownProvider
             .overrideWith((ref) async => _emptySkillBreakdown),
+        masteryProgressProvider
+            .overrideWith((ref) async => _emptyMasteryProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -383,6 +392,8 @@ void main() {
         progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
         skillBreakdownProvider
             .overrideWith((ref) async => _emptySkillBreakdown),
+        masteryProgressProvider
+            .overrideWith((ref) async => _emptyMasteryProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -409,6 +420,11 @@ void main() {
     );
 
     await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Passage Difficulty Distribution'),
+      500,
+    );
 
     expect(find.text('Passage Difficulty Distribution'), findsOneWidget);
     expect(find.text('Easy'), findsOneWidget);
@@ -475,6 +491,8 @@ void main() {
             unmatchedAnswerCount: 1,
           ),
         ),
+        masteryProgressProvider
+            .overrideWith((ref) async => _emptyMasteryProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -507,6 +525,8 @@ void main() {
     );
 
     await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Skill Breakdown'), 500);
 
     expect(find.text('Skill Breakdown'), findsOneWidget);
     expect(find.text('Main Idea'), findsOneWidget);
@@ -577,6 +597,8 @@ void main() {
         ),
         skillBreakdownProvider
             .overrideWith((ref) async => _emptySkillBreakdown),
+        masteryProgressProvider
+            .overrideWith((ref) async => _emptyMasteryProgress),
       ],
     );
     addTearDown(container.dispose);
@@ -646,6 +668,133 @@ void main() {
     expect(find.text('552'), findsOneWidget);
     expect(find.text('Private imported passage text.'), findsNothing);
   });
+
+  testWidgets('shows immediate mastery candidate progress', (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    final container = ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(database),
+        passageRepositoryProvider.overrideWithValue(
+          const _FakePassageRepository(
+            passages: [
+              Passage(
+                id: 'mastery-one',
+                title: 'Mastery One',
+                body: 'Official bundled body.',
+                metadata: PassageMetadata(
+                  wordCount: 800,
+                  difficulty: PassageDifficulty.standard,
+                  topic: 'Adventure',
+                  source: PassageSource.official,
+                  license: 'Public domain',
+                  type: PassageType.fiction,
+                  vocabularyDensity: 0.2,
+                  tags: ['mastery'],
+                  isCertificationEligible: true,
+                  isMasteryEligible: true,
+                ),
+              ),
+              Passage(
+                id: 'mastery-two',
+                title: 'Mastery Two',
+                body: 'Official bundled body.',
+                metadata: PassageMetadata(
+                  wordCount: 800,
+                  difficulty: PassageDifficulty.hard,
+                  topic: 'Adventure',
+                  source: PassageSource.official,
+                  license: 'Public domain',
+                  type: PassageType.fiction,
+                  vocabularyDensity: 0.3,
+                  tags: ['mastery'],
+                  isCertificationEligible: true,
+                  isMasteryEligible: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        progressShareableSummaryProvider.overrideWith((ref) async => null),
+        bestQualifiedAttemptProvider.overrideWith((ref) async => null),
+        passageDifficultyDistributionProvider.overrideWith(
+          (ref) async => _emptyDifficultyDistribution,
+        ),
+        progressTrendProvider.overrideWith((ref) async => _emptyProgressTrend),
+        skillBreakdownProvider
+            .overrideWith((ref) async => _emptySkillBreakdown),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final store = container.read(localDataStoreProvider);
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'mastery-one-session',
+        passageId: 'mastery-one',
+        mode: ReadingMode.rsvp,
+        startedAt: DateTime.utc(2026, 7, 8, 12),
+        activeReadingSeconds: 60,
+        wordCount: 800,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+    await store.saveReadingSession(
+      ReadingSession(
+        id: 'mastery-two-session',
+        passageId: 'mastery-two',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8, 13),
+        activeReadingSeconds: 60,
+        wordCount: 820,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    );
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'mastery-one-quiz',
+        sessionId: 'mastery-one-session',
+        passageId: 'mastery-one',
+        correctCount: 10,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 12, 2),
+      ),
+    );
+    await store.saveQuizResult(
+      QuizResult(
+        id: 'mastery-two-quiz',
+        sessionId: 'mastery-two-session',
+        passageId: 'mastery-two',
+        correctCount: 10,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 13, 2),
+      ),
+    );
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: ProgressScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('800 WPM Mastery Progress'),
+      500,
+    );
+
+    expect(find.text('800 WPM Mastery Progress'), findsOneWidget);
+    expect(find.text('2/3'), findsOneWidget);
+    expect(find.text('Met'), findsOneWidget);
+    expect(find.text('Pending - not yet tracked'), findsOneWidget);
+    expect(find.text('Mastery One'), findsOneWidget);
+    expect(find.text('Mastery Two'), findsOneWidget);
+  });
 }
 
 const _emptyDifficultyDistribution = PassageDifficultyDistribution(
@@ -661,6 +810,14 @@ const _emptySkillBreakdown = SkillBreakdown(
 const _emptyProgressTrend = ProgressTrend(
   points: [],
   unmatchedSessionCount: 0,
+);
+
+const _emptyMasteryProgress = MasteryProgress(
+  immediateCandidates: [],
+  requiredPassageCount: 3,
+  hasNonRsvpCandidate: false,
+  delayedRecallTracked: false,
+  masteryEarned: false,
 );
 
 ReadingSession _session({
