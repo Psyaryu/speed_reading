@@ -237,7 +237,7 @@ Notes: Used manual immutable Dart models with JSON helpers instead of generated 
 
 ### Epic 1.2: Local Persistence
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -334,6 +334,16 @@ Changed files: lib/settings/domain/progress_exporter.dart, test/progress_exporte
 Verification: Could not run flutter test because Flutter is not installed or not on PATH. Added tests for JSON export structure and session CSV output.
 Commit: See Git history for `feat: add progress export formatter`
 Notes: Database persistence and file writing remain open. This formatter supports future JSON/CSV export flows.
+```
+
+```text
+Task: Close local persistence acceptance criteria
+Status: Done
+Completed: 2026-07-09
+Changed files: test/drift_local_data_store_test.dart, TASKS.md
+Verification: Confirmed Drift schema covers local profiles/settings, passage records with metadata/source, reading sessions, quiz results, delayed recall attempts, progress snapshots, certification attempts, and mastery attempts. Confirmed official passage metadata is bundled locally in JSON assets and is not touched by reset; imported passages, sessions, quiz results, snapshots, settings, JSON export, CSV export, and confirmed reset flow are implemented and covered by existing tests. Added a file-backed Drift restart test proving pasted/imported passages survive database close and reopen. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all 170 tests passed.
+Commit: See Git history for `test: close local persistence criteria`
+Notes: No local persistence follow-up tasks remain.
 ```
 
 ### Epic 1.3: Local User Profile

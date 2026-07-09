@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_reading/assessment/domain/quiz.dart';
@@ -121,7 +123,9 @@ void main() {
     final results = await store.loadQuizResults();
 
     expect(
-        results.single.writtenSummary, 'The passage is about a signal fire.');
+      results.single.writtenSummary,
+      'The passage is about a signal fire.',
+    );
     expect(results.single.comprehensionScore, 0.5);
   });
 
@@ -176,6 +180,39 @@ void main() {
 
     expect(await store.loadPassages(), hasLength(1));
     expect(await store.loadReadingSessions(), isEmpty);
+  });
+
+  test('imported passages survive database restart', () async {
+    final directory = await Directory.systemTemp.createTemp(
+      'speed_reading_persistence_test_',
+    );
+    addTearDown(() async {
+      await database.close();
+      if (await directory.exists()) {
+        await directory.delete(recursive: true);
+      }
+    });
+    final file = File('${directory.path}/speed_reading.sqlite');
+
+    await database.close();
+    database = AppDatabase(NativeDatabase(file));
+    store = DriftLocalDataStore(database);
+    await store.saveImportedPassage(
+      ImportedPassageFactory.create(
+        id: 'import-restart',
+        title: 'Restart Passage',
+        body: 'This passage should survive a database reopen.',
+      ),
+    );
+    await database.close();
+
+    database = AppDatabase(NativeDatabase(file));
+    store = DriftLocalDataStore(database);
+    final passages = await store.loadPassages();
+
+    expect(passages, hasLength(1));
+    expect(passages.single.id, 'import-restart');
+    expect(passages.single.title, 'Restart Passage');
   });
 }
 
