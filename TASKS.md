@@ -1386,7 +1386,7 @@ Goal: Show progress clearly without encouraging speed-only behavior.
 
 ### Epic 8.1: Home Dashboard
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -1459,6 +1459,16 @@ Changed files: lib/training/presentation/dashboard_screen.dart, test/dashboard_s
 Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 119 tests passed.
 Commit: See Git history for `feat: show dashboard practice plan`
 Notes: Dashboard now shows a short daily practice plan and a deterministic recommended next drill derived from local sessions, quiz results, qualified ERS history, scan accuracy, WPM plateau checks, and RSVP transfer state.
+```
+
+```text
+Task: Close home dashboard acceptance criteria
+Status: Done
+Completed: 2026-07-09
+Changed files: lib/training/presentation/dashboard_screen.dart, test/dashboard_screen_test.dart, TASKS.md
+Verification: Confirmed the dashboard is the first post-onboarding route and uses local profile, session, quiz, passage, and official question data. Dashboard shows current level, 800 WPM readiness, latest WPM paired with comprehension, ERS trend summary, practice streak, daily practice plan, and recommended next drill. Added widget coverage for ERS trend and streak derived from local history. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\dashboard_screen_test.dart`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; focused tests passed, analyze passed with no issues, and all 181 tests passed.
+Commit: See Git history for `feat: close dashboard criteria`
+Notes: No Epic 8.1 follow-up tasks remain.
 ```
 
 ### Epic 8.2: Analytics Views

@@ -94,6 +94,26 @@ void main() {
     expect(find.text('Readiness: 70% (560 qualified ERS)'), findsOneWidget);
   });
 
+  testWidgets('dashboard shows ERS trend and practice streak from local data',
+      (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          _profileOverride(),
+          _dashboardSummaryOverride(_twoDayTrendHistory()),
+        ],
+        child: const SpeedReadingApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('ERS trend: up 80 from previous session.'),
+      findsOneWidget,
+    );
+    expect(find.text('Practice streak: 2 days'), findsOneWidget);
+  });
+
   testWidgets('dashboard recommends comprehension review for weak quizzes',
       (tester) async {
     await tester.pumpWidget(
@@ -266,6 +286,51 @@ ProgressHistory _rsvpOnlyHistory() {
       QuizResult(
         id: 'quiz-manual-slower',
         sessionId: 'manual-slower',
+        passageId: 'passage-1',
+        correctCount: 8,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 7, 0, 2),
+      ),
+    ],
+  );
+}
+
+ProgressHistory _twoDayTrendHistory() {
+  return ProgressHistory(
+    sessions: [
+      ReadingSession(
+        id: 'session-latest',
+        passageId: 'passage-1',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 8),
+        activeReadingSeconds: 60,
+        wordCount: 800,
+        status: AttemptQualificationStatus.qualified,
+      ),
+      ReadingSession(
+        id: 'session-previous',
+        passageId: 'passage-1',
+        mode: ReadingMode.manual,
+        startedAt: DateTime.utc(2026, 7, 7),
+        activeReadingSeconds: 80,
+        wordCount: 800,
+        status: AttemptQualificationStatus.qualified,
+      ),
+    ],
+    quizResults: [
+      QuizResult(
+        id: 'quiz-latest',
+        sessionId: 'session-latest',
+        passageId: 'passage-1',
+        correctCount: 7,
+        totalQuestions: 10,
+        answersByQuestionId: const {},
+        completedAt: DateTime.utc(2026, 7, 8, 0, 2),
+      ),
+      QuizResult(
+        id: 'quiz-previous',
+        sessionId: 'session-previous',
         passageId: 'passage-1',
         correctCount: 8,
         totalQuestions: 10,

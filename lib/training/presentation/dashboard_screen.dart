@@ -5,10 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../assessment/domain/quiz.dart';
 import '../../content/domain/passage.dart';
 import '../../content/domain/passage_filter.dart';
+import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
 import '../../progress/domain/effective_reading_score.dart';
+import '../../progress/domain/progress_trend.dart';
 import '../../progress/domain/progression.dart';
 import '../../progress/presentation/progress_screen.dart';
+import '../../reading/domain/reading_session.dart';
 import '../domain/training_recommendation.dart';
 
 final dashboardProgressSummaryProvider =
@@ -37,6 +40,8 @@ class DashboardProgressSummary {
     required this.levelName,
     required this.bestQualifiedErs,
     required this.readinessPercent,
+    required this.ersTrendSummary,
+    required this.streakDays,
     required this.recommendedDrill,
     required this.practicePlanItems,
   });
@@ -46,6 +51,8 @@ class DashboardProgressSummary {
   final String levelName;
   final double bestQualifiedErs;
   final double readinessPercent;
+  final String ersTrendSummary;
+  final int streakDays;
   final TrainingDrill recommendedDrill;
   final List<String> practicePlanItems;
 
@@ -90,6 +97,11 @@ class DashboardProgressSummary {
     }
 
     final level = Progression.levelForQualifiedErs(bestQualifiedErs);
+    final trend = ProgressTrendBuilder.fromHistory(
+      sessions: history.sessions,
+      quizResults: history.quizResults,
+      passages: passages,
+    );
     final recommendedDrill = _recommendedDrillFor(
       history,
       questions,
@@ -100,9 +112,70 @@ class DashboardProgressSummary {
       levelName: Progression.levelName(level),
       bestQualifiedErs: bestQualifiedErs,
       readinessPercent: Progression.readinessPercent(bestQualifiedErs),
+      ersTrendSummary: _ersTrendSummary(trend),
+      streakDays: _currentStreakDays(history.sessions),
       recommendedDrill: recommendedDrill,
       practicePlanItems: _practicePlanFor(recommendedDrill),
     );
+  }
+
+  static String _ersTrendSummary(ProgressTrend trend) {
+    if (!trend.hasEnoughData) {
+      return 'ERS trend: complete two sessions with quizzes to compare.';
+    }
+
+    final latest = trend.points.last;
+    final previous = trend.points[trend.points.length - 2];
+    final delta = latest.effectiveReadingScore - previous.effectiveReadingScore;
+    if (delta.abs() < 0.5) {
+      return 'ERS trend: steady from previous session.';
+    }
+
+    final direction = delta > 0 ? 'up' : 'down';
+    return 'ERS trend: $direction ${delta.abs().round()} from previous session.';
+  }
+
+  static int _currentStreakDays(List<ReadingSession> sessions) {
+    final completedPracticeDays = sessions
+        .where((session) {
+          return switch (session.status) {
+            AttemptQualificationStatus.qualified ||
+            AttemptQualificationStatus.unqualified =>
+              true,
+            AttemptQualificationStatus.interrupted ||
+            AttemptQualificationStatus.incomplete =>
+              false,
+          };
+        })
+        .map(
+          (session) => DateTime.utc(
+            session.startedAt.year,
+            session.startedAt.month,
+            session.startedAt.day,
+          ),
+        )
+        .toSet()
+        .toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    if (completedPracticeDays.isEmpty) {
+      return 0;
+    }
+
+    var streak = 1;
+    var expectedPreviousDay =
+        completedPracticeDays.first.subtract(const Duration(days: 1));
+    for (final day in completedPracticeDays.skip(1)) {
+      if (day != expectedPreviousDay) {
+        break;
+      }
+      streak += 1;
+      expectedPreviousDay = expectedPreviousDay.subtract(
+        const Duration(days: 1),
+      );
+    }
+
+    return streak;
   }
 
   static TrainingDrill _recommendedDrillFor(
@@ -247,6 +320,11 @@ class _ProgressSummary extends StatelessWidget {
         Text(
           'Readiness: ${summary.readinessPercent.round()}% '
           '(${summary.bestQualifiedErs.round()} qualified ERS)',
+        ),
+        Text(summary.ersTrendSummary),
+        Text(
+          'Practice streak: ${summary.streakDays} '
+          '${summary.streakDays == 1 ? 'day' : 'days'}',
         ),
         Text('${latest.wpm.round()} WPM - Comprehension: $comprehension'),
         const SizedBox(height: 16),
