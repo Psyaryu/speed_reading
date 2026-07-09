@@ -651,7 +651,7 @@ Goal: Build the core reading experience for manual, paced, and RSVP modes.
 
 ### Epic 4.1: Manual Reading Mode
 
-Status: In Progress
+Status: Done
 
 Tasks:
 
@@ -743,6 +743,16 @@ Changed files: lib/reading/presentation/reader_screen.dart, test/reader_screen_t
 Verification: Ran `flutter analyze` and `flutter test`. Analyze passed with no issues and all 106 tests passed.
 Commit: See Git history for `feat: link reader completion to quiz`
 Notes: After a manual session is saved, the reader now shows a Take Quiz action that navigates to the quiz route. End-to-end automatic result/ERS progression remains open.
+```
+
+```text
+Task: Close manual reading mode acceptance criteria
+Status: Done
+Completed: 2026-07-09
+Changed files: test/reader_screen_test.dart, TASKS.md
+Verification: Confirmed the manual reader renders passage text in a distraction-light column; applies persisted font size, line height, theme, and column width settings; tracks start, pause, resume, and finish; persists WPM from word count and active reading time excluding pauses; guards active reader exits; and hands the saved manual session through quiz submission into results. Added a widget flow test for manual reader -> persisted quiz session -> persisted results. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\reader_screen_test.dart`; all 9 reader tests passed. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all 172 tests passed.
+Commit: See Git history for `test: close manual reader criteria`
+Notes: No manual reading mode follow-up tasks remain.
 ```
 
 ### Epic 4.2: Paced Reading Mode

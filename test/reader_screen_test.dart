@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:speed_reading/assessment/data/official_question_loader.dart';
+import 'package:speed_reading/assessment/domain/quiz.dart';
+import 'package:speed_reading/assessment/presentation/quiz_screen.dart';
+import 'package:speed_reading/assessment/presentation/results_screen.dart';
 import 'package:speed_reading/content/domain/passage.dart';
 import 'package:speed_reading/core/data/app_database.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
@@ -254,6 +258,103 @@ void main() {
     expect(find.text('Quiz Route'), findsOneWidget);
   });
 
+  testWidgets('manual session flows through quiz to persisted results',
+      (tester) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    final clock = _FakeClock([
+      DateTime.utc(2026, 7, 9, 12),
+      DateTime.utc(2026, 7, 9, 12, 1),
+      DateTime.utc(2026, 7, 9, 12, 2),
+    ]);
+    addTearDown(database.close);
+
+    final router = GoRouter(
+      initialLocation: '/reader',
+      routes: [
+        GoRoute(
+          path: '/reader',
+          name: 'reader',
+          builder: (context, state) => const ReaderScreen(),
+        ),
+        GoRoute(
+          path: '/quiz',
+          name: 'quiz',
+          builder: (context, state) => const QuizScreen(),
+        ),
+        GoRoute(
+          path: '/results',
+          name: 'results',
+          builder: (context, state) => const ResultsScreen(),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(clock.call),
+          localProfileProvider.overrideWith((ref) async => _profile()),
+          readerSessionIdProvider.overrideWithValue(() => 'session-1'),
+          readerPassagesProvider.overrideWith((ref) async => [
+                _passage(),
+              ]),
+          officialQuestionSourceProvider.overrideWithValue(
+            const _FakeOfficialQuestionSource(),
+          ),
+          quizResultIdProvider.overrideWithValue(() => 'quiz-1'),
+          resultPassagesProvider.overrideWith((ref) async => [
+                _passage(),
+              ]),
+        ],
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start'));
+    await tester.pump();
+    await tester.tap(find.text('Finish'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Take Quiz'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Comprehension Check'), findsOneWidget);
+
+    await tester.tap(find.text('The signal fire'));
+    await tester.pump();
+    await tester.tap(find.text('A hidden map'));
+    await tester.pump();
+    await tester.scrollUntilVisible(
+      find.text('Submit Quiz'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Submit Quiz'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Comprehension: 50%'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('View Results'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('View Results'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Latest Result'), findsOneWidget);
+    expect(find.text('800 WPM'), findsOneWidget);
+    expect(find.text('50%'), findsOneWidget);
+    expect(find.text('Below 70%'), findsOneWidget);
+
+    final sessions =
+        await database.select(database.readingSessionRecords).get();
+    final results = await database.select(database.quizResultRecords).get();
+    expect(sessions.single.id, 'session-1');
+    expect(results.single.sessionId, 'session-1');
+  });
+
   testWidgets('runs RSVP mode with WPM, pause, resume, and rewind controls',
       (tester) async {
     final database = AppDatabase(NativeDatabase.memory());
@@ -455,4 +556,32 @@ class _FakeClock {
   final Queue<DateTime> _times;
 
   DateTime call() => _times.removeFirst();
+}
+
+List<QuizQuestion> _questions() {
+  return const [
+    QuizQuestion(
+      id: 'q1',
+      passageId: 'passage-1',
+      type: QuestionType.mainIdea,
+      prompt: 'What pulled the runner onward?',
+      options: ['The signal fire', 'A quiet garden'],
+      correctOptionIndex: 0,
+    ),
+    QuizQuestion(
+      id: 'q2',
+      passageId: 'passage-1',
+      type: QuestionType.detailRecall,
+      prompt: 'What did the runner carry?',
+      options: ['A compass', 'A hidden map'],
+      correctOptionIndex: 0,
+    ),
+  ];
+}
+
+class _FakeOfficialQuestionSource implements OfficialQuestionSource {
+  const _FakeOfficialQuestionSource();
+
+  @override
+  Future<List<QuizQuestion>> load() async => _questions();
 }
