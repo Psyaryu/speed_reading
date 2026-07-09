@@ -423,6 +423,16 @@ Notes: Added a starter public-domain adventure fiction passage from Treasure Isl
 ```
 
 ```text
+Task: Expand official bundled adventure fiction passages
+Status: Done
+Completed: 2026-07-08
+Changed files: assets/passages/official_passages.json, test/official_passage_loader_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 111 tests passed.
+Commit: See Git history for `feat: expand official passage library`
+Notes: Added short, medium, and long official public-domain adventure fiction passages from Treasure Island with source/license metadata, filterable length tags, and word-count validation against the bundled asset.
+```
+
+```text
 Task: Add passage filtering service
 Status: Done
 Completed: 2026-07-06
