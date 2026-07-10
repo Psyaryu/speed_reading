@@ -57,3 +57,5 @@ final localProfileControllerProvider = Provider<LocalProfileController>((ref) {
 final localProfileProvider = FutureProvider<LocalUserProfile>((ref) {
   return ref.watch(localProfileControllerProvider).loadOrCreate();
 });
+
+final themePreviewProvider = StateProvider<LocalThemeMode?>((ref) => null);

@@ -1021,7 +1021,7 @@ Status: Done
 Completed: 2026-07-09
 Changed files: TASKS.md
 Verification: Confirmed every bundled official MVP passage in `assets/passages/official_passages.json` has a quiz in `assets/passages/official_questions.json`; questions include category tags, answer keys, and explanations; length-scaled minimum counts are enforced by `test/official_question_loader_test.dart`; and no current certification-eligible official passages lack question coverage. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all 173 tests passed.
-Commit:
+Commit: See Git history for `feat: preview settings theme instantly`
 Notes: Epic 5.2 acceptance criteria are closed. No follow-up tasks were added.
 ```
 
@@ -1699,6 +1699,16 @@ Changed files: lib/settings/domain/local_user_profile.dart, lib/core/theme/app_t
 Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build windows`. Analyze passed with no issues, all 186 tests passed, and the Windows release build succeeded at `build\windows\x64\runner\Release\speed_reading.exe`.
 Commit:
 Notes: Added GX Crimson, Ultraviolet, Electric Cyan, Acid Lime, and Hot Magenta theme presets with dark neon surfaces, persisted through the existing local profile setting and applied as app-wide ThemeData.
+```
+
+```text
+Task: Add instant theme preview with unsaved revert
+Status: Done
+Completed: 2026-07-10
+Changed files: lib/core/providers/app_providers.dart, lib/main.dart, lib/settings/presentation/settings_screen.dart, test/settings_screen_test.dart, test/widget_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 188 tests passed.
+Commit: See Git history for `feat: preview settings theme instantly`
+Notes: Added a temporary theme preview provider used by the app shell, updated Settings to preview theme selections immediately, persist them only on Save Settings, and clear unsaved previews when leaving Settings through the back button or route pop.
 ```
 
 ```text

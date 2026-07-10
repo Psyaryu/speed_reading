@@ -16,10 +16,11 @@ class SpeedReadingApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(localProfileProvider);
-    final themeMode = profile.maybeWhen(
+    final persistedThemeMode = profile.maybeWhen(
       data: (profile) => profile.preferredThemeMode,
       orElse: () => LocalThemeMode.system,
     );
+    final themeMode = ref.watch(themePreviewProvider) ?? persistedThemeMode;
     final appTheme = themeMode.toAppTheme();
 
     return MaterialApp.router(

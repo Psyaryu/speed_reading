@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/providers/app_providers.dart';
@@ -13,17 +14,23 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(localProfileProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: const AppBackButton(),
-        title: const Text('Settings'),
-      ),
-      body: profile.when(
-        data: (profile) => _SettingsForm(profile: profile),
-        error: (error, stackTrace) => Center(
+    return profile.when(
+      data: (profile) => _SettingsForm(profile: profile),
+      error: (error, stackTrace) => Scaffold(
+        appBar: AppBar(
+          leading: const AppBackButton(),
+          title: const Text('Settings'),
+        ),
+        body: Center(
           child: Text('Unable to load settings: $error'),
         ),
-        loading: () => const Center(child: CircularProgressIndicator()),
+      ),
+      loading: () => Scaffold(
+        appBar: AppBar(
+          leading: const AppBackButton(),
+          title: const Text('Settings'),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
       ),
     );
   }
@@ -43,10 +50,12 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
   late double _lineHeight;
   late double _columnWidth;
   late LocalThemeMode _themeMode;
+  late LocalThemeMode _savedThemeMode;
   late bool _reducedMotion;
   bool _isSaving = false;
   bool _isResetting = false;
   bool _isExporting = false;
+  bool _themePreviewSaved = false;
   String? _exportText;
   _ExportFormat? _exportFormat;
 
@@ -66,181 +75,200 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Text(
-          'Reading Preferences',
-          style: Theme.of(context).textTheme.headlineSmall,
+    return PopScope<void>(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop && !_themePreviewSaved) {
+          ref.read(themePreviewProvider.notifier).state = null;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: AppBackButton(onPressed: _leaveSettings),
+          title: const Text('Settings'),
         ),
-        const SizedBox(height: 20),
-        _SliderSetting(
-          label: 'Font Size',
-          valueLabel: '${_fontSize.round()} pt',
-          value: _fontSize,
-          min: 14,
-          max: 30,
-          divisions: 16,
-          onChanged: (value) {
-            setState(() {
-              _fontSize = value;
-            });
-          },
-        ),
-        const SizedBox(height: 16),
-        _SliderSetting(
-          label: 'Line Height',
-          valueLabel: _lineHeight.toStringAsFixed(1),
-          value: _lineHeight,
-          min: 1.2,
-          max: 2,
-          divisions: 8,
-          onChanged: (value) {
-            setState(() {
-              _lineHeight = value;
-            });
-          },
-        ),
-        const SizedBox(height: 16),
-        _SliderSetting(
-          label: 'Column Width',
-          valueLabel: '${_columnWidth.round()} px',
-          value: _columnWidth,
-          min: 520,
-          max: 920,
-          divisions: 8,
-          onChanged: (value) {
-            setState(() {
-              _columnWidth = value;
-            });
-          },
-        ),
-        const SizedBox(height: 16),
-        DropdownButtonFormField<LocalThemeMode>(
-          initialValue: _themeMode,
-          decoration: const InputDecoration(
-            labelText: 'Theme',
-            border: OutlineInputBorder(),
-          ),
-          items: LocalThemeMode.values.map((themeMode) {
-            return DropdownMenuItem(
-              value: themeMode,
-              child: Text(themeMode.label),
-            );
-          }).toList(growable: false),
-          onChanged: (value) {
-            if (value == null) {
-              return;
-            }
-            setState(() {
-              _themeMode = value;
-            });
-          },
-        ),
-        const SizedBox(height: 8),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Reduced Motion'),
-          subtitle: const Text('Minimize animated reading effects.'),
-          value: _reducedMotion,
-          onChanged: (value) {
-            setState(() {
-              _reducedMotion = value;
-            });
-          },
-        ),
-        const SizedBox(height: 20),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: FilledButton.icon(
-            onPressed: _isSaving ? null : _save,
-            icon: _isSaving
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.save),
-            label: const Text('Save Settings'),
-          ),
-        ),
-        const SizedBox(height: 32),
-        Text(
-          'Data',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: OutlinedButton.icon(
-            onPressed: _isResetting ? null : _confirmResetProgress,
-            icon: _isResetting
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.delete_outline),
-            label: const Text('Reset Progress'),
-          ),
-        ),
-        const SizedBox(height: 24),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
+        body: ListView(
+          padding: const EdgeInsets.all(20),
           children: [
-            OutlinedButton.icon(
-              onPressed:
-                  _isExporting ? null : () => _exportData(_ExportFormat.json),
-              icon: const Icon(Icons.data_object),
-              label: const Text('Export JSON'),
+            Text(
+              'Reading Preferences',
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-            OutlinedButton.icon(
-              onPressed:
-                  _isExporting ? null : () => _exportData(_ExportFormat.csv),
-              icon: const Icon(Icons.table_chart),
-              label: const Text('Export CSV'),
+            const SizedBox(height: 20),
+            _SliderSetting(
+              label: 'Font Size',
+              valueLabel: '${_fontSize.round()} pt',
+              value: _fontSize,
+              min: 14,
+              max: 30,
+              divisions: 16,
+              onChanged: (value) {
+                setState(() {
+                  _fontSize = value;
+                });
+              },
             ),
-          ],
-        ),
-        if (_isExporting) ...[
-          const SizedBox(height: 12),
-          const LinearProgressIndicator(),
-        ],
-        if (_exportText != null) ...[
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Export Preview',
-                  style: Theme.of(context).textTheme.titleMedium,
+            const SizedBox(height: 16),
+            _SliderSetting(
+              label: 'Line Height',
+              valueLabel: _lineHeight.toStringAsFixed(1),
+              value: _lineHeight,
+              min: 1.2,
+              max: 2,
+              divisions: 8,
+              onChanged: (value) {
+                setState(() {
+                  _lineHeight = value;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            _SliderSetting(
+              label: 'Column Width',
+              valueLabel: '${_columnWidth.round()} px',
+              value: _columnWidth,
+              min: 520,
+              max: 920,
+              divisions: 8,
+              onChanged: (value) {
+                setState(() {
+                  _columnWidth = value;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<LocalThemeMode>(
+              initialValue: _themeMode,
+              decoration: const InputDecoration(
+                labelText: 'Theme',
+                border: OutlineInputBorder(),
+              ),
+              items: LocalThemeMode.values.map((themeMode) {
+                return DropdownMenuItem(
+                  value: themeMode,
+                  child: Text(themeMode.label),
+                );
+              }).toList(growable: false),
+              onChanged: (value) {
+                if (value == null) {
+                  return;
+                }
+                setState(() {
+                  _themeMode = value;
+                  _themePreviewSaved = false;
+                });
+                ref.read(themePreviewProvider.notifier).state =
+                    value == _savedThemeMode ? null : value;
+              },
+            ),
+            const SizedBox(height: 8),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Reduced Motion'),
+              subtitle: const Text('Minimize animated reading effects.'),
+              value: _reducedMotion,
+              onChanged: (value) {
+                setState(() {
+                  _reducedMotion = value;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton.icon(
+                onPressed: _isSaving ? null : _save,
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.save),
+                label: const Text('Save Settings'),
+              ),
+            ),
+            const SizedBox(height: 32),
+            Text(
+              'Data',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                onPressed: _isResetting ? null : _confirmResetProgress,
+                icon: _isResetting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.delete_outline),
+                label: const Text('Reset Progress'),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: _isExporting
+                      ? null
+                      : () => _exportData(_ExportFormat.json),
+                  icon: const Icon(Icons.data_object),
+                  label: const Text('Export JSON'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: _isExporting
+                      ? null
+                      : () => _exportData(_ExportFormat.csv),
+                  icon: const Icon(Icons.table_chart),
+                  label: const Text('Export CSV'),
+                ),
+              ],
+            ),
+            if (_isExporting) ...[
+              const SizedBox(height: 12),
+              const LinearProgressIndicator(),
+            ],
+            if (_exportText != null) ...[
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Export Preview',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: _shareExport,
+                    icon: const Icon(Icons.ios_share),
+                    label: const Text('Share Export'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Container(
+                constraints: const BoxConstraints(maxHeight: 220),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SingleChildScrollView(
+                  child: SelectableText(
+                    _exportText!,
+                    key: const ValueKey('settings-export-preview-text'),
+                  ),
                 ),
               ),
-              TextButton.icon(
-                onPressed: _shareExport,
-                icon: const Icon(Icons.ios_share),
-                label: const Text('Share Export'),
-              ),
             ],
-          ),
-          const SizedBox(height: 8),
-          Container(
-            constraints: const BoxConstraints(maxHeight: 220),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).dividerColor),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: SingleChildScrollView(
-              child: SelectableText(
-                _exportText!,
-                key: const ValueKey('settings-export-preview-text'),
-              ),
-            ),
-          ),
-        ],
-      ],
+          ],
+        ),
+      ),
     );
   }
 
@@ -249,6 +277,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
     _lineHeight = profile.preferredLineHeight;
     _columnWidth = profile.preferredColumnWidth;
     _themeMode = profile.preferredThemeMode;
+    _savedThemeMode = profile.preferredThemeMode;
     _reducedMotion = profile.reducedMotion;
   }
 
@@ -265,13 +294,17 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
           reducedMotion: _reducedMotion,
         );
     ref.invalidate(localProfileProvider);
+    await ref.read(localProfileProvider.future);
+    ref.read(themePreviewProvider.notifier).state = null;
 
     if (!mounted) {
       return;
     }
 
     setState(() {
+      _savedThemeMode = _themeMode;
       _isSaving = false;
+      _themePreviewSaved = true;
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Settings saved.')),
@@ -358,6 +391,24 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
       exportText,
       subject: 'Speed Reading $label Export',
     );
+  }
+
+  void _leaveSettings() {
+    if (!_themePreviewSaved) {
+      ref.read(themePreviewProvider.notifier).state = null;
+    }
+
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+      return;
+    }
+
+    try {
+      context.goNamed('dashboard');
+    } on Object {
+      // Some isolated widget tests mount Settings without a GoRouter.
+    }
   }
 }
 

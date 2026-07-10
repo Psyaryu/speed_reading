@@ -44,6 +44,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Settings saved.'), findsOneWidget);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsScreen)),
+    );
+    expect(container.read(themePreviewProvider), isNull);
 
     final profile = await database.select(database.localProfiles).getSingle();
     expect(profile.preferredFontSize, 24);
@@ -51,6 +55,44 @@ void main() {
     expect(profile.preferredColumnWidth, 820);
     expect(profile.preferredThemeMode, LocalThemeMode.electricCyan.name);
     expect(profile.reducedMotion, isTrue);
+  });
+
+  testWidgets('previews theme immediately and reverts when leaving unsaved', (
+    tester,
+  ) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          currentDateTimeProvider.overrideWithValue(
+            () => DateTime.utc(2026, 7, 10),
+          ),
+        ],
+        child: const MaterialApp(home: SettingsScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsScreen)),
+    );
+
+    await tester.tap(find.text('System'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('GX Crimson').last);
+    await tester.pumpAndSettle();
+
+    expect(container.read(themePreviewProvider), LocalThemeMode.gxCrimson);
+
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(themePreviewProvider), isNull);
+    final profile = await database.select(database.localProfiles).getSingle();
+    expect(profile.preferredThemeMode, LocalThemeMode.system.name);
   });
 
   testWidgets('resets progress only after confirmation', (tester) async {

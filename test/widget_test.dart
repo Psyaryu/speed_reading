@@ -88,6 +88,40 @@ void main() {
     expect(app.theme?.scaffoldBackgroundColor, const Color(0xFF0D080C));
   });
 
+  testWidgets('applies temporary theme preview before profile is saved', (
+    tester,
+  ) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          localProfileProvider.overrideWith((ref) async {
+            return LocalUserProfile.initial(
+              id: 'local',
+              createdAt: DateTime.utc(2026, 7, 10),
+            ).copyWith(preferredThemeMode: LocalThemeMode.light);
+          }),
+        ],
+        child: const SpeedReadingApp(),
+      ),
+    );
+    await tester.pump();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SpeedReadingApp)),
+    );
+    container.read(themePreviewProvider.notifier).state =
+        LocalThemeMode.hotMagenta;
+    await tester.pump();
+
+    final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+    expect(app.theme?.colorScheme.primary, const Color(0xFFFF4FD8));
+    expect(app.theme?.scaffoldBackgroundColor, const Color(0xFF120812));
+  });
+
   testWidgets('defines distinct app-wide light and dark theme surfaces', (
     tester,
   ) async {
