@@ -59,6 +59,40 @@ void main() {
     expect(app.themeMode, ThemeMode.dark);
   });
 
+  testWidgets('defines distinct app-wide light and dark theme surfaces', (
+    tester,
+  ) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          localProfileProvider.overrideWith((ref) async {
+            return LocalUserProfile.initial(
+              id: 'local',
+              createdAt: DateTime.utc(2026, 7, 7),
+            );
+          }),
+        ],
+        child: const SpeedReadingApp(),
+      ),
+    );
+    await tester.pump();
+
+    final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+    expect(
+      app.theme?.scaffoldBackgroundColor,
+      isNot(app.darkTheme?.scaffoldBackgroundColor),
+    );
+    expect(
+      app.theme?.appBarTheme.backgroundColor,
+      isNot(app.darkTheme?.appBarTheme.backgroundColor),
+    );
+    expect(app.theme?.cardTheme.color, isNot(app.darkTheme?.cardTheme.color));
+  });
+
   testWidgets('applies reduced motion preference to MediaQuery', (tester) async {
     final database = AppDatabase(NativeDatabase.memory());
     addTearDown(database.close);

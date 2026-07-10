@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/widgets/app_back_button.dart';
 import '../../settings/domain/local_user_profile.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -23,7 +24,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Onboarding')),
+      appBar: AppBar(
+        leading: const AppBackButton(),
+        title: const Text('Onboarding'),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [

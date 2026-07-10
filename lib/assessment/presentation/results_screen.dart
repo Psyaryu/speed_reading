@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../content/domain/passage.dart';
 import '../../content/domain/passage_filter.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/widgets/app_back_button.dart';
 import '../../progress/domain/effective_reading_score.dart';
 import '../../progress/domain/progression.dart';
 import '../../progress/domain/shareable_progress_summary.dart';
@@ -29,7 +30,10 @@ class ResultsScreen extends ConsumerWidget {
     final passages = ref.watch(resultPassagesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Results')),
+      appBar: AppBar(
+        leading: const AppBackButton(),
+        title: const Text('Results'),
+      ),
       body: switch ((history, passages)) {
         (AsyncData(value: final history), AsyncData(value: final passages)) =>
           _ResultsBody(

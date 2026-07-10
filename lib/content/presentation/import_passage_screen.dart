@@ -5,6 +5,7 @@ import '../domain/imported_passage_factory.dart';
 import '../domain/passage.dart';
 import '../../../core/domain/reading_enums.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../core/widgets/app_back_button.dart';
 
 final importedPassageIdProvider = Provider<String Function()>((ref) {
   return () => DateTime.now().microsecondsSinceEpoch.toString();
@@ -66,6 +67,7 @@ class _ImportPassageScreenState extends ConsumerState<ImportPassageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: const AppBackButton(),
         title: Text(_isEditing ? 'Edit Passage' : 'Import Passage'),
       ),
       body: ListView(

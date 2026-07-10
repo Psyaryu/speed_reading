@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/providers/app_providers.dart';
+import '../../core/widgets/app_back_button.dart';
 import '../domain/local_user_profile.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -13,7 +14,10 @@ class SettingsScreen extends ConsumerWidget {
     final profile = ref.watch(localProfileProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        leading: const AppBackButton(),
+        title: const Text('Settings'),
+      ),
       body: profile.when(
         data: (profile) => _SettingsForm(profile: profile),
         error: (error, stackTrace) => Center(

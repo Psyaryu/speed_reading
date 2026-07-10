@@ -6,6 +6,7 @@ import '../../assessment/domain/quiz.dart';
 import '../../content/domain/passage_filter.dart';
 import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/widgets/app_back_button.dart';
 import '../../progress/domain/best_qualified_attempt.dart';
 import '../../progress/domain/certification_progress.dart';
 import '../../progress/domain/delayed_recall_attempt.dart';
@@ -159,7 +160,10 @@ class ProgressScreen extends ConsumerWidget {
     final certificationProgress = ref.watch(certificationProgressProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Progress')),
+      appBar: AppBar(
+        leading: const AppBackButton(),
+        title: const Text('Progress'),
+      ),
       body: history.when(
         data: (history) => _ProgressBody(
           history: history,

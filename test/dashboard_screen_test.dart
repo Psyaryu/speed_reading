@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speed_reading/assessment/domain/quiz.dart';
 import 'package:speed_reading/content/domain/passage.dart';
+import 'package:speed_reading/content/presentation/library_screen.dart';
 import 'package:speed_reading/core/domain/reading_enums.dart';
 import 'package:speed_reading/core/providers/app_providers.dart';
 import 'package:speed_reading/main.dart';
@@ -16,6 +18,10 @@ void main() {
       ProviderScope(
         overrides: [
           _profileOverride(),
+          libraryPassagesProvider.overrideWith((ref) async => const []),
+          libraryAvailablePassagesProvider.overrideWith(
+            (ref) async => const [],
+          ),
           _dashboardSummaryOverride(
             const ProgressHistory(
               sessions: [],
@@ -36,6 +42,36 @@ void main() {
     expect(find.text('Progress'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Settings'), 300);
     expect(find.text('Settings'), findsOneWidget);
+  });
+
+  testWidgets('dashboard routes provide back navigation', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          _profileOverride(),
+          _dashboardSummaryOverride(
+            const ProgressHistory(
+              sessions: [],
+              quizResults: [],
+            ),
+          ),
+        ],
+        child: const SpeedReadingApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(ListTile, 'Library'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.byTooltip('Back'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Dashboard'), findsOneWidget);
   });
 
   testWidgets('dashboard shows initialized local profile', (tester) async {

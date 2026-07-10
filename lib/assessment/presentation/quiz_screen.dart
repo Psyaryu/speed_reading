@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../content/domain/passage_filter.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/widgets/app_back_button.dart';
 import '../../progress/domain/delayed_recall_reminder.dart';
 import '../../progress/domain/mastery_rules.dart';
 import '../../reading/domain/reading_session.dart';
@@ -41,7 +42,10 @@ class QuizScreen extends ConsumerWidget {
     final session = ref.watch(latestQuizSessionProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Quiz')),
+      appBar: AppBar(
+        leading: const AppBackButton(),
+        title: const Text('Quiz'),
+      ),
       body: session.when(
         data: (session) {
           if (session == null) {
@@ -163,7 +167,7 @@ class _QuizFormState extends ConsumerState<_QuizForm> {
           Align(
             alignment: Alignment.centerLeft,
             child: FilledButton.icon(
-              onPressed: () => context.goNamed('results'),
+              onPressed: () => context.pushNamed('results'),
               icon: const Icon(Icons.assessment),
               label: const Text('View Results'),
             ),

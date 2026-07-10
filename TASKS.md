@@ -95,7 +95,7 @@ Status: Done
 Completed: 2026-07-06
 Changed files: .gitignore, README.md, analysis_options.yaml, pubspec.yaml, lib/main.dart, test/widget_test.dart, assets/passages/.gitkeep, lib/*/.gitkeep, android/.gitkeep, ios/.gitkeep, windows/.gitkeep, TASKS.md
 Verification: Could not run flutter analyze or flutter test because Flutter is not installed or not on PATH in this environment. Manual file review completed.
-Commit:
+Commit: See Git history for `feat: add navigation and theme polish`
 Notes: Added manual Flutter project metadata, dependency declarations, placeholder dashboard, starter widget test, module folders, asset folder, and platform placeholder directories. Generated platform files still need to be produced with flutter create once the Flutter SDK is available.
 ```
 
@@ -156,6 +156,16 @@ Changed files: lib/main.dart, lib/core/router/app_router.dart, lib/core/theme/ap
 Verification: Could not run flutter analyze or flutter test because Flutter is not installed or not on PATH. Manual file review completed.
 Commit: See Git history for `chore: add app architecture skeleton`
 Notes: Added GoRouter route definitions for onboarding, dashboard, library, reader, quiz, results, progress, and settings. Added app theme helper and shared placeholder page.
+```
+
+```text
+Task: Add screen back navigation and visible app-wide themes
+Status: Done
+Completed: 2026-07-10
+Changed files: lib/core/widgets/app_back_button.dart, lib/core/theme/app_theme.dart, lib/training/presentation/dashboard_screen.dart, lib/training/presentation/onboarding_screen.dart, lib/content/presentation/library_screen.dart, lib/content/presentation/import_passage_screen.dart, lib/reading/presentation/reader_screen.dart, lib/assessment/presentation/quiz_screen.dart, lib/assessment/presentation/results_screen.dart, lib/progress/presentation/progress_screen.dart, lib/settings/presentation/settings_screen.dart, test/dashboard_screen_test.dart, test/widget_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 184 tests passed.
+Commit: See Git history for `feat: add navigation and theme polish`
+Notes: Added a shared back button for non-dashboard screens with a dashboard fallback for direct route entry, changed dashboard entry tiles to push routes so normal back navigation is available, preserved active reader discard confirmation on back, and expanded light/dark theme tokens across Scaffold, AppBar, cards, chips, inputs, and buttons so saved theme changes are visible app-wide.
 ```
 
 ```text

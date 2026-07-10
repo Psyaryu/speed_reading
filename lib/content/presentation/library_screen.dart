@@ -6,6 +6,7 @@ import '../domain/passage.dart';
 import '../domain/passage_filter.dart';
 import '../../../core/domain/reading_enums.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../core/widgets/app_back_button.dart';
 
 final libraryPassagesProvider = FutureProvider<List<Passage>>((ref) {
   final filter = ref.watch(libraryPassageFilterProvider);
@@ -44,6 +45,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const AppBackButton(),
         title: const Text('Library'),
         actions: [
           IconButton(

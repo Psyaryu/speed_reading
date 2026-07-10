@@ -8,6 +8,7 @@ import '../../content/domain/passage.dart';
 import '../../content/domain/passage_filter.dart';
 import '../../core/domain/reading_enums.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/widgets/app_back_button.dart';
 import '../domain/reading_session.dart';
 import '../domain/reading_session_factory.dart';
 import '../domain/rsvp_timing.dart';
@@ -65,7 +66,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
         _confirmDiscardSession();
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Reader')),
+        appBar: AppBar(
+          leading: AppBackButton(onPressed: _handleBackPressed),
+          title: const Text('Reader'),
+        ),
         body: passages.when(
           data: (items) {
             if (items.isEmpty) {
@@ -326,7 +330,28 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     });
     _rsvpTimer?.cancel();
 
-    Navigator.of(context).pop();
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+      return;
+    }
+    context.goNamed('dashboard');
+  }
+
+  Future<void> _handleBackPressed() async {
+    if (_isReading) {
+      await _confirmDiscardSession();
+      return;
+    }
+
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      await navigator.maybePop();
+      return;
+    }
+    if (mounted) {
+      context.goNamed('dashboard');
+    }
   }
 }
 
