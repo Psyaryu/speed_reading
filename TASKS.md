@@ -95,7 +95,7 @@ Status: Done
 Completed: 2026-07-06
 Changed files: .gitignore, README.md, analysis_options.yaml, pubspec.yaml, lib/main.dart, test/widget_test.dart, assets/passages/.gitkeep, lib/*/.gitkeep, android/.gitkeep, ios/.gitkeep, windows/.gitkeep, TASKS.md
 Verification: Could not run flutter analyze or flutter test because Flutter is not installed or not on PATH in this environment. Manual file review completed.
-Commit: See Git history for `feat: add navigation and theme polish`
+Commit: See Git history for `chore: add initial Flutter project skeleton`
 Notes: Added manual Flutter project metadata, dependency declarations, placeholder dashboard, starter widget test, module folders, asset folder, and platform placeholder directories. Generated platform files still need to be produced with flutter create once the Flutter SDK is available.
 ```
 
@@ -953,7 +953,7 @@ Status: Done
 Completed: 2026-07-09
 Changed files: lib/assessment/domain/quiz.dart, lib/assessment/domain/quiz_scorer.dart, lib/core/data/app_database.dart, lib/core/data/app_database.g.dart, lib/core/data/drift_local_data_store.dart, test/domain_models_test.dart, test/drift_local_data_store_test.dart, test/quiz_scorer_test.dart, TASKS.md
 Verification: Confirmed quiz engine supports multiple-choice questions; main idea, detail recall, inference, and vocabulary-in-context categories; optional written summary prompt; scoring; immediate comprehension score; 70% pass/fail result display; reading-session-linked persisted results. Added stored question category snapshots to quiz results and Drift persistence. Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test test\quiz_scorer_test.dart test\domain_models_test.dart test\drift_local_data_store_test.dart`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`; analyze passed with no issues and all tests passed.
-Commit:
+Commit: See Git history for `feat: add expanded neon themes`
 Notes: Epic 5.1 acceptance criteria are closed. Official question-set breadth remains tracked separately under Epic 5.2.
 ```
 
@@ -1689,6 +1689,16 @@ Changed files: lib/core/data/app_database.dart, lib/core/data/app_database.g.dar
 Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze` and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`. Analyze passed with no issues and all 115 tests passed.
 Commit: See Git history for `feat: add theme setting`
 Notes: Settings now persists system, light, or dark theme preference locally, migrates existing profile rows with a system default, and applies it through MaterialApp themeMode.
+```
+
+```text
+Task: Add expanded neon theme presets
+Status: Done
+Completed: 2026-07-10
+Changed files: lib/settings/domain/local_user_profile.dart, lib/core/theme/app_theme.dart, lib/main.dart, lib/settings/presentation/settings_screen.dart, lib/training/presentation/onboarding_screen.dart, test/local_user_profile_test.dart, test/settings_screen_test.dart, test/onboarding_screen_test.dart, test/widget_test.dart, TASKS.md
+Verification: Ran `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat analyze`, `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat test`, and `C:\Users\Psyaryu\tools\flutter\bin\flutter.bat build windows`. Analyze passed with no issues, all 186 tests passed, and the Windows release build succeeded at `build\windows\x64\runner\Release\speed_reading.exe`.
+Commit:
+Notes: Added GX Crimson, Ultraviolet, Electric Cyan, Acid Lime, and Hot Magenta theme presets with dark neon surfaces, persisted through the existing local profile setting and applied as app-wide ThemeData.
 ```
 
 ```text

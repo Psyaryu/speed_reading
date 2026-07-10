@@ -1,6 +1,15 @@
 import '../../core/domain/reading_enums.dart';
 
-enum LocalThemeMode { system, light, dark }
+enum LocalThemeMode {
+  system,
+  light,
+  dark,
+  gxCrimson,
+  ultraviolet,
+  electricCyan,
+  acidLime,
+  hotMagenta,
+}
 
 class LocalUserProfile {
   const LocalUserProfile({

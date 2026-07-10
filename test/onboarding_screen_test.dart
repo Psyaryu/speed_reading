@@ -56,9 +56,11 @@ void main() {
 
     await tester.tap(find.text('School'));
     await tester.tap(find.text('Exam'));
-    await tester.scrollUntilVisible(find.text('Dark'), 300);
-    await tester.tap(find.text('Dark'));
-    await tester.pump();
+    await tester.scrollUntilVisible(find.text('System'), 300);
+    await tester.tap(find.text('System'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('GX Crimson').last);
+    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Reduced Motion'), 300);
     await tester.tap(find.text('Reduced Motion'));
     await tester.pump();
@@ -75,7 +77,7 @@ void main() {
 
     expect(profile?.goals, contains(TrainingGoal.school));
     expect(profile?.goals, contains(TrainingGoal.exam));
-    expect(profile?.preferredThemeMode, LocalThemeMode.dark);
+    expect(profile?.preferredThemeMode, LocalThemeMode.gxCrimson);
     expect(profile?.reducedMotion, isTrue);
   });
 }

@@ -84,28 +84,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             },
           ),
           const SizedBox(height: 16),
-          SegmentedButton<LocalThemeMode>(
-            segments: const [
-              ButtonSegment(
-                value: LocalThemeMode.system,
-                icon: Icon(Icons.devices),
-                label: Text('System'),
-              ),
-              ButtonSegment(
-                value: LocalThemeMode.light,
-                icon: Icon(Icons.light_mode),
-                label: Text('Light'),
-              ),
-              ButtonSegment(
-                value: LocalThemeMode.dark,
-                icon: Icon(Icons.dark_mode),
-                label: Text('Dark'),
-              ),
-            ],
-            selected: {_themeMode},
-            onSelectionChanged: (selection) {
+          DropdownButtonFormField<LocalThemeMode>(
+            initialValue: _themeMode,
+            decoration: const InputDecoration(
+              labelText: 'Theme',
+              border: OutlineInputBorder(),
+            ),
+            items: LocalThemeMode.values.map((themeMode) {
+              return DropdownMenuItem(
+                value: themeMode,
+                child: Text(themeMode.label),
+              );
+            }).toList(growable: false),
+            onChanged: (value) {
+              if (value == null) {
+                return;
+              }
               setState(() {
-                _themeMode = selection.single;
+                _themeMode = value;
               });
             },
           ),
@@ -165,6 +161,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       TrainingGoal.exam => 'Exam',
       TrainingGoal.personalLearning => 'Personal Learning',
       TrainingGoal.generalImprovement => 'General Improvement',
+    };
+  }
+}
+
+extension on LocalThemeMode {
+  String get label {
+    return switch (this) {
+      LocalThemeMode.system => 'System',
+      LocalThemeMode.light => 'Light',
+      LocalThemeMode.dark => 'Dark',
+      LocalThemeMode.gxCrimson => 'GX Crimson',
+      LocalThemeMode.ultraviolet => 'Ultraviolet',
+      LocalThemeMode.electricCyan => 'Electric Cyan',
+      LocalThemeMode.acidLime => 'Acid Lime',
+      LocalThemeMode.hotMagenta => 'Hot Magenta',
     };
   }
 }

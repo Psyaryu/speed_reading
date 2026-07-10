@@ -16,15 +16,17 @@ class SpeedReadingApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(localProfileProvider);
+    final themeMode = profile.maybeWhen(
+      data: (profile) => profile.preferredThemeMode,
+      orElse: () => LocalThemeMode.system,
+    );
+    final appTheme = themeMode.toAppTheme();
 
     return MaterialApp.router(
       title: 'Speed Reading Trainer',
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: profile.maybeWhen(
-        data: (profile) => profile.preferredThemeMode.toMaterialThemeMode(),
-        orElse: () => ThemeMode.system,
-      ),
+      theme: appTheme.theme,
+      darkTheme: appTheme.darkTheme,
+      themeMode: appTheme.themeMode,
       builder: (context, child) {
         final reduceMotion = profile.maybeWhen(
           data: (profile) => profile.reducedMotion,
@@ -43,11 +45,51 @@ class SpeedReadingApp extends ConsumerWidget {
 }
 
 extension on LocalThemeMode {
-  ThemeMode toMaterialThemeMode() {
+  _ResolvedAppTheme toAppTheme() {
     return switch (this) {
-      LocalThemeMode.system => ThemeMode.system,
-      LocalThemeMode.light => ThemeMode.light,
-      LocalThemeMode.dark => ThemeMode.dark,
+      LocalThemeMode.system => _ResolvedAppTheme(
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          themeMode: ThemeMode.system,
+        ),
+      LocalThemeMode.light => _ResolvedAppTheme(
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.light(),
+          themeMode: ThemeMode.light,
+        ),
+      LocalThemeMode.dark => _ResolvedAppTheme(
+          theme: AppTheme.dark(),
+          darkTheme: AppTheme.dark(),
+          themeMode: ThemeMode.dark,
+        ),
+      LocalThemeMode.gxCrimson => _ResolvedAppTheme.fixed(AppTheme.gxCrimson()),
+      LocalThemeMode.ultraviolet =>
+        _ResolvedAppTheme.fixed(AppTheme.ultraviolet()),
+      LocalThemeMode.electricCyan =>
+        _ResolvedAppTheme.fixed(AppTheme.electricCyan()),
+      LocalThemeMode.acidLime => _ResolvedAppTheme.fixed(AppTheme.acidLime()),
+      LocalThemeMode.hotMagenta =>
+        _ResolvedAppTheme.fixed(AppTheme.hotMagenta()),
     };
   }
+}
+
+class _ResolvedAppTheme {
+  const _ResolvedAppTheme({
+    required this.theme,
+    required this.darkTheme,
+    required this.themeMode,
+  });
+
+  factory _ResolvedAppTheme.fixed(ThemeData theme) {
+    return _ResolvedAppTheme(
+      theme: theme,
+      darkTheme: theme,
+      themeMode: ThemeMode.light,
+    );
+  }
+
+  final ThemeData theme;
+  final ThemeData darkTheme;
+  final ThemeMode themeMode;
 }

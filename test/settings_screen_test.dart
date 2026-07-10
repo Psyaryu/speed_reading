@@ -35,7 +35,7 @@ void main() {
     sliders[2].onChanged?.call(820);
     await tester.tap(find.text('System'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Dark').last);
+    await tester.tap(find.text('Electric Cyan').last);
     await tester.pumpAndSettle();
     await tester.tap(find.byType(SwitchListTile));
     await tester.pump();
@@ -49,7 +49,7 @@ void main() {
     expect(profile.preferredFontSize, 24);
     expect(profile.preferredLineHeight, 1.8);
     expect(profile.preferredColumnWidth, 820);
-    expect(profile.preferredThemeMode, LocalThemeMode.dark.name);
+    expect(profile.preferredThemeMode, LocalThemeMode.electricCyan.name);
     expect(profile.reducedMotion, isTrue);
   });
 

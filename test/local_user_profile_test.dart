@@ -42,6 +42,17 @@ void main() {
     expect(roundTrip.reducedMotion, isTrue);
   });
 
+  test('serializes expanded theme presets', () {
+    final profile = LocalUserProfile.initial(
+      id: 'local',
+      createdAt: DateTime.utc(2026, 7, 10),
+    ).copyWith(preferredThemeMode: LocalThemeMode.electricCyan);
+
+    final roundTrip = LocalUserProfile.fromJson(profile.toJson());
+
+    expect(roundTrip.preferredThemeMode, LocalThemeMode.electricCyan);
+  });
+
   test('deserializes older profile JSON with default column width and theme', () {
     final profile = LocalUserProfile.fromJson({
       'id': 'local',

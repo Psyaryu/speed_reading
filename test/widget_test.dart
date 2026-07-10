@@ -59,6 +59,35 @@ void main() {
     expect(app.themeMode, ThemeMode.dark);
   });
 
+  testWidgets('applies expanded neon theme preset to MaterialApp', (
+    tester,
+  ) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          localProfileProvider.overrideWith((ref) async {
+            return LocalUserProfile.initial(
+              id: 'local',
+              createdAt: DateTime.utc(2026, 7, 10),
+            ).copyWith(preferredThemeMode: LocalThemeMode.gxCrimson);
+          }),
+        ],
+        child: const SpeedReadingApp(),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+    expect(app.themeMode, ThemeMode.light);
+    expect(app.theme?.colorScheme.primary, const Color(0xFFFF2A6D));
+    expect(app.theme?.scaffoldBackgroundColor, const Color(0xFF0D080C));
+  });
+
   testWidgets('defines distinct app-wide light and dark theme surfaces', (
     tester,
   ) async {

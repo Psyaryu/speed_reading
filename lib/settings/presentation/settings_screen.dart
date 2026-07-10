@@ -122,20 +122,12 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             labelText: 'Theme',
             border: OutlineInputBorder(),
           ),
-          items: const [
-            DropdownMenuItem(
-              value: LocalThemeMode.system,
-              child: Text('System'),
-            ),
-            DropdownMenuItem(
-              value: LocalThemeMode.light,
-              child: Text('Light'),
-            ),
-            DropdownMenuItem(
-              value: LocalThemeMode.dark,
-              child: Text('Dark'),
-            ),
-          ],
+          items: LocalThemeMode.values.map((themeMode) {
+            return DropdownMenuItem(
+              value: themeMode,
+              child: Text(themeMode.label),
+            );
+          }).toList(growable: false),
           onChanged: (value) {
             if (value == null) {
               return;
@@ -370,6 +362,21 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
 }
 
 enum _ExportFormat { json, csv }
+
+extension on LocalThemeMode {
+  String get label {
+    return switch (this) {
+      LocalThemeMode.system => 'System',
+      LocalThemeMode.light => 'Light',
+      LocalThemeMode.dark => 'Dark',
+      LocalThemeMode.gxCrimson => 'GX Crimson',
+      LocalThemeMode.ultraviolet => 'Ultraviolet',
+      LocalThemeMode.electricCyan => 'Electric Cyan',
+      LocalThemeMode.acidLime => 'Acid Lime',
+      LocalThemeMode.hotMagenta => 'Hot Magenta',
+    };
+  }
+}
 
 class _SliderSetting extends StatelessWidget {
   const _SliderSetting({
